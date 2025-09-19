@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>POPMART Facebook Auto Workflow</title>
+    <title>Baby Toy Facebook Auto Workflow</title>
     <style>
         * {
             margin: 0;
@@ -13,7 +13,7 @@
         
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #87CEEB 0%, #FFB6C1 100%);
             min-height: 100vh;
             display: flex;
             align-items: center;
@@ -69,7 +69,7 @@
         .form-group input:focus,
         .form-group select:focus {
             outline: none;
-            border-color: #667eea;
+            border-color: #87CEEB;
         }
         
         .file-upload {
@@ -82,7 +82,7 @@
         }
         
         .file-upload:hover {
-            border-color: #667eea;
+            border-color: #87CEEB;
         }
         
         .file-upload input[type="file"] {
@@ -90,7 +90,7 @@
         }
         
         .btn {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #87CEEB 0%, #FFB6C1 100%);
             color: white;
             border: none;
             padding: 15px 30px;
@@ -129,35 +129,29 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>🎯 POPMART Facebook Auto Workflow</h1>
-            <p>自動產生 Facebook 宣傳素材</p>
+            <img id="brandLogo" src="" alt="Brand Logo" style="max-height: 120px; margin-bottom: 15px; border-radius: 10px; display: none;">
+            <h1 id="brandTitle">🧸 Loading...</h1>
+            <p id="brandSlogan">Loading brand information...</p>
+            <p>自動產生嬰幼兒玩具 Facebook 雙語宣傳素材</p>
         </div>
         
         <form id="workflowForm">
             <div class="form-group">
                 <label for="productName">Product Name</label>
-                <input type="text" id="productName" name="productName" placeholder="Enter POPMART product name" required>
+                <input type="text" id="productName" name="productName" placeholder="輸入玩具名稱" required>
             </div>
             
             <div class="form-group">
                 <label for="campaign">Campaign Type</label>
                 <select id="campaign" name="campaign" required>
-                    <option value="">Select campaign type</option>
-                    <option value="new-release">New Release</option>
-                    <option value="limited-edition">Limited Edition</option>
-                    <option value="collaboration">Collaboration</option>
-                    <option value="seasonal">Seasonal</option>
+                    <option value="">Loading campaign types...</option>
                 </select>
             </div>
             
             <div class="form-group">
                 <label for="template">Template Style</label>
                 <select id="template" name="template" required>
-                    <option value="">Select template</option>
-                    <option value="minimal">Minimal</option>
-                    <option value="colorful">Colorful</option>
-                    <option value="artistic">Artistic</option>
-                    <option value="professional">Professional</option>
+                    <option value="">Loading template styles...</option>
                 </select>
             </div>
             
@@ -165,7 +159,7 @@
                 <label>Product Image</label>
                 <div class="file-upload" onclick="document.getElementById('imageUpload').click()">
                     <input type="file" id="imageUpload" accept="image/*">
-                    <p>📸 Click to upload product image</p>
+                    <p>📸 上傳玩具圖片 (Upload toy image)</p>
                     <small>Supports JPG, PNG (Max 10MB)</small>
                 </div>
             </div>
@@ -245,18 +239,61 @@
                 
                 // Reset form
                 form.reset();
-                document.querySelector('.file-upload p').textContent = '📸 Click to upload product image';
+                document.querySelector('.file-upload p').textContent = '📸 上傳玩具圖片 (Upload toy image)';
                 
             } catch (error) {
                 showStatus(`❌ Error: ${error.message}`, 'error');
             }
         });
         
-        // Test API connection on load
+        // Load brand configuration and populate UI dynamically
+        async function loadBrandConfig() {
+            try {
+                const response = await fetch('/api/config');
+                const config = await response.json();
+                
+                // Update brand elements
+                const logoElement = document.getElementById('brandLogo');
+                logoElement.src = config.brand.logoPath;
+                logoElement.alt = `${config.brand.name} Logo`;
+                logoElement.style.display = 'block';
+                document.getElementById('brandTitle').textContent = `🧸 ${config.brand.name} Facebook Auto Workflow`;
+                document.getElementById('brandSlogan').textContent = config.brand.slogan;
+                document.getElementById('productName').placeholder = `輸入 ${config.brand.name} 玩具名稱`;
+                document.title = `${config.brand.name} Facebook Auto Workflow`;
+                
+                // Update campaign options
+                const campaignSelect = document.getElementById('campaign');
+                campaignSelect.innerHTML = '<option value="">Select campaign type</option>';
+                config.campaignTypes.forEach(type => {
+                    const option = document.createElement('option');
+                    option.value = type.value;
+                    option.textContent = type.label;
+                    campaignSelect.appendChild(option);
+                });
+                
+                // Update template options
+                const templateSelect = document.getElementById('template');
+                templateSelect.innerHTML = '<option value="">Select template</option>';
+                config.templateStyles.forEach(style => {
+                    const option = document.createElement('option');
+                    option.value = style.value;
+                    option.textContent = style.label;
+                    templateSelect.appendChild(option);
+                });
+                
+                console.log('Brand configuration loaded:', config);
+            } catch (error) {
+                console.error('Failed to load brand configuration:', error);
+            }
+        }
+        
+        // Test API connection and load config on load
         fetch('/api/health')
             .then(response => response.json())
             .then(data => {
                 console.log('API Status:', data);
+                return loadBrandConfig();
             })
             .catch(error => {
                 console.error('API connection failed:', error);
