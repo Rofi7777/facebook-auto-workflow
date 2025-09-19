@@ -10,7 +10,7 @@ class GeminiAIService {
     if (!process.env.GEMINI_API_KEY) {
       throw new Error('GEMINI_API_KEY environment variable is required');
     }
-    this.ai = new GoogleGenAI(process.env.GEMINI_API_KEY);
+    this.genAI = new GoogleGenAI(process.env.GEMINI_API_KEY);
   }
 
   // 分析產品圖片並識別產品特性
@@ -52,7 +52,7 @@ class GeminiAIService {
         }`
       ];
 
-      const model = this.ai.getGenerativeModel({ model: "gemini-2.0-flash-exp" });
+      const model = this.genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
       const response = await model.generateContent(contents);
       
       const analysisText = response.response.text();
@@ -101,7 +101,7 @@ class GeminiAIService {
         "marketingAngles": ["行銷角度1", "行銷角度2"]
       }`;
 
-      const model = this.ai.getGenerativeModel({ model: "gemini-2.0-flash-exp" });
+      const model = this.genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
       const response = await model.generateContent(prompt);
       
       const analysisText = response.response.text();
@@ -181,7 +181,7 @@ class GeminiAIService {
         "imagePrompt": "配圖建議描述"
       }`;
 
-      const model = this.ai.getGenerativeModel({ model: "gemini-2.0-flash-exp" });
+      const model = this.genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
       const response = await model.generateContent(prompt);
       
       const contentText = response.response.text();
@@ -205,7 +205,7 @@ class GeminiAIService {
     try {
       // Note: Current Gemini models don't support direct image generation
       // This generates a detailed image description that can be used with image generation services
-      const model = this.ai.getGenerativeModel({ model: "gemini-2.0-flash-exp" });
+      const model = this.genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
       
       const enhancedPrompt = `請為以下產品創建一個詳細的圖片設計描述，可以用於圖像生成AI工具：
       

@@ -337,6 +337,10 @@
                     <button type="submit" class="btn" id="analyzeBtn">
                         🧠 分析產品並生成內容
                     </button>
+                    
+                    <button type="button" class="btn btn-secondary" id="generateScenariosBtn" style="display: none;">
+                        🎬 生成行銷場景
+                    </button>
                 </form>
                 
                 <div id="status" class="status"></div>
@@ -358,17 +362,26 @@
                 <div id="platformResults"></div>
             </div>
         </div>
+        
+        <div class="scenarios-container" id="scenariosContainer" style="display: none;">
+            <div style="background: white; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); padding: 30px; margin-top: 30px;">
+                <h2 class="panel-title">🎬 AI 生成行銷場景</h2>
+                <div id="scenarioResults"></div>
+            </div>
+        </div>
     </div>
 
     <script>
         let uploadedImagePath = null;
         let productAnalysis = null;
         let painPointsAnalysis = null;
+        let generatedContent = null;
         
         const form = document.getElementById('productForm');
         const statusDiv = document.getElementById('status');
         const fileUpload = document.getElementById('imageUpload');
         const analyzeBtn = document.getElementById('analyzeBtn');
+        const generateScenariosBtn = document.getElementById('generateScenariosBtn');
         
         // File upload handling
         fileUpload.addEventListener('change', function(e) {
@@ -489,13 +502,56 @@
                 }
                 
                 const contentResult = await contentResponse.json();
+                generatedContent = contentResult.results;
                 displayPlatformResults(contentResult.results);
                 showStatus('✅ 多平台內容生成完成！', 'success');
+                
+                // Show scenario generation button
+                generateScenariosBtn.style.display = 'block';
                 
             } catch (error) {
                 showStatus(`❌ 錯誤: ${error.message}`, 'error');
             } finally {
                 setLoading(false);
+            }
+        });
+        
+        // Scenario generation button handler
+        generateScenariosBtn.addEventListener('click', async function() {
+            if (!productAnalysis || !generatedContent) {
+                showStatus('⚠️ 請先完成產品分析和內容生成', 'error');
+                return;
+            }
+            
+            try {
+                showStatus('🎬 AI 生成行銷場景中...', 'info');
+                generateScenariosBtn.disabled = true;
+                generateScenariosBtn.innerHTML = '<span class="loading"></span>場景生成中...';
+                
+                const scenarioResponse = await fetch('/api/generate-scenarios', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        productInfo: productAnalysis,
+                        contentData: generatedContent
+                    })
+                });
+                
+                if (!scenarioResponse.ok) {
+                    throw new Error('場景生成失敗');
+                }
+                
+                const scenarioResult = await scenarioResponse.json();
+                displayScenariosResults(scenarioResult.scenarios);
+                showStatus('✅ 行銷場景生成完成！', 'success');
+                
+            } catch (error) {
+                showStatus(`❌ 場景生成錯誤: ${error.message}`, 'error');
+            } finally {
+                generateScenariosBtn.disabled = false;
+                generateScenariosBtn.innerHTML = '🎬 生成行銷場景';
             }
         });
         
@@ -602,6 +658,67 @@
                 facebook: '👍'
             };
             return icons[platform] || '📱';
+        }
+        
+        // Display scenarios results
+        function displayScenariosResults(scenarios) {
+            const scenariosContainer = document.getElementById('scenariosContainer');
+            const scenarioResults = document.getElementById('scenarioResults');
+            
+            let html = '';
+            
+            scenarios.forEach((scenario, index) => {
+                html += `<div class="platform-result" style="margin-bottom: 25px;">
+                    <h3 style="color: #4a90e2;">
+                        🎬 場景 ${scenario.scenarioIndex}: ${scenario.name}
+                        ${scenario.imageError ? '⚠️' : '✅'}
+                    </h3>
+                    
+                    <div style="margin-bottom: 15px;">
+                        <h4 style="color: #333; margin-bottom: 8px;">📝 場景描述</h4>
+                        <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 10px;">
+                            ${scenario.description}
+                        </div>
+                        
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                            <div>
+                                <strong>💭 情感氛圍:</strong> ${scenario.emotion}<br>
+                                <strong>🎯 適合平台:</strong> ${scenario.suitablePlatforms?.join(', ') || '通用'}
+                            </div>
+                            <div>
+                                <strong>🎨 視覺重點:</strong> ${scenario.visualFocus}
+                            </div>
+                        </div>
+                    </div>`;
+                
+                if (scenario.imageDescription) {
+                    html += `<div style="background: #e3f2fd; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                        <h4 style="color: #1976d2; margin-bottom: 10px;">🖼️ 圖片設計描述</h4>
+                        <div style="white-space: pre-wrap; font-size: 14px; line-height: 1.6;">
+                            ${scenario.imageDescription}
+                        </div>
+                    </div>`;
+                }
+                
+                if (scenario.designGuidePath) {
+                    html += `<div style="background: #f3e5f5; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                        <h4 style="color: #7b1fa2; margin-bottom: 10px;">📋 設計指導文件</h4>
+                        <p><strong>檔案路徑:</strong> ${scenario.designGuidePath}</p>
+                        <p style="color: #666; font-size: 14px;">詳細的設計指導已保存，可供設計師或 AI 圖像生成工具使用</p>
+                    </div>`;
+                }
+                
+                if (scenario.imageError) {
+                    html += `<div style="background: #ffebee; padding: 15px; border-radius: 8px; border-left: 4px solid #f44336;">
+                        <strong style="color: #d32f2f;">圖片生成錯誤:</strong> ${scenario.imageError}
+                    </div>`;
+                }
+                
+                html += '</div>';
+            });
+            
+            scenarioResults.innerHTML = html;
+            scenariosContainer.style.display = 'block';
         }
         
         // Load brand configuration and populate UI

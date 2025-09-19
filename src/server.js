@@ -5,12 +5,14 @@ const dotenv = require('dotenv');
 const multer = require('multer');
 const fs = require('fs-extra');
 const GeminiAIService = require('./services/geminiAI');
+const ScenarioGeneratorService = require('./services/scenarioGenerator');
 const { PLATFORM_CONFIGS, CONTENT_TEMPLATES, BABY_TOY_CATEGORIES } = require('./schemas/platforms');
 
 dotenv.config();
 
-// Initialize AI service
+// Initialize AI services
 const aiService = new GeminiAIService();
+const scenarioService = new ScenarioGeneratorService();
 
 // Brand configuration from environment variables
 const ASSETS_BASE_URL = process.env.ASSETS_BASE_URL || '/brand';
@@ -241,6 +243,63 @@ app.post('/api/generate-platform-content', async (req, res) => {
   } catch (error) {
     console.error('Multi-platform content generation error:', error);
     res.status(500).json({ error: 'Content generation failed: ' + error.message });
+  }
+});
+
+// Scene generation endpoint for creating marketing scenarios
+app.post('/api/generate-scenarios', async (req, res) => {
+  try {
+    const { productInfo, contentData } = req.body;
+    
+    if (!productInfo || !contentData) {
+      return res.status(400).json({ error: 'Product info and content data are required' });
+    }
+
+    console.log('Generating marketing scenarios for product:', productInfo);
+    
+    // Generate three marketing scenarios
+    const scenarios = await scenarioService.generateMarketingScenarios(productInfo, contentData);
+    console.log('Scenarios generated successfully');
+    
+    // Generate detailed image descriptions for each scenario
+    const scenariosWithImages = await Promise.all(
+      scenarios.scenarios?.map(async (scenario, index) => {
+        try {
+          const imageDescription = await scenarioService.generateImageDescription(scenario, productInfo);
+          const imagePath = `assets/scenarios/${Date.now()}_scenario_${index + 1}.png`;
+          const designGuidePath = await scenarioService.generateScenarioImage(imageDescription, scenario.name, imagePath);
+          
+          return {
+            ...scenario,
+            imageDescription,
+            designGuidePath,
+            scenarioIndex: index + 1
+          };
+        } catch (error) {
+          console.error(`Error generating image for scenario ${index + 1}:`, error);
+          return {
+            ...scenario,
+            imageError: error.message,
+            scenarioIndex: index + 1
+          };
+        }
+      }) || []
+    );
+    
+    res.json({
+      success: true,
+      message: 'Marketing scenarios generated successfully',
+      scenarios: scenariosWithImages,
+      brand: BRAND_CONFIG.name,
+      timestamp: new Date().toISOString()
+    });
+    
+  } catch (error) {
+    console.error('Scenario generation error:', error);
+    res.status(500).json({ 
+      error: 'Scenario generation failed: ' + error.message,
+      fallback: 'Please try again or use manual scenario creation'
+    });
   }
 });
 
