@@ -553,12 +553,12 @@
             let html = '';
             
             Object.entries(results).forEach(([platform, result]) => {
-                const config = result.platformConfig;
+                const config = result.platformConfig || {};
                 const content = result.content;
                 
                 html += `<div class="platform-result">
                     <h3>
-                        ${getPlatformIcon(platform)} ${config.displayName}
+                        ${getPlatformIcon(platform)} ${config.displayName || platform.toUpperCase()}
                         ${result.status === 'success' ? '✅' : '⚠️'}
                     </h3>`;
                 
