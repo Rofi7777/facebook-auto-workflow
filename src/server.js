@@ -63,7 +63,8 @@ app.get('/api/download-image', async (req, res) => {
   try {
     const { path: filePath } = req.query;
     
-    if (!filePath) {
+    if (!filePath || filePath === 'undefined') {
+      console.log('🚨 Forbidden file access attempt:', filePath);
       return res.status(400).json({ error: 'File path is required' });
     }
     
@@ -300,10 +301,18 @@ app.post('/api/generate-platform-content', async (req, res) => {
             console.log(`Generating image for ${platform}:`, imagePrompt);
             const generatedImagePath = await aiService.generateMarketingImage(imagePrompt, imagePath);
             
-            // Note: Currently returns image description instead of actual image
-            platformResult.generatedImageDescription = generatedImagePath;
+            // Check if actual image was generated or just description
+            if (generatedImagePath && generatedImagePath.includes('.png')) {
+              platformResult.generatedImageDescription = "AI 生成的真實圖片";
+              platformResult.path = generatedImagePath;
+              platformResult.isRealImage = true;
+              platformResult.downloadUrl = `/api/download-image?path=${encodeURIComponent(generatedImagePath)}`;
+            } else {
+              platformResult.generatedImageDescription = generatedImagePath;
+              platformResult.isRealImage = false;
+              platformResult.imageNote = "圖片描述已生成，需要圖像生成服務來創建實際圖片";
+            }
             platformResult.imagePrompt = imagePrompt;
-            platformResult.imageNote = "圖片描述已生成，需要圖像生成服務來創建實際圖片";
           } catch (imageError) {
             console.error(`Image generation failed for ${platform}:`, imageError);
             platformResult.imageError = imageError.message;

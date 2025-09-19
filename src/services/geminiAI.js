@@ -239,15 +239,50 @@ class GeminiAIService {
         .map(part => part.text)
         .join('');
       try {
+        // Try to parse if it looks like JSON
         const jsonMatch = contentText.match(/\{[\s\S]*\}/);
         if (jsonMatch) {
-          return JSON.parse(jsonMatch[0]);
+          const parsed = JSON.parse(jsonMatch[0]);
+          return parsed;
         }
       } catch (parseError) {
-        console.log('JSON parsing failed for platform content');
+        console.log('JSON parsing failed for platform content, using structured fallback');
       }
       
-      return { rawContent: contentText };
+      // If JSON parsing fails, create structured content from raw text
+      const lines = contentText.split('\n').filter(line => line.trim());
+      const structured = {
+        mainContent: "",
+        hashtags: [],
+        cta: "",
+        emotionalConnect: "",
+        imagePrompt: ""
+      };
+      
+      // Extract content sections
+      lines.forEach(line => {
+        const trimmed = line.trim();
+        if (trimmed.includes('#') && trimmed.includes('hashtags')) {
+          // Extract hashtags
+          const hashtagMatch = trimmed.match(/#\w+/g);
+          if (hashtagMatch) {
+            structured.hashtags = hashtagMatch;
+          }
+        } else if (trimmed.toLowerCase().includes('cta') || trimmed.includes('行動呼籲')) {
+          structured.cta = trimmed.replace(/^.*?[:：]/, '').trim();
+        } else if (trimmed.includes('情感連結') || trimmed.includes('emotional')) {
+          structured.emotionalConnect = trimmed.replace(/^.*?[:：]/, '').trim();
+        } else if (!structured.mainContent && trimmed.length > 20) {
+          structured.mainContent = trimmed;
+        }
+      });
+      
+      // If no structured content found, use the raw text as main content
+      if (!structured.mainContent) {
+        structured.mainContent = contentText.trim();
+      }
+      
+      return structured;
     } catch (error) {
       throw new Error(`Platform content generation failed: ${error.message}`);
     }
