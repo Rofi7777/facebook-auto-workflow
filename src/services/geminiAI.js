@@ -288,13 +288,65 @@ class GeminiAIService {
     }
   }
 
-  // 增強版 Nano Banana 圖片生成 (支援真實圖片生成和下載)
-  async generateMarketingImage(prompt, imagePath) {
+  // 增強版 Nano Banana 圖片生成 (支援真實圖片生成和下載，使用用戶上傳的產品圖片作為參考)
+  async generateMarketingImage(prompt, imagePath, productImagePath = null) {
     try {
       console.log('🎨 Starting Nano Banana image generation process...');
       
-      // 使用增強的英文提示詞來改善圖片生成質量
-      const enhancedPrompt = `Create a professional marketing image for a baby toy product.
+      // 準備文字提示詞（根據是否有產品圖片參考調整）
+      let enhancedPrompt;
+      let contentParts = [];
+      
+      if (productImagePath) {
+        // 如果有產品圖片，讀取並轉換為 base64
+        const productImageBuffer = await fs.readFile(productImagePath);
+        const productImageBase64 = productImageBuffer.toString('base64');
+        
+        // 判斷圖片類型
+        const ext = path.extname(productImagePath).toLowerCase();
+        let mimeType = "image/jpeg";
+        if (ext === ".png") {
+          mimeType = "image/png";
+        } else if (ext === ".webp") {
+          mimeType = "image/webp";
+        } else if (ext === ".gif") {
+          mimeType = "image/gif";
+        }
+
+        enhancedPrompt = `Create a professional marketing image using the EXACT SAME toy product shown in the reference image.
+
+Marketing Context: ${prompt}
+
+CRITICAL REQUIREMENTS:
+- Use the EXACT same toy product from the reference image - same colors, same shape, same design details
+- Create a marketing scenario around this specific product
+- Warm family atmosphere suitable for babies and toddlers
+- Bright, safe, educational visual elements  
+- Soft pastel color palette (sky blue to pink gradient)
+- High-quality product photography style
+- Googoogaga brand aesthetic (safe, nurturing, developmental)
+- Composition suitable for social media marketing
+- Professional commercial photography lighting
+- Family-friendly environment (nursery, playroom, or living room)
+- Parents and babies interacting naturally with the SAME product from reference image
+
+IMPORTANT: The generated image MUST feature the identical toy product shown in the reference image. Do not create a different or similar product - use the exact same one.
+
+Style: Professional product photography, warm family moments, high-quality visual appeal, commercially polished`;
+
+        // 準備多模態內容：產品圖片 + 文字提示
+        contentParts = [
+          { text: enhancedPrompt },
+          { 
+            inlineData: {
+              mimeType: mimeType,
+              data: productImageBase64
+            }
+          }
+        ];
+      } else {
+        // 沒有產品圖片時的一般提示詞
+        enhancedPrompt = `Create a professional marketing image for a baby toy product.
 
 Product: ${prompt}
 
@@ -312,6 +364,9 @@ Requirements:
 
 Style: Professional product photography, warm family moments, high-quality visual appeal, commercially polished`;
 
+        contentParts = [{ text: enhancedPrompt }];
+      }
+
       // 使用正確的圖片生成模型
       try {
         console.log('🎨 Attempting real image generation with gemini-2.5-flash-image-preview...');
@@ -320,7 +375,7 @@ Style: Professional product photography, warm family moments, high-quality visua
           model: "gemini-2.5-flash-image-preview",
           contents: [{ 
             role: 'user', 
-            parts: [{ text: enhancedPrompt }] 
+            parts: contentParts 
           }],
           generationConfig: {
             responseMimeType: 'image/png',

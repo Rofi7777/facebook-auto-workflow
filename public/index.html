@@ -493,7 +493,8 @@
                         painPointsAnalysis: painPointsAnalysis || {},
                         platforms: selectedPlatforms,
                         language: language,
-                        generateImages: generateImages
+                        generateImages: generateImages,
+                        productImagePath: uploadedImagePath
                     })
                 });
                 
@@ -535,7 +536,8 @@
                     },
                     body: JSON.stringify({
                         productInfo: productAnalysis,
-                        contentData: generatedContent
+                        contentData: generatedContent,
+                        productImagePath: uploadedImagePath
                     })
                 });
                 

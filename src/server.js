@@ -268,10 +268,32 @@ app.post('/api/generate-platform-content', async (req, res) => {
       painPointsAnalysis, 
       platforms = ['shopee', 'tiktok', 'instagram', 'facebook'], 
       language = 'zh-TW',
-      generateImages = false
+      generateImages = false,
+      productImagePath = null
     } = req.body;
     
     console.log('Generating content for platforms:', platforms);
+    
+    // 安全性檢查：如果有 productImagePath，驗證路徑安全性
+    let validatedProductImagePath = null;
+    if (productImagePath) {
+      try {
+        const uploadsDir = path.resolve(__dirname, '..', 'assets', 'uploads');
+        const resolvedImagePath = path.resolve(__dirname, '..', productImagePath);
+        
+        // 安全檢查：確保路徑在上傳目錄內
+        if (resolvedImagePath.startsWith(uploadsDir)) {
+          // 檢查文件是否存在
+          await fs.access(resolvedImagePath);
+          validatedProductImagePath = resolvedImagePath;
+          console.log('Validated product image path for generation:', validatedProductImagePath);
+        } else {
+          console.warn('🚨 Invalid product image path (outside uploads directory):', productImagePath);
+        }
+      } catch (validationError) {
+        console.warn('🚨 Product image validation failed:', validationError.message);
+      }
+    }
     
     const results = {};
     
@@ -299,7 +321,7 @@ app.post('/api/generate-platform-content', async (req, res) => {
             const imagePath = `assets/generated/${platform}_${Date.now()}.png`;
             
             console.log(`Generating image for ${platform}:`, imagePrompt);
-            const generatedImageResult = await aiService.generateMarketingImage(imagePrompt, imagePath);
+            const generatedImageResult = await aiService.generateMarketingImage(imagePrompt, imagePath, validatedProductImagePath);
             
             // Check if actual image was generated or just description
             if (generatedImageResult && generatedImageResult.type === 'image' && generatedImageResult.isRealImage) {
@@ -360,13 +382,34 @@ app.post('/api/generate-platform-content', async (req, res) => {
 // Scene generation endpoint for creating marketing scenarios
 app.post('/api/generate-scenarios', async (req, res) => {
   try {
-    const { productInfo, contentData } = req.body;
+    const { productInfo, contentData, productImagePath = null } = req.body;
     
     if (!productInfo || !contentData) {
       return res.status(400).json({ error: 'Product info and content data are required' });
     }
 
     console.log('Generating marketing scenarios for product:', productInfo);
+    
+    // 安全性檢查：如果有 productImagePath，驗證路徑安全性
+    let validatedProductImagePath = null;
+    if (productImagePath) {
+      try {
+        const uploadsDir = path.resolve(__dirname, '..', 'assets', 'uploads');
+        const resolvedImagePath = path.resolve(__dirname, '..', productImagePath);
+        
+        // 安全檢查：確保路徑在上傳目錄內
+        if (resolvedImagePath.startsWith(uploadsDir)) {
+          // 檢查文件是否存在
+          await fs.access(resolvedImagePath);
+          validatedProductImagePath = resolvedImagePath;
+          console.log('Validated product image path for scenarios:', validatedProductImagePath);
+        } else {
+          console.warn('🚨 Invalid product image path (outside uploads directory):', productImagePath);
+        }
+      } catch (validationError) {
+        console.warn('🚨 Product image validation failed for scenarios:', validationError.message);
+      }
+    }
     
     // Generate three marketing scenarios
     const scenarios = await scenarioService.generateMarketingScenarios(productInfo, contentData);
@@ -378,7 +421,7 @@ app.post('/api/generate-scenarios', async (req, res) => {
         try {
           const imageDescription = await scenarioService.generateImageDescription(scenario, productInfo);
           const imagePath = `assets/scenarios/${Date.now()}_scenario_${index + 1}.png`;
-          const scenarioImageResult = await scenarioService.generateScenarioImage(imageDescription, scenario.name, imagePath);
+          const scenarioImageResult = await scenarioService.generateScenarioImage(imageDescription, scenario.name, imagePath, validatedProductImagePath);
           
           // Handle both image and design guide results
           const scenarioData = {

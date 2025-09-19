@@ -140,13 +140,66 @@ class ScenarioGeneratorService {
     }
   }
 
-  // 自動 Nano Banana 圖片生成（場景專用）
-  async generateScenarioImage(imageDescription, scenarioName, outputPath) {
+  // 自動 Nano Banana 圖片生成（場景專用，使用用戶上傳的產品圖片作為參考）
+  async generateScenarioImage(imageDescription, scenarioName, outputPath, productImagePath = null) {
     try {
       console.log(`🎨 Generating scenario image for: ${scenarioName}`);
       
-      // 增強的英文提示詞用於真實圖片生成
-      const enhancedPrompt = `Create a high-quality marketing scenario image for Googoogaga baby toys:
+      // 準備文字提示詞和圖片內容（根據是否有產品圖片參考調整）
+      let enhancedPrompt;
+      let contentParts = [];
+      
+      if (productImagePath) {
+        // 如果有產品圖片，讀取並轉換為 base64
+        const productImageBuffer = await fs.readFile(productImagePath);
+        const productImageBase64 = productImageBuffer.toString('base64');
+        
+        // 判斷圖片類型
+        const ext = path.extname(productImagePath).toLowerCase();
+        let mimeType = "image/jpeg";
+        if (ext === ".png") {
+          mimeType = "image/png";
+        } else if (ext === ".webp") {
+          mimeType = "image/webp";
+        } else if (ext === ".gif") {
+          mimeType = "image/gif";
+        }
+
+        enhancedPrompt = `Create a high-quality marketing scenario image for Googoogaga baby toys using the EXACT SAME toy product shown in the reference image:
+
+Scenario: ${scenarioName}
+Description: ${imageDescription}
+
+CRITICAL REQUIREMENTS:
+- Use the EXACT same toy product from the reference image - same colors, same shape, same design details
+- Create the specified marketing scenario around this specific product
+- Professional photography style
+- Warm, family-friendly atmosphere  
+- Soft pastel colors (sky blue to pink gradient)
+- Safe, educational environment
+- Clear product visibility
+- Natural lighting and realistic shadows
+- High resolution suitable for marketing
+- Googoogaga brand aesthetic (nurturing, developmental, safe)
+- Composition optimized for social media platforms
+
+IMPORTANT: The generated image MUST feature the identical toy product shown in the reference image in the specified scenario context.
+
+Style: Realistic photography, commercial quality, warm family moments, professionally lit`;
+
+        // 準備多模態內容：產品圖片 + 文字提示
+        contentParts = [
+          { text: enhancedPrompt },
+          { 
+            inlineData: {
+              mimeType: mimeType,
+              data: productImageBase64
+            }
+          }
+        ];
+      } else {
+        // 沒有產品圖片時的一般提示詞
+        enhancedPrompt = `Create a high-quality marketing scenario image for Googoogaga baby toys:
 
 Scenario: ${scenarioName}
 Description: ${imageDescription}
@@ -164,6 +217,9 @@ Requirements:
 
 Style: Realistic photography, commercial quality, warm family moments, professionally lit`;
 
+        contentParts = [{ text: enhancedPrompt }];
+      }
+
       // 使用正確的圖片生成模型進行場景圖片生成
       try {
         console.log('🎨 Generating scenario image with gemini-2.5-flash-image-preview...');
@@ -172,7 +228,7 @@ Style: Realistic photography, commercial quality, warm family moments, professio
           model: "gemini-2.5-flash-image-preview",
           contents: [{ 
             role: 'user', 
-            parts: [{ text: enhancedPrompt }] 
+            parts: contentParts 
           }],
           generationConfig: {
             responseMimeType: 'image/png',
