@@ -5,14 +5,17 @@ const path = require('path');
 // Scene generation service for creating marketing scenarios
 class ScenarioGeneratorService {
   constructor() {
-    const apiKey = process.env.GEMINI_API_KEY;
+    // Use the new API key to avoid the corrupted one
+    const apiKey = process.env.GEMINI_API_KEY_NEW || process.env.GEMINI_API_KEY;
     
     if (!apiKey) {
-      throw new Error('GEMINI_API_KEY environment variable is required');
+      throw new Error('GEMINI_API_KEY_NEW environment variable is required');
     }
     
+    console.log('🔑 ScenarioGenerator using API Key format:', apiKey.startsWith('AIzaSy') ? 'VALID' : 'INVALID');
+    
     this.ai = new GoogleGenAI({ apiKey: apiKey });
-    console.log('✅ ScenarioGenerator service initialized with API key');
+    console.log('✅ ScenarioGenerator service initialized successfully');
   }
 
   // 根據產品內容生成三種行銷場景
