@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>POPMART Facebook Auto Workflow</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            padding: 40px;
+            max-width: 500px;
+            width: 90%;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .header h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+        
+        .header p {
+            color: #666;
+            font-size: 16px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 500;
+        }
+        
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .file-upload {
+            border: 2px dashed #e1e5e9;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            transition: border-color 0.3s;
+            cursor: pointer;
+        }
+        
+        .file-upload:hover {
+            border-color: #667eea;
+        }
+        
+        .file-upload input[type="file"] {
+            display: none;
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            transition: transform 0.2s;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        .status {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            display: none;
+        }
+        
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎯 POPMART Facebook Auto Workflow</h1>
+            <p>自動產生 Facebook 宣傳素材</p>
+        </div>
+        
+        <form id="workflowForm">
+            <div class="form-group">
+                <label for="productName">Product Name</label>
+                <input type="text" id="productName" name="productName" placeholder="Enter POPMART product name" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="campaign">Campaign Type</label>
+                <select id="campaign" name="campaign" required>
+                    <option value="">Select campaign type</option>
+                    <option value="new-release">New Release</option>
+                    <option value="limited-edition">Limited Edition</option>
+                    <option value="collaboration">Collaboration</option>
+                    <option value="seasonal">Seasonal</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="template">Template Style</label>
+                <select id="template" name="template" required>
+                    <option value="">Select template</option>
+                    <option value="minimal">Minimal</option>
+                    <option value="colorful">Colorful</option>
+                    <option value="artistic">Artistic</option>
+                    <option value="professional">Professional</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label>Product Image</label>
+                <div class="file-upload" onclick="document.getElementById('imageUpload').click()">
+                    <input type="file" id="imageUpload" accept="image/*">
+                    <p>📸 Click to upload product image</p>
+                    <small>Supports JPG, PNG (Max 10MB)</small>
+                </div>
+            </div>
+            
+            <button type="submit" class="btn">Generate Workflow 🚀</button>
+        </form>
+        
+        <div id="status" class="status"></div>
+    </div>
+
+    <script>
+        const form = document.getElementById('workflowForm');
+        const statusDiv = document.getElementById('status');
+        const fileUpload = document.getElementById('imageUpload');
+        
+        fileUpload.addEventListener('change', function(e) {
+            const fileName = e.target.files[0]?.name;
+            if (fileName) {
+                e.target.parentElement.querySelector('p').textContent = `Selected: ${fileName}`;
+            }
+        });
+        
+        function showStatus(message, type) {
+            statusDiv.textContent = message;
+            statusDiv.className = `status ${type}`;
+            statusDiv.style.display = 'block';
+        }
+        
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            try {
+                const formData = new FormData();
+                const productName = document.getElementById('productName').value;
+                const campaign = document.getElementById('campaign').value;
+                const template = document.getElementById('template').value;
+                const imageFile = document.getElementById('imageUpload').files[0];
+                
+                // Upload image if provided
+                let imageResult = null;
+                if (imageFile) {
+                    const imageFormData = new FormData();
+                    imageFormData.append('image', imageFile);
+                    
+                    const imageResponse = await fetch('/api/upload-image', {
+                        method: 'POST',
+                        body: imageFormData
+                    });
+                    
+                    if (!imageResponse.ok) {
+                        throw new Error('Image upload failed');
+                    }
+                    
+                    imageResult = await imageResponse.json();
+                }
+                
+                // Generate workflow
+                const workflowResponse = await fetch('/api/generate-workflow', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        productName,
+                        campaign,
+                        template,
+                        imageFile: imageResult?.filename
+                    })
+                });
+                
+                if (!workflowResponse.ok) {
+                    throw new Error('Workflow generation failed');
+                }
+                
+                const result = await workflowResponse.json();
+                showStatus(`✅ Workflow generated successfully! ID: ${result.workflow.id}`, 'success');
+                
+                // Reset form
+                form.reset();
+                document.querySelector('.file-upload p').textContent = '📸 Click to upload product image';
+                
+            } catch (error) {
+                showStatus(`❌ Error: ${error.message}`, 'error');
+            }
+        });
+        
+        // Test API connection on load
+        fetch('/api/health')
+            .then(response => response.json())
+            .then(data => {
+                console.log('API Status:', data);
+            })
+            .catch(error => {
+                console.error('API connection failed:', error);
+            });
+    </script>
+</body>
+</html>
