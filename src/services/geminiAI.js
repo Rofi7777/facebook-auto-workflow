@@ -7,10 +7,22 @@ const path = require('path');
 
 class GeminiAIService {
   constructor() {
-    if (!process.env.GEMINI_API_KEY) {
+    // Force refresh environment variables from Replit Secrets
+    const apiKey = process.env.GEMINI_API_KEY;
+    
+    // Validate API key format
+    if (!apiKey) {
       throw new Error('GEMINI_API_KEY environment variable is required');
     }
-    this.ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+    
+    if (!apiKey.startsWith('AIzaSy')) {
+      console.error('⚠️ GEMINI_API_KEY format appears invalid. Expected format: AIzaSy...');
+      console.error('Current length:', apiKey.length);
+      console.error('Starts with AIzaSy:', apiKey.startsWith('AIzaSy'));
+    }
+    
+    this.ai = new GoogleGenAI({ apiKey: apiKey });
+    console.log('✅ GeminiAI service initialized with API key');
   }
 
   // 分析產品圖片並識別產品特性
