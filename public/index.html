@@ -601,7 +601,24 @@
             resultsDiv.innerHTML = html;
         }
         
-        // Display platform-specific results
+        // 圖片下載功能
+        function downloadFile(filePath, filename) {
+            try {
+                const downloadUrl = `/api/download-image?path=${encodeURIComponent(filePath)}`;
+                const link = document.createElement('a');
+                link.href = downloadUrl;
+                link.download = filename || 'download';
+                link.style.display = 'none';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                showStatus(`📥 正在下載: ${filename}`, 'info');
+            } catch (error) {
+                showStatus(`❌ 下載失敗: ${error.message}`, 'error');
+            }
+        }
+
+        // Display platform-specific results with download functionality
         function displayPlatformResults(results) {
             const resultsContainer = document.getElementById('resultsContainer');
             const platformResults = document.getElementById('platformResults');
@@ -629,12 +646,33 @@
                         html += `<div style="margin-top: 10px;"><strong>CTA:</strong> ${content.cta}</div>`;
                     }
                     
+                    // 顯示生成的圖片或設計描述（帶下載功能）
                     if (result.generatedImageDescription) {
-                        html += `<div style="margin-top: 10px; padding: 10px; background: #e3f2fd; border-radius: 5px;">
-                            <strong>📝 圖片設計描述:</strong><br>
-                            <small>${result.imageNote || ''}</small><br>
-                            <em>實際圖片需要外部圖像生成服務</em>
-                        </div>`;
+                        html += `<div style="margin-top: 15px; padding: 15px; background: #e3f2fd; border-radius: 8px;">`;
+                        
+                        if (result.isRealImage) {
+                            html += `
+                                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                                    <strong>🎨 AI 生成圖片:</strong>
+                                    <button onclick="downloadFile('${result.path}', '${platform}_generated_image.png')" 
+                                            class="btn btn-small" style="background: #4CAF50; color: white; padding: 5px 10px; border: none; border-radius: 4px; cursor: pointer;">
+                                        📥 下載圖片
+                                    </button>
+                                </div>
+                                <small style="color: #1976d2;">✅ 真實 AI 圖片已生成 (${Math.round(result.size/1024)}KB)</small>`;
+                        } else {
+                            html += `
+                                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                                    <strong>📋 專業設計規格:</strong>
+                                    <button onclick="downloadFile('${result.path}', '${platform}_design_spec.md')" 
+                                            class="btn btn-small" style="background: #2196F3; color: white; padding: 5px 10px; border: none; border-radius: 4px; cursor: pointer;">
+                                        📥 下載規格
+                                    </button>
+                                </div>
+                                <small style="color: #666;">📝 可用於專業設計工具 (DALL-E, Midjourney, Stable Diffusion)</small>`;
+                        }
+                        
+                        html += `</div>`;
                     }
                 } else {
                     html += `<div class="content" style="color: #dc3545;">
@@ -660,7 +698,7 @@
             return icons[platform] || '📱';
         }
         
-        // Display scenarios results
+        // Display scenarios results with download functionality
         function displayScenariosResults(scenarios) {
             const scenariosContainer = document.getElementById('scenariosContainer');
             const scenarioResults = document.getElementById('scenarioResults');
@@ -700,11 +738,31 @@
                     </div>`;
                 }
                 
-                if (scenario.designGuidePath) {
+                // 顯示生成的圖片或設計指導（帶下載功能）
+                if (scenario.isRealImage && scenario.path) {
+                    html += `<div style="background: #e8f5e8; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                        <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 10px;">
+                            <h4 style="color: #2e7d2e; margin: 0;">🎨 AI 生成場景圖片</h4>
+                            <button onclick="downloadFile('${scenario.path}', 'scenario_${scenario.scenarioIndex}_${scenario.name.replace(/[^a-zA-Z0-9]/g, '_')}.png')" 
+                                    class="btn btn-small" style="background: #4CAF50; color: white; padding: 8px 15px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">
+                                📥 下載場景圖片
+                            </button>
+                        </div>
+                        <p style="color: #2e7d2e; margin: 0;">✅ 真實 AI 圖片已生成 (${Math.round(scenario.size/1024)}KB)</p>
+                    </div>`;
+                } else if (scenario.designGuidePath || scenario.path) {
+                    const filePath = scenario.designGuidePath || scenario.path;
+                    const fileName = `scenario_${scenario.scenarioIndex}_${scenario.name.replace(/[^a-zA-Z0-9]/g, '_')}_guide.md`;
+                    
                     html += `<div style="background: #f3e5f5; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
-                        <h4 style="color: #7b1fa2; margin-bottom: 10px;">📋 設計指導文件</h4>
-                        <p><strong>檔案路徑:</strong> ${scenario.designGuidePath}</p>
-                        <p style="color: #666; font-size: 14px;">詳細的設計指導已保存，可供設計師或 AI 圖像生成工具使用</p>
+                        <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 10px;">
+                            <h4 style="color: #7b1fa2; margin: 0;">📋 專業設計指導文件</h4>
+                            <button onclick="downloadFile('${filePath}', '${fileName}')" 
+                                    class="btn btn-small" style="background: #9C27B0; color: white; padding: 8px 15px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">
+                                📥 下載設計指導
+                            </button>
+                        </div>
+                        <p style="color: #666; font-size: 14px; margin: 0;">📝 包含完整設計規格，可用於專業設計工具 (DALL-E, Midjourney, Stable Diffusion)</p>
                     </div>`;
                 }
                 

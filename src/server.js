@@ -58,6 +58,105 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'OK', message: `${BRAND_CONFIG.name} Facebook Auto Workflow API is running` });
 });
 
+// 安全的圖片下載端點 - 防止路徑遍歷攻擊
+app.get('/api/download-image', async (req, res) => {
+  try {
+    const { path: filePath } = req.query;
+    
+    if (!filePath) {
+      return res.status(400).json({ error: 'File path is required' });
+    }
+    
+    // 定義安全的基礎目錄
+    const baseDirs = {
+      'assets/generated/': path.resolve(__dirname, '..', 'assets', 'generated'),
+      'assets/scenarios/': path.resolve(__dirname, '..', 'assets', 'scenarios'),
+      'assets/uploads/': path.resolve(__dirname, '..', 'assets', 'uploads')
+    };
+    
+    // 驗證檔案路徑在允許的目錄內
+    let allowedBaseDir = null;
+    let resolvedFilePath = null;
+    
+    for (const [prefix, baseDir] of Object.entries(baseDirs)) {
+      if (filePath.startsWith(prefix)) {
+        resolvedFilePath = path.resolve(__dirname, '..', filePath);
+        
+        // 安全檢查：確保解析後的路徑仍在允許的基礎目錄內
+        if (resolvedFilePath.startsWith(baseDir)) {
+          allowedBaseDir = baseDir;
+          break;
+        }
+      }
+    }
+    
+    if (!allowedBaseDir || !resolvedFilePath) {
+      console.warn(`🚨 Forbidden file access attempt: ${filePath}`);
+      return res.status(403).json({ error: 'Access to this file is forbidden' });
+    }
+    
+    // 異步檢查檔案是否存在並獲取統計資訊
+    let stat;
+    try {
+      stat = await fs.stat(resolvedFilePath);
+      if (!stat.isFile()) {
+        return res.status(404).json({ error: 'Not a valid file' });
+      }
+    } catch (statError) {
+      return res.status(404).json({ error: 'File not found' });
+    }
+    
+    const fileExtension = path.extname(resolvedFilePath).toLowerCase();
+    
+    // 檔案類型白名單驗證（生產安全性）
+    const allowedExtensions = ['.png', '.jpg', '.jpeg', '.webp', '.md', '.txt'];
+    if (!allowedExtensions.includes(fileExtension)) {
+      return res.status(415).json({ error: 'File type not supported for download' });
+    }
+    
+    // 設定適當的 Content-Type
+    let contentType = 'application/octet-stream';
+    if (fileExtension === '.png') {
+      contentType = 'image/png';
+    } else if (fileExtension === '.jpg' || fileExtension === '.jpeg') {
+      contentType = 'image/jpeg';
+    } else if (fileExtension === '.webp') {
+      contentType = 'image/webp';
+    } else if (fileExtension === '.md') {
+      contentType = 'text/markdown';
+    } else if (fileExtension === '.txt') {
+      contentType = 'text/plain';
+    }
+    
+    // 設定安全的下載標頭
+    const fileName = path.basename(resolvedFilePath);
+    const sanitizedFileName = fileName.replace(/[^\w\-_\.]/g, '_'); // 全局清理檔名
+    
+    res.setHeader('Content-Disposition', `attachment; filename="${sanitizedFileName}"`);
+    res.setHeader('Content-Type', contentType);
+    res.setHeader('Content-Length', stat.size);
+    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+    
+    // 傳送檔案
+    const fileStream = fs.createReadStream(resolvedFilePath);
+    fileStream.pipe(res);
+    
+    fileStream.on('error', (error) => {
+      console.error('File download error:', error);
+      if (!res.headersSent) {
+        res.status(500).json({ error: 'File download failed' });
+      }
+    });
+    
+    console.log(`📥 Secure file download: ${sanitizedFileName} (${stat.size} bytes) from ${allowedBaseDir}`);
+    
+  } catch (error) {
+    console.error('Download endpoint error:', error);
+    res.status(500).json({ error: 'Download failed: ' + error.message });
+  }
+});
+
 // Brand configuration endpoint with multi-platform support
 app.get('/api/config', (req, res) => {
   res.json({
@@ -128,8 +227,10 @@ app.post('/api/analyze-product', async (req, res) => {
       return res.status(400).json({ error: 'Invalid image path' });
     }
     
-    // Check if file exists
-    if (!fs.existsSync(resolvedImagePath)) {
+    // 異步檢查文件是否存在
+    try {
+      await fs.access(resolvedImagePath);
+    } catch (accessError) {
       return res.status(400).json({ error: 'Image file not found' });
     }
 

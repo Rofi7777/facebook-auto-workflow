@@ -140,37 +140,109 @@ class ScenarioGeneratorService {
     }
   }
 
-  // 模擬圖片生成（創建設計描述文件）
+  // 自動 Nano Banana 圖片生成（場景專用）
   async generateScenarioImage(imageDescription, scenarioName, outputPath) {
     try {
-      // 由於目前 Gemini 不支援直接圖片生成，我們創建詳細的設計描述
-      // 使用更新的 API 格式
+      console.log(`🎨 Generating scenario image for: ${scenarioName}`);
       
-      const enhancedPrompt = `
-基於以下圖像描述，創建一個專業的設計指導文件，用於圖像生成：
+      // 增強的英文提示詞用於真實圖片生成
+      const enhancedPrompt = `Create a high-quality marketing scenario image for Googoogaga baby toys:
 
-原始描述：${imageDescription}
+Scenario: ${scenarioName}
+Description: ${imageDescription}
 
-請提供：
-1. 精確的構圖指導
-2. 色彩配置建議（具體色彩代碼）
-3. 光線和陰影設置
-4. 物件比例和位置
-5. 質感和材質描述
-6. 後製建議
-7. 品牌一致性要求
+Requirements:
+- Professional photography style
+- Warm, family-friendly atmosphere  
+- Soft pastel colors (sky blue to pink gradient)
+- Safe, educational environment
+- Clear product visibility
+- Natural lighting and realistic shadows
+- High resolution suitable for marketing
+- Googoogaga brand aesthetic (nurturing, developmental, safe)
+- Composition optimized for social media platforms
 
-場景名稱：${scenarioName}`;
+Style: Realistic photography, commercial quality, warm family moments, professionally lit`;
+
+      // 使用正確的圖片生成模型進行場景圖片生成
+      try {
+        console.log('🎨 Generating scenario image with gemini-2.5-flash-image-preview...');
+        
+        const response = await this.ai.models.generateContent({
+          model: "gemini-2.5-flash-image-preview",
+          contents: [{ 
+            role: 'user', 
+            parts: [{ text: enhancedPrompt }] 
+          }],
+          generationConfig: {
+            responseMimeType: 'image/png',
+            maxOutputTokens: 2048
+          }
+        });
+        
+        // 檢查是否返回真實圖片
+        if (response.candidates && response.candidates[0] && response.candidates[0].content && response.candidates[0].content.parts) {
+          for (const part of response.candidates[0].content.parts) {
+            if (part.inlineData && part.inlineData.mimeType && part.inlineData.mimeType.startsWith('image/')) {
+              const imageData = part.inlineData.data;
+              const buffer = Buffer.from(imageData, "base64");
+              
+              // 確保輸出目錄存在並保存圖片
+              await fs.ensureDir(path.dirname(outputPath));
+              await fs.writeFile(outputPath, buffer);
+              
+              console.log(`✅ Real scenario image generated: ${outputPath} (${buffer.length} bytes)`);
+              return {
+                type: 'image',
+                path: outputPath,
+                size: buffer.length,
+                downloadUrl: `/api/download-image?path=${encodeURIComponent(outputPath)}`,
+                isRealImage: true,
+                scenario: scenarioName
+              };
+            }
+          }
+        }
+        
+        console.log('⚠️ Scenario image generation returned no image data');
+      } catch (imageError) {
+        console.log(`⚠️ Scenario image generation failed: ${imageError.message}`);
+      }
+      
+      // 如果圖片生成失敗，創建專業設計指導文件
+      console.log('📋 Creating professional design guide for external generation...');
+      const designGuide = await this.createScenarioDesignGuide(imageDescription, scenarioName, outputPath);
+      return designGuide;
+      
+    } catch (error) {
+      throw new Error(`Scenario image generation failed: ${error.message}`);
+    }
+  }
+
+  // 創建場景專用的詳細設計指導文件
+  async createScenarioDesignGuide(imageDescription, scenarioName, outputPath) {
+    try {
+      const enhancedPrompt = `Create a comprehensive design guide for a baby toy marketing scenario image:
+
+Scenario: ${scenarioName}
+Base Description: ${imageDescription}
+
+Provide detailed specifications for:
+1. Camera setup (angle, distance, lens type)
+2. Lighting design (key light, fill light, rim light positions)
+3. Set design and props placement
+4. Character directions (baby/parent poses, expressions)
+5. Color grading and post-production notes
+6. Brand integration guidelines
+7. Platform-specific adaptations
+8. Technical photography settings
+
+Make this guide professional enough for a commercial photographer or AI generation tool.`;
 
       const response = await this.ai.models.generateContent({
         model: "gemini-1.5-flash",
         contents: [{ role: 'user', parts: [{ text: enhancedPrompt }] }]
       });
-      
-      // 安全檢查回應格式
-      if (!response.candidates || !response.candidates[0] || !response.candidates[0].content || !response.candidates[0].content.parts) {
-        throw new Error('Invalid AI response format for design guide');
-      }
       
       const designGuide = response.candidates[0].content.parts
         .filter(part => part.text)
@@ -180,29 +252,74 @@ class ScenarioGeneratorService {
       // 確保輸出目錄存在
       await fs.ensureDir(path.dirname(outputPath));
       
-      // 創建設計指導文件
-      const designContent = `# ${scenarioName} 設計指導
+      // 創建專業設計指導文件
+      const designContent = `# ${scenarioName} - Professional Photography Guide
+**Project:** Googoogaga Baby Toy Marketing Campaign  
+**Generated:** ${new Date().toISOString()}  
+**Scenario:** ${scenarioName}
 
-## 圖像描述
+## Original Creative Brief
 ${imageDescription}
 
-## 詳細設計指導
+## Professional Photography Specification
 ${designGuide}
 
-## 生成時間
-${new Date().toISOString()}
+## Googoogaga Brand Standards
+- **Color Palette:** Soft pastels with sky blue to pink gradient (#87CEEB to #FFB6C1)
+- **Typography:** Clean, modern sans-serif fonts (Nunito, Open Sans)
+- **Mood:** Safe, nurturing, developmental, educational
+- **Target Demographic:** Parents with babies/toddlers (0-3 years)
+- **Core Values:** Safety first, developmental growth, family bonding
 
----
-註：此文件包含 AI 生成的詳細設計指導，可用於專業圖像生成工具或設計師參考。
+## Technical Specifications
+- **Resolution:** Minimum 1024x1024, preferred 2048x2048
+- **Format:** PNG with transparency support
+- **Quality:** Commercial grade, suitable for print and digital
+- **Color Space:** sRGB for digital, Adobe RGB for print
+- **File Size:** Optimized for web while maintaining quality
+
+## Production Notes
+- Ensure all toys appear safe and age-appropriate
+- Maintain consistent lighting across campaign images
+- Include subtle Googoogaga branding without overwhelming the scene
+- Focus on emotional connection between product and family
+- Verify accessibility standards (contrast, visibility)
+
+## Usage Rights
+This design guide is for Googoogaga marketing campaign use only.
+Compatible with professional AI image generation tools:
+- DALL-E 3 (OpenAI)
+- Midjourney
+- Stable Diffusion XL
+- Adobe Firefly
+
+## Quality Checklist
+- [ ] Product clearly visible and appealing
+- [ ] Brand guidelines followed
+- [ ] Safety messaging apparent
+- [ ] Educational value communicated
+- [ ] Family warmth conveyed
+- [ ] Technical specs met
+- [ ] Platform requirements satisfied
 `;
 
-      const designFilePath = outputPath.replace('.png', '_design.md');
+      const designFilePath = outputPath.replace('.png', '_professional_guide.md');
       fs.writeFileSync(designFilePath, designContent);
       
-      console.log(`Design guide saved as ${designFilePath}`);
-      return designFilePath;
+      console.log(`📋 Professional design guide created: ${designFilePath}`);
+      
+      return {
+        type: 'guide',
+        path: designFilePath,
+        description: designGuide,
+        downloadUrl: `/api/download-image?path=${encodeURIComponent(designFilePath)}`,
+        isRealImage: false,
+        scenario: scenarioName,
+        useCase: 'Professional external image generation'
+      };
+      
     } catch (error) {
-      throw new Error(`Scenario image generation failed: ${error.message}`);
+      throw new Error(`Design guide creation failed: ${error.message}`);
     }
   }
 }

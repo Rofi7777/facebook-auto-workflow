@@ -31,7 +31,7 @@ class GeminiAIService {
   // 分析產品圖片並識別產品特性
   async analyzeProductImage(imagePath) {
     try {
-      const imageBytes = fs.readFileSync(imagePath);
+      const imageBytes = await fs.readFile(imagePath);
       
       // Detect MIME type from file extension
       const ext = path.extname(imagePath).toLowerCase();
@@ -253,71 +253,175 @@ class GeminiAIService {
     }
   }
 
-  // 生成行銷圖片 (目前使用文字描述生成，實際圖片生成需要其他服務)
+  // 增強版 Nano Banana 圖片生成 (支援真實圖片生成和下載)
   async generateMarketingImage(prompt, imagePath) {
     try {
-      // 使用 Nano Banana (Gemini 2.5 Flash Image) 生成實際圖片
-      const enhancedPrompt = `請創建一張吸引人的嬰幼兒玩具行銷圖片。
-
-產品描述：${prompt}
-
-圖片要求：
-- 溫馨的家庭氛圍，適合嬰幼兒
-- 明亮、安全、教育性的視覺元素
-- 柔和的色彩搭配（粉彩色調）
-- 高品質產品攝影風格
-- Googoogaga 品牌風格
-- 適合社群媒體使用的構圖
-
-風格：專業產品攝影，溫馨家庭氛圍，高品質視覺效果`;
+      console.log('🎨 Starting Nano Banana image generation process...');
       
-      const response = await this.ai.models.generateContent({
-        model: "gemini-2.5-flash-image-preview",
-        contents: [{ role: 'user', parts: [{ text: enhancedPrompt }] }],
-        generationConfig: {
-          responseMimeType: 'image/png',
-          maxOutputTokens: 2048
+      // 使用增強的英文提示詞來改善圖片生成質量
+      const enhancedPrompt = `Create a professional marketing image for a baby toy product.
+
+Product: ${prompt}
+
+Requirements:
+- Warm family atmosphere suitable for babies and toddlers
+- Bright, safe, educational visual elements  
+- Soft pastel color palette (sky blue to pink gradient)
+- High-quality product photography style
+- Googoogaga brand aesthetic (safe, nurturing, developmental)
+- Composition suitable for social media marketing
+- Professional commercial photography lighting
+- Clear focus on the toy product
+- Family-friendly environment (nursery, playroom, or living room)
+- Parents and babies interacting naturally with the product
+
+Style: Professional product photography, warm family moments, high-quality visual appeal, commercially polished`;
+
+      // 使用正確的圖片生成模型
+      try {
+        console.log('🎨 Attempting real image generation with gemini-2.5-flash-image-preview...');
+        
+        const response = await this.ai.models.generateContent({
+          model: "gemini-2.5-flash-image-preview",
+          contents: [{ 
+            role: 'user', 
+            parts: [{ text: enhancedPrompt }] 
+          }],
+          generationConfig: {
+            responseMimeType: 'image/png',
+            maxOutputTokens: 2048
+          }
+        });
+        
+        // 檢查是否有圖片數據返回
+        if (response.candidates && response.candidates[0] && response.candidates[0].content && response.candidates[0].content.parts) {
+          for (const part of response.candidates[0].content.parts) {
+            if (part.inlineData && part.inlineData.mimeType && part.inlineData.mimeType.startsWith('image/')) {
+              const imageData = part.inlineData.data;
+              const buffer = Buffer.from(imageData, "base64");
+              
+              // 確保目錄存在並保存圖片
+              await fs.ensureDir(path.dirname(imagePath));
+              await fs.writeFile(imagePath, buffer);
+              
+              console.log(`✅ Real Nano Banana image generated: ${imagePath} (${buffer.length} bytes)`);
+              return { 
+                type: 'image', 
+                path: imagePath, 
+                size: buffer.length,
+                downloadUrl: `/api/download-image?path=${encodeURIComponent(imagePath)}`,
+                isRealImage: true
+              };
+            }
+          }
         }
+        
+        console.log('⚠️ Image generation model returned no image data');
+      } catch (imageError) {
+        console.log(`⚠️ Image generation failed: ${imageError.message}`);
+      }
+      
+      // 如果所有圖片生成方法都失敗，創建詳細的設計規格文件
+      console.log('📋 Creating detailed design specification for external generation...');
+      const designSpec = await this.createDetailedDesignSpec(prompt, imagePath);
+      return designSpec;
+      
+    } catch (error) {
+      throw new Error(`Nano Banana image generation failed: ${error.message}`);
+    }
+  }
+
+  // 創建詳細設計規格文件（當無法直接生成圖片時）
+  async createDetailedDesignSpec(prompt, imagePath) {
+    try {
+      const specPrompt = `Create a comprehensive design specification for a baby toy marketing image:
+
+Product: ${prompt}
+
+Please provide detailed specifications including:
+1. Exact composition and layout (camera angle, framing, focal points)
+2. Precise color palette with hex codes for Googoogaga brand
+3. Lighting setup (natural/artificial, direction, intensity)
+4. Object placement and proportions
+5. Background and environment details
+6. Human subjects (age, expressions, clothing, poses)
+7. Typography and text overlay suggestions
+8. Brand elements integration (logo placement, slogan)
+9. Technical specs (resolution: 1024x1024, format: PNG)
+10. Style references (realistic photography vs illustration)
+
+Make this specification detailed enough for any designer or AI tool to recreate the exact vision.`;
+
+      const response = await this.ai.models.generateContent({
+        model: "gemini-1.5-flash",
+        contents: [{ role: 'user', parts: [{ text: specPrompt }] }]
       });
       
-      // 安全檢查回應格式
-      if (!response.candidates || !response.candidates[0] || !response.candidates[0].content || !response.candidates[0].content.parts) {
-        throw new Error('Invalid AI response format for image generation');
-      }
-      
-      // 檢查回應中是否有圖片數據
-      for (const part of response.candidates[0].content.parts) {
-        if (part.inlineData) {
-          const imageData = part.inlineData.data;
-          const buffer = Buffer.from(imageData, "base64");
-          
-          // 確保目錄存在並保存圖片
-          await fs.ensureDir(path.dirname(imagePath));
-          fs.writeFileSync(imagePath, buffer);
-          
-          console.log(`Generated image saved as ${imagePath}`);
-          return { type: 'image', path: imagePath };
-        }
-      }
-      
-      // 如果沒有圖片，保存文字描述
-      const imageDescription = response.candidates[0].content.parts
+      const designSpec = response.candidates[0].content.parts
         .filter(part => part.text)
         .map(part => part.text)
-        .join('') || "Image generation failed";
+        .join('');
       
-      // 暫時創建一個包含描述的文本文件，作為圖片生成的指導
+      // 保存設計規格文件
       await fs.ensureDir(path.dirname(imagePath));
-      const descriptionPath = imagePath.replace('.png', '_description.txt');
-      fs.writeFileSync(descriptionPath, imageDescription);
+      const specPath = imagePath.replace('.png', '_design_spec.md');
       
-      console.log(`Image description saved as ${descriptionPath}`);
-      console.log('Image description:', imageDescription);
+      const fullSpec = `# Googoogaga Baby Toy Marketing Image Specification
+**Generated:** ${new Date().toISOString()}  
+**Original Request:** ${prompt}
+
+## Executive Summary
+This specification provides detailed instructions for creating a professional marketing image for Googoogaga baby toy products. The image should convey safety, education, and family warmth while showcasing the product effectively.
+
+## Detailed Design Specification
+${designSpec}
+
+## Googoogaga Brand Guidelines
+- **Primary Colors:** Soft pastels with sky blue to pink gradient
+- **Typography:** Clean, modern, child-friendly sans-serif fonts
+- **Tone:** Safe, educational, nurturing, developmental
+- **Target Audience:** Parents with babies and toddlers (0-3 years)
+- **Brand Values:** Safety first, educational development, family bonding
+
+## Technical Requirements
+- **Resolution:** 1024x1024 pixels minimum
+- **Format:** PNG with transparency support
+- **Quality:** High resolution suitable for both digital and print
+- **Composition:** Rule of thirds, clear focal hierarchy
+- **Accessibility:** High contrast, clear visibility
+
+## Implementation Tools
+This specification can be used with:
+- Professional AI image generators (DALL-E 3, Midjourney, Stable Diffusion)
+- Professional designers and photographers
+- Internal design teams
+- External marketing agencies
+
+## Quality Assurance Checklist
+- [ ] Product is clearly visible and appealing
+- [ ] Brand colors are accurate
+- [ ] Family atmosphere is warm and inviting
+- [ ] Safety aspects are visually apparent
+- [ ] Educational value is communicated
+- [ ] Image is suitable for target platforms
+- [ ] Googoogaga brand identity is maintained
+`;
+
+      fs.writeFileSync(specPath, fullSpec);
       
-      // 返回描述文件信息
-      return { type: 'description', path: descriptionPath, description: imageDescription };
+      console.log(`📋 Professional design specification saved as ${specPath}`);
+      
+      return { 
+        type: 'specification', 
+        path: specPath, 
+        description: designSpec,
+        downloadUrl: `/api/download-image?path=${encodeURIComponent(specPath)}`,
+        isRealImage: false,
+        useCase: 'External image generation with professional tools'
+      };
+      
     } catch (error) {
-      throw new Error(`Image description generation failed: ${error.message}`);
+      throw new Error(`Design specification creation failed: ${error.message}`);
     }
   }
 
