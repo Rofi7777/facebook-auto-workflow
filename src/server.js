@@ -299,16 +299,17 @@ app.post('/api/generate-platform-content', async (req, res) => {
             const imagePath = `assets/generated/${platform}_${Date.now()}.png`;
             
             console.log(`Generating image for ${platform}:`, imagePrompt);
-            const generatedImagePath = await aiService.generateMarketingImage(imagePrompt, imagePath);
+            const generatedImageResult = await aiService.generateMarketingImage(imagePrompt, imagePath);
             
             // Check if actual image was generated or just description
-            if (generatedImagePath && generatedImagePath.includes('.png')) {
+            if (generatedImageResult && generatedImageResult.type === 'image' && generatedImageResult.isRealImage) {
               platformResult.generatedImageDescription = "AI 生成的真實圖片";
-              platformResult.path = generatedImagePath;
+              platformResult.path = generatedImageResult.path;
               platformResult.isRealImage = true;
-              platformResult.downloadUrl = `/api/download-image?path=${encodeURIComponent(generatedImagePath)}`;
+              platformResult.downloadUrl = generatedImageResult.downloadUrl;
+              platformResult.imageSize = generatedImageResult.size;
             } else {
-              platformResult.generatedImageDescription = generatedImagePath;
+              platformResult.generatedImageDescription = generatedImageResult;
               platformResult.isRealImage = false;
               platformResult.imageNote = "圖片描述已生成，需要圖像生成服務來創建實際圖片";
             }
@@ -377,20 +378,33 @@ app.post('/api/generate-scenarios', async (req, res) => {
         try {
           const imageDescription = await scenarioService.generateImageDescription(scenario, productInfo);
           const imagePath = `assets/scenarios/${Date.now()}_scenario_${index + 1}.png`;
-          const designGuidePath = await scenarioService.generateScenarioImage(imageDescription, scenario.name, imagePath);
+          const scenarioImageResult = await scenarioService.generateScenarioImage(imageDescription, scenario.name, imagePath);
           
-          return {
+          // Handle both image and design guide results
+          const scenarioData = {
             ...scenario,
             imageDescription,
-            designGuidePath,
             scenarioIndex: index + 1
           };
+          
+          if (scenarioImageResult && scenarioImageResult.type === 'image' && scenarioImageResult.isRealImage) {
+            scenarioData.isRealImage = true;
+            scenarioData.path = scenarioImageResult.path;
+            scenarioData.downloadUrl = scenarioImageResult.downloadUrl;
+            scenarioData.imageSize = scenarioImageResult.size;
+          } else {
+            scenarioData.isRealImage = false;
+            scenarioData.designGuidePath = scenarioImageResult;
+          }
+          
+          return scenarioData;
         } catch (error) {
           console.error(`Error generating image for scenario ${index + 1}:`, error);
           return {
             ...scenario,
             imageError: error.message,
-            scenarioIndex: index + 1
+            scenarioIndex: index + 1,
+            isRealImage: false
           };
         }
       }) || []
