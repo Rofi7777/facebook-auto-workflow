@@ -8,13 +8,13 @@ class ScenarioGeneratorService {
     if (!process.env.GEMINI_API_KEY) {
       throw new Error('GEMINI_API_KEY environment variable is required');
     }
-    this.genAI = new GoogleGenAI(process.env.GEMINI_API_KEY);
+    this.ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
   }
 
   // 根據產品內容生成三種行銷場景
   async generateMarketingScenarios(productInfo, contentData) {
     try {
-      const model = this.genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+      // 使用更新的 API 格式
       
       const prompt = `
 基於以下產品資訊和行銷內容，請為這個嬰幼兒玩具產品創建三種不同的行銷場景。
@@ -60,8 +60,20 @@ class ScenarioGeneratorService {
   ]
 }`;
 
-      const response = await model.generateContent(prompt);
-      const scenarioText = response.response.text();
+      const response = await this.ai.models.generateContent({
+        model: "gemini-1.5-flash",
+        contents: [{ role: 'user', parts: [{ text: prompt }] }]
+      });
+      
+      // 安全檢查回應格式
+      if (!response.candidates || !response.candidates[0] || !response.candidates[0].content || !response.candidates[0].content.parts) {
+        throw new Error('Invalid AI response format for scenario generation');
+      }
+      
+      const scenarioText = response.candidates[0].content.parts
+        .filter(part => part.text)
+        .map(part => part.text)
+        .join('');
       
       try {
         const jsonMatch = scenarioText.match(/\{[\s\S]*\}/);
@@ -81,7 +93,7 @@ class ScenarioGeneratorService {
   // 為場景生成詳細的圖片描述
   async generateImageDescription(scenario, productInfo) {
     try {
-      const model = this.genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+      // 使用更新的 API 格式
       
       const prompt = `
 為以下嬰幼兒玩具行銷場景創建詳細的圖像生成描述：
@@ -102,8 +114,20 @@ class ScenarioGeneratorService {
 
 請用一段詳細的描述文字回答，適合直接用於 AI 圖像生成工具。`;
 
-      const response = await model.generateContent(prompt);
-      return response.response.text();
+      const response = await this.ai.models.generateContent({
+        model: "gemini-1.5-flash", 
+        contents: [{ role: 'user', parts: [{ text: prompt }] }]
+      });
+      
+      // 安全檢查回應格式
+      if (!response.candidates || !response.candidates[0] || !response.candidates[0].content || !response.candidates[0].content.parts) {
+        throw new Error('Invalid AI response format for image description');
+      }
+      
+      return response.candidates[0].content.parts
+        .filter(part => part.text)
+        .map(part => part.text)
+        .join('');
     } catch (error) {
       throw new Error(`Image description generation failed: ${error.message}`);
     }
@@ -113,7 +137,7 @@ class ScenarioGeneratorService {
   async generateScenarioImage(imageDescription, scenarioName, outputPath) {
     try {
       // 由於目前 Gemini 不支援直接圖片生成，我們創建詳細的設計描述
-      const model = this.genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+      // 使用更新的 API 格式
       
       const enhancedPrompt = `
 基於以下圖像描述，創建一個專業的設計指導文件，用於圖像生成：
@@ -131,8 +155,20 @@ class ScenarioGeneratorService {
 
 場景名稱：${scenarioName}`;
 
-      const response = await model.generateContent(enhancedPrompt);
-      const designGuide = response.response.text();
+      const response = await this.ai.models.generateContent({
+        model: "gemini-1.5-flash",
+        contents: [{ role: 'user', parts: [{ text: enhancedPrompt }] }]
+      });
+      
+      // 安全檢查回應格式
+      if (!response.candidates || !response.candidates[0] || !response.candidates[0].content || !response.candidates[0].content.parts) {
+        throw new Error('Invalid AI response format for design guide');
+      }
+      
+      const designGuide = response.candidates[0].content.parts
+        .filter(part => part.text)
+        .map(part => part.text)
+        .join('');
       
       // 確保輸出目錄存在
       await fs.ensureDir(path.dirname(outputPath));

@@ -10,7 +10,7 @@ class GeminiAIService {
     if (!process.env.GEMINI_API_KEY) {
       throw new Error('GEMINI_API_KEY environment variable is required');
     }
-    this.genAI = new GoogleGenAI(process.env.GEMINI_API_KEY);
+    this.ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
   }
 
   // 分析產品圖片並識別產品特性
@@ -27,12 +27,16 @@ class GeminiAIService {
       
       const contents = [
         {
-          inlineData: {
-            data: imageBytes.toString("base64"),
-            mimeType: mimeType,
-          },
-        },
-        `請詳細分析這個嬰幼兒玩具產品圖片，提供以下資訊：
+          role: 'user',
+          parts: [
+            {
+              inlineData: {
+                data: imageBytes.toString("base64"),
+                mimeType: mimeType,
+              },
+            },
+            {
+              text: `請詳細分析這個嬰幼兒玩具產品圖片，提供以下資訊：
         1. 產品類型和主要特徵
         2. 適合年齡層
         3. 主要功能和教育價值
@@ -50,12 +54,26 @@ class GeminiAIService {
           "colors": ["顏色1", "顏色2"],
           "usageScenarios": ["使用場景1", "使用場景2"]
         }`
+            }
+          ]
+        }
       ];
 
-      const model = this.genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-      const response = await model.generateContent(contents);
+      const response = await this.ai.models.generateContent({
+        model: "gemini-1.5-flash",
+        contents: contents
+      });
       
-      const analysisText = response.response.text();
+      // 安全檢查回應格式
+      if (!response.candidates || !response.candidates[0] || !response.candidates[0].content || !response.candidates[0].content.parts) {
+        throw new Error('Invalid AI response format');
+      }
+      
+      // 合併所有文字部分
+      const analysisText = response.candidates[0].content.parts
+        .filter(part => part.text)
+        .map(part => part.text)
+        .join('');
       // 嘗試解析 JSON 回應
       try {
         const jsonMatch = analysisText.match(/\{[\s\S]*\}/);
@@ -101,10 +119,20 @@ class GeminiAIService {
         "marketingAngles": ["行銷角度1", "行銷角度2"]
       }`;
 
-      const model = this.genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-      const response = await model.generateContent(prompt);
+      const response = await this.ai.models.generateContent({
+        model: "gemini-1.5-flash",
+        contents: [{ role: 'user', parts: [{ text: prompt }] }]
+      });
       
-      const analysisText = response.response.text();
+      // 安全檢查回應格式
+      if (!response.candidates || !response.candidates[0] || !response.candidates[0].content || !response.candidates[0].content.parts) {
+        throw new Error('Invalid AI response format');
+      }
+      
+      const analysisText = response.candidates[0].content.parts
+        .filter(part => part.text)
+        .map(part => part.text)
+        .join('');
       try {
         const jsonMatch = analysisText.match(/\{[\s\S]*\}/);
         if (jsonMatch) {
@@ -181,10 +209,20 @@ class GeminiAIService {
         "imagePrompt": "配圖建議描述"
       }`;
 
-      const model = this.genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-      const response = await model.generateContent(prompt);
+      const response = await this.ai.models.generateContent({
+        model: "gemini-1.5-flash", 
+        contents: [{ role: 'user', parts: [{ text: prompt }] }]
+      });
       
-      const contentText = response.response.text();
+      // 安全檢查回應格式
+      if (!response.candidates || !response.candidates[0] || !response.candidates[0].content || !response.candidates[0].content.parts) {
+        throw new Error('Invalid AI response format');
+      }
+      
+      const contentText = response.candidates[0].content.parts
+        .filter(part => part.text)
+        .map(part => part.text)
+        .join('');
       try {
         const jsonMatch = contentText.match(/\{[\s\S]*\}/);
         if (jsonMatch) {
@@ -203,26 +241,55 @@ class GeminiAIService {
   // 生成行銷圖片 (目前使用文字描述生成，實際圖片生成需要其他服務)
   async generateMarketingImage(prompt, imagePath) {
     try {
-      // Note: Current Gemini models don't support direct image generation
-      // This generates a detailed image description that can be used with image generation services
-      const model = this.genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-      
-      const enhancedPrompt = `請為以下產品創建一個詳細的圖片設計描述，可以用於圖像生成AI工具：
-      
-${prompt}
+      // 使用 Nano Banana (Gemini 2.5 Flash Image) 生成實際圖片
+      const enhancedPrompt = `請創建一張吸引人的嬰幼兒玩具行銷圖片。
 
-請提供包含以下元素的詳細描述：
-1. 構圖和布局
-2. 色彩搭配
-3. 光線和氛圍
-4. 具體物件和場景
-5. 文字元素建議
-6. 整體風格定位
+產品描述：${prompt}
 
-回傳純文字描述，詳細且具體。`;
+圖片要求：
+- 溫馨的家庭氛圍，適合嬰幼兒
+- 明亮、安全、教育性的視覺元素
+- 柔和的色彩搭配（粉彩色調）
+- 高品質產品攝影風格
+- Googoogaga 品牌風格
+- 適合社群媒體使用的構圖
+
+風格：專業產品攝影，溫馨家庭氛圍，高品質視覺效果`;
       
-      const response = await model.generateContent(enhancedPrompt);
-      const imageDescription = response.response.text();
+      const response = await this.ai.models.generateContent({
+        model: "gemini-2.5-flash-image-preview",
+        contents: [{ role: 'user', parts: [{ text: enhancedPrompt }] }],
+        generationConfig: {
+          responseMimeType: 'image/png',
+          maxOutputTokens: 2048
+        }
+      });
+      
+      // 安全檢查回應格式
+      if (!response.candidates || !response.candidates[0] || !response.candidates[0].content || !response.candidates[0].content.parts) {
+        throw new Error('Invalid AI response format for image generation');
+      }
+      
+      // 檢查回應中是否有圖片數據
+      for (const part of response.candidates[0].content.parts) {
+        if (part.inlineData) {
+          const imageData = part.inlineData.data;
+          const buffer = Buffer.from(imageData, "base64");
+          
+          // 確保目錄存在並保存圖片
+          await fs.ensureDir(path.dirname(imagePath));
+          fs.writeFileSync(imagePath, buffer);
+          
+          console.log(`Generated image saved as ${imagePath}`);
+          return { type: 'image', path: imagePath };
+        }
+      }
+      
+      // 如果沒有圖片，保存文字描述
+      const imageDescription = response.candidates[0].content.parts
+        .filter(part => part.text)
+        .map(part => part.text)
+        .join('') || "Image generation failed";
       
       // 暫時創建一個包含描述的文本文件，作為圖片生成的指導
       await fs.ensureDir(path.dirname(imagePath));
@@ -232,8 +299,8 @@ ${prompt}
       console.log(`Image description saved as ${descriptionPath}`);
       console.log('Image description:', imageDescription);
       
-      // 返回描述文件路徑，表示功能已執行但需要外部圖像生成服務
-      return descriptionPath;
+      // 返回描述文件信息
+      return { type: 'description', path: descriptionPath, description: imageDescription };
     } catch (error) {
       throw new Error(`Image description generation failed: ${error.message}`);
     }
