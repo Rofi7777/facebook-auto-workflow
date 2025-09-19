@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Baby Toy Facebook Auto Workflow</title>
+    <title>Multi-Platform Baby Toy Content Generator</title>
     <style>
         * {
             margin: 0;
@@ -15,21 +15,19 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #87CEEB 0%, #FFB6C1 100%);
             min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            padding: 20px;
         }
         
-        .container {
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-            padding: 40px;
-            max-width: 500px;
-            width: 90%;
+        .main-container {
+            max-width: 1200px;
+            margin: 0 auto;
         }
         
         .header {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            padding: 30px;
             text-align: center;
             margin-bottom: 30px;
         }
@@ -37,12 +35,34 @@
         .header h1 {
             color: #333;
             margin-bottom: 10px;
-            font-size: 28px;
+            font-size: 32px;
         }
         
         .header p {
             color: #666;
-            font-size: 16px;
+            font-size: 18px;
+        }
+        
+        .workflow-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .input-panel, .output-panel {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            padding: 30px;
+        }
+        
+        .panel-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 20px;
+            text-align: center;
         }
         
         .form-group {
@@ -57,7 +77,8 @@
         }
         
         .form-group input,
-        .form-group select {
+        .form-group select,
+        .form-group textarea {
             width: 100%;
             padding: 12px;
             border: 2px solid #e1e5e9;
@@ -67,9 +88,37 @@
         }
         
         .form-group input:focus,
-        .form-group select:focus {
+        .form-group select:focus,
+        .form-group textarea:focus {
             outline: none;
             border-color: #87CEEB;
+        }
+        
+        .checkbox-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        
+        .checkbox-item:hover {
+            border-color: #87CEEB;
+            background: #f8f9fa;
+        }
+        
+        .checkbox-item input[type="checkbox"] {
+            width: auto;
         }
         
         .file-upload {
@@ -100,10 +149,21 @@
             cursor: pointer;
             width: 100%;
             transition: transform 0.2s;
+            margin-bottom: 10px;
         }
         
         .btn:hover {
             transform: translateY(-2px);
+        }
+        
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
         }
         
         .status {
@@ -124,83 +184,240 @@
             color: #721c24;
             border: 1px solid #f5c6cb;
         }
+        
+        .status.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #87CEEB;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 10px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .results-container {
+            display: none;
+            margin-top: 30px;
+        }
+        
+        .platform-result {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .platform-result h3 {
+            color: #333;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .platform-result .content {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            white-space: pre-wrap;
+        }
+        
+        .platform-result .hashtags {
+            color: #007bff;
+            font-weight: 500;
+        }
+        
+        .platform-result .image-preview {
+            max-width: 100%;
+            border-radius: 8px;
+            margin-top: 10px;
+        }
+        
+        .analysis-section {
+            background: #e3f2fd;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .analysis-section h4 {
+            color: #1976d2;
+            margin-bottom: 10px;
+        }
+        
+        .pain-point, .scenario {
+            background: white;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 8px;
+            border-left: 4px solid #87CEEB;
+        }
+        
+        @media (max-width: 768px) {
+            .workflow-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .checkbox-group {
+                grid-template-columns: 1fr;
+            }
+        }
     </style>
 </head>
 <body>
-    <div class="container">
+    <div class="main-container">
         <div class="header">
             <img id="brandLogo" src="" alt="Brand Logo" style="max-height: 120px; margin-bottom: 15px; border-radius: 10px; display: none;">
             <h1 id="brandTitle">🧸 Loading...</h1>
             <p id="brandSlogan">Loading brand information...</p>
-            <p>自動產生嬰幼兒玩具 Facebook 雙語宣傳素材</p>
+            <p>AI 驅動的多平台嬰幼兒玩具行銷內容生成器</p>
         </div>
         
-        <form id="workflowForm">
-            <div class="form-group">
-                <label for="productName">Product Name</label>
-                <input type="text" id="productName" name="productName" placeholder="輸入玩具名稱" required>
+        <div class="workflow-container">
+            <div class="input-panel">
+                <h2 class="panel-title">📝 產品資訊輸入</h2>
+                
+                <form id="productForm">
+                    <div class="form-group">
+                        <label for="productName">產品名稱 / Product Name</label>
+                        <input type="text" id="productName" name="productName" placeholder="輸入玩具名稱" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="productDescription">產品描述 (可選)</label>
+                        <textarea id="productDescription" name="productDescription" placeholder="描述產品特色、功能、適用年齡等..." rows="3"></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>產品圖片 / Product Image</label>
+                        <div class="file-upload" onclick="document.getElementById('imageUpload').click()">
+                            <input type="file" id="imageUpload" accept="image/*">
+                            <p>📸 上傳玩具圖片 (Upload toy image)</p>
+                            <small>支援 JPG, PNG (最大 10MB)</small>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>目標平台 / Target Platforms</label>
+                        <div class="checkbox-group" id="platformsGroup">
+                            <!-- Platforms will be loaded dynamically -->
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="language">內容語言 / Content Language</label>
+                        <select id="language" name="language">
+                            <option value="zh-TW">繁體中文 (Traditional Chinese)</option>
+                            <option value="vi">Tiếng Việt (Vietnamese)</option>
+                            <option value="bilingual">雙語 (Bilingual)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>
+                            <input type="checkbox" id="generateImages" name="generateImages">
+                            自動生成行銷圖片 (Generate Marketing Images)
+                        </label>
+                    </div>
+                    
+                    <button type="submit" class="btn" id="analyzeBtn">
+                        🧠 分析產品並生成內容
+                    </button>
+                </form>
+                
+                <div id="status" class="status"></div>
             </div>
             
-            <div class="form-group">
-                <label for="campaign">Campaign Type</label>
-                <select id="campaign" name="campaign" required>
-                    <option value="">Loading campaign types...</option>
-                </select>
-            </div>
-            
-            <div class="form-group">
-                <label for="template">Template Style</label>
-                <select id="template" name="template" required>
-                    <option value="">Loading template styles...</option>
-                </select>
-            </div>
-            
-            <div class="form-group">
-                <label>Product Image</label>
-                <div class="file-upload" onclick="document.getElementById('imageUpload').click()">
-                    <input type="file" id="imageUpload" accept="image/*">
-                    <p>📸 上傳玩具圖片 (Upload toy image)</p>
-                    <small>Supports JPG, PNG (Max 10MB)</small>
+            <div class="output-panel">
+                <h2 class="panel-title">📊 AI 分析結果</h2>
+                <div id="analysisResults">
+                    <p style="text-align: center; color: #666; padding: 40px;">
+                        上傳產品圖片並點擊分析按鈕開始 AI 智慧分析
+                    </p>
                 </div>
             </div>
-            
-            <button type="submit" class="btn">Generate Workflow 🚀</button>
-        </form>
+        </div>
         
-        <div id="status" class="status"></div>
+        <div class="results-container" id="resultsContainer">
+            <div style="background: white; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); padding: 30px;">
+                <h2 class="panel-title">🎯 多平台內容生成結果</h2>
+                <div id="platformResults"></div>
+            </div>
+        </div>
     </div>
 
     <script>
-        const form = document.getElementById('workflowForm');
+        let uploadedImagePath = null;
+        let productAnalysis = null;
+        let painPointsAnalysis = null;
+        
+        const form = document.getElementById('productForm');
         const statusDiv = document.getElementById('status');
         const fileUpload = document.getElementById('imageUpload');
+        const analyzeBtn = document.getElementById('analyzeBtn');
         
+        // File upload handling
         fileUpload.addEventListener('change', function(e) {
             const fileName = e.target.files[0]?.name;
             if (fileName) {
-                e.target.parentElement.querySelector('p').textContent = `Selected: ${fileName}`;
+                e.target.parentElement.querySelector('p').textContent = `已選擇: ${fileName}`;
             }
         });
         
+        // Status display
         function showStatus(message, type) {
-            statusDiv.textContent = message;
+            statusDiv.innerHTML = message;
             statusDiv.className = `status ${type}`;
             statusDiv.style.display = 'block';
         }
         
+        // Loading state management
+        function setLoading(isLoading) {
+            analyzeBtn.disabled = isLoading;
+            if (isLoading) {
+                analyzeBtn.innerHTML = '<span class="loading"></span>AI 分析中...';
+            } else {
+                analyzeBtn.innerHTML = '🧠 分析產品並生成內容';
+            }
+        }
+        
+        // Main form submission
         form.addEventListener('submit', async function(e) {
             e.preventDefault();
+            setLoading(true);
             
             try {
                 const formData = new FormData();
                 const productName = document.getElementById('productName').value;
-                const campaign = document.getElementById('campaign').value;
-                const template = document.getElementById('template').value;
+                const productDescription = document.getElementById('productDescription').value;
                 const imageFile = document.getElementById('imageUpload').files[0];
+                const language = document.getElementById('language').value;
+                const generateImages = document.getElementById('generateImages').checked;
                 
-                // Upload image if provided
-                let imageResult = null;
+                // Get selected platforms
+                const selectedPlatforms = Array.from(document.querySelectorAll('#platformsGroup input[type="checkbox"]:checked')).map(cb => cb.value);
+                
+                if (selectedPlatforms.length === 0) {
+                    throw new Error('請至少選擇一個目標平台');
+                }
+                
+                // Step 1: Upload image if provided
                 if (imageFile) {
+                    showStatus('📤 上傳圖片中...', 'info');
                     const imageFormData = new FormData();
                     imageFormData.append('image', imageFile);
                     
@@ -210,43 +427,184 @@
                     });
                     
                     if (!imageResponse.ok) {
-                        throw new Error('Image upload failed');
+                        throw new Error('圖片上傳失敗');
                     }
                     
-                    imageResult = await imageResponse.json();
+                    const imageResult = await imageResponse.json();
+                    uploadedImagePath = imageResult.path;
                 }
                 
-                // Generate workflow
-                const workflowResponse = await fetch('/api/generate-workflow', {
+                // Step 2: AI Product Analysis
+                if (uploadedImagePath || productDescription) {
+                    showStatus('🧠 AI 產品分析中...', 'info');
+                    
+                    const analysisResponse = await fetch('/api/analyze-product', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            imagePath: uploadedImagePath,
+                            productInfo: {
+                                name: productName,
+                                description: productDescription
+                            }
+                        })
+                    });
+                    
+                    if (analysisResponse.ok) {
+                        const analysisResult = await analysisResponse.json();
+                        productAnalysis = analysisResult.productAnalysis;
+                        painPointsAnalysis = analysisResult.painPointsAnalysis;
+                        
+                        displayAnalysisResults(productAnalysis, painPointsAnalysis);
+                    } else {
+                        showStatus('⚠️ AI 分析失敗，使用基礎模式生成內容', 'info');
+                    }
+                }
+                
+                // Step 3: Generate platform content
+                showStatus('🎯 生成多平台內容中...', 'info');
+                
+                const contentResponse = await fetch('/api/generate-platform-content', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
-                        productName,
-                        campaign,
-                        template,
-                        imageFile: imageResult?.filename
+                        productInfo: productAnalysis || {
+                            name: productName,
+                            description: productDescription,
+                            productType: productName
+                        },
+                        painPointsAnalysis: painPointsAnalysis || {},
+                        platforms: selectedPlatforms,
+                        language: language,
+                        generateImages: generateImages
                     })
                 });
                 
-                if (!workflowResponse.ok) {
-                    throw new Error('Workflow generation failed');
+                if (!contentResponse.ok) {
+                    throw new Error('內容生成失敗');
                 }
                 
-                const result = await workflowResponse.json();
-                showStatus(`✅ Workflow generated successfully! ID: ${result.workflow.id}`, 'success');
-                
-                // Reset form
-                form.reset();
-                document.querySelector('.file-upload p').textContent = '📸 上傳玩具圖片 (Upload toy image)';
+                const contentResult = await contentResponse.json();
+                displayPlatformResults(contentResult.results);
+                showStatus('✅ 多平台內容生成完成！', 'success');
                 
             } catch (error) {
-                showStatus(`❌ Error: ${error.message}`, 'error');
+                showStatus(`❌ 錯誤: ${error.message}`, 'error');
+            } finally {
+                setLoading(false);
             }
         });
         
-        // Load brand configuration and populate UI dynamically
+        // Display AI analysis results
+        function displayAnalysisResults(productAnalysis, painPointsAnalysis) {
+            const resultsDiv = document.getElementById('analysisResults');
+            
+            let html = '<div class="analysis-section">';
+            html += '<h4>🧸 產品分析結果</h4>';
+            
+            if (productAnalysis.productType) {
+                html += `<p><strong>產品類型:</strong> ${productAnalysis.productType}</p>`;
+            }
+            if (productAnalysis.ageRange) {
+                html += `<p><strong>適合年齡:</strong> ${productAnalysis.ageRange}</p>`;
+            }
+            if (productAnalysis.educationalValue) {
+                html += `<p><strong>教育價值:</strong> ${productAnalysis.educationalValue}</p>`;
+            }
+            
+            html += '</div>';
+            
+            if (painPointsAnalysis.painPoints) {
+                html += '<div class="analysis-section">';
+                html += '<h4>💡 識別的用戶痛點</h4>';
+                painPointsAnalysis.painPoints.forEach(pain => {
+                    html += `<div class="pain-point">
+                        <strong>${pain.category}:</strong> ${pain.description}
+                        <small style="color: #666;"> (${pain.severity})</small>
+                    </div>`;
+                });
+                html += '</div>';
+            }
+            
+            if (painPointsAnalysis.usageScenarios) {
+                html += '<div class="analysis-section">';
+                html += '<h4>🎬 使用場景建議</h4>';
+                painPointsAnalysis.usageScenarios.forEach(scenario => {
+                    html += `<div class="scenario">
+                        <strong>${scenario.scenario}:</strong> ${scenario.context}
+                        <br><small style="color: #28a745;">${scenario.benefits}</small>
+                    </div>`;
+                });
+                html += '</div>';
+            }
+            
+            resultsDiv.innerHTML = html;
+        }
+        
+        // Display platform-specific results
+        function displayPlatformResults(results) {
+            const resultsContainer = document.getElementById('resultsContainer');
+            const platformResults = document.getElementById('platformResults');
+            
+            let html = '';
+            
+            Object.entries(results).forEach(([platform, result]) => {
+                const config = result.platformConfig;
+                const content = result.content;
+                
+                html += `<div class="platform-result">
+                    <h3>
+                        ${getPlatformIcon(platform)} ${config.displayName}
+                        ${result.status === 'success' ? '✅' : '⚠️'}
+                    </h3>`;
+                
+                if (result.status === 'success' && content) {
+                    html += `<div class="content">${content.mainContent || content.rawContent}</div>`;
+                    
+                    if (content.hashtags && content.hashtags.length > 0) {
+                        html += `<div class="hashtags">${content.hashtags.join(' ')}</div>`;
+                    }
+                    
+                    if (content.cta) {
+                        html += `<div style="margin-top: 10px;"><strong>CTA:</strong> ${content.cta}</div>`;
+                    }
+                    
+                    if (result.generatedImageDescription) {
+                        html += `<div style="margin-top: 10px; padding: 10px; background: #e3f2fd; border-radius: 5px;">
+                            <strong>📝 圖片設計描述:</strong><br>
+                            <small>${result.imageNote || ''}</small><br>
+                            <em>實際圖片需要外部圖像生成服務</em>
+                        </div>`;
+                    }
+                } else {
+                    html += `<div class="content" style="color: #dc3545;">
+                        錯誤: ${result.error}
+                        <br>備用內容: ${result.fallback}
+                    </div>`;
+                }
+                
+                html += '</div>';
+            });
+            
+            platformResults.innerHTML = html;
+            resultsContainer.style.display = 'block';
+        }
+        
+        function getPlatformIcon(platform) {
+            const icons = {
+                shopee: '🛒',
+                tiktok: '🎵',
+                instagram: '📸',
+                facebook: '👍'
+            };
+            return icons[platform] || '📱';
+        }
+        
+        // Load brand configuration and populate UI
         async function loadBrandConfig() {
             try {
                 const response = await fetch('/api/config');
@@ -257,29 +615,22 @@
                 logoElement.src = config.brand.logoPath;
                 logoElement.alt = `${config.brand.name} Logo`;
                 logoElement.style.display = 'block';
-                document.getElementById('brandTitle').textContent = `🧸 ${config.brand.name} Facebook Auto Workflow`;
+                document.getElementById('brandTitle').textContent = `🧸 ${config.brand.name} Multi-Platform Generator`;
                 document.getElementById('brandSlogan').textContent = config.brand.slogan;
                 document.getElementById('productName').placeholder = `輸入 ${config.brand.name} 玩具名稱`;
-                document.title = `${config.brand.name} Facebook Auto Workflow`;
+                document.title = `${config.brand.name} Multi-Platform Content Generator`;
                 
-                // Update campaign options
-                const campaignSelect = document.getElementById('campaign');
-                campaignSelect.innerHTML = '<option value="">Select campaign type</option>';
-                config.campaignTypes.forEach(type => {
-                    const option = document.createElement('option');
-                    option.value = type.value;
-                    option.textContent = type.label;
-                    campaignSelect.appendChild(option);
-                });
-                
-                // Update template options
-                const templateSelect = document.getElementById('template');
-                templateSelect.innerHTML = '<option value="">Select template</option>';
-                config.templateStyles.forEach(style => {
-                    const option = document.createElement('option');
-                    option.value = style.value;
-                    option.textContent = style.label;
-                    templateSelect.appendChild(option);
+                // Populate platforms
+                const platformsGroup = document.getElementById('platformsGroup');
+                platformsGroup.innerHTML = '';
+                config.platforms.forEach(platform => {
+                    const item = document.createElement('div');
+                    item.className = 'checkbox-item';
+                    item.innerHTML = `
+                        <input type="checkbox" id="platform_${platform.value}" value="${platform.value}" checked>
+                        <label for="platform_${platform.value}">${platform.label}</label>
+                    `;
+                    platformsGroup.appendChild(item);
                 });
                 
                 console.log('Brand configuration loaded:', config);
@@ -288,7 +639,7 @@
             }
         }
         
-        // Test API connection and load config on load
+        // Initialize app
         fetch('/api/health')
             .then(response => response.json())
             .then(data => {
