@@ -15,9 +15,9 @@ const aiService = new GeminiAIService();
 // Brand configuration from environment variables
 const ASSETS_BASE_URL = process.env.ASSETS_BASE_URL || '/brand';
 const BRAND_CONFIG = {
-  name: process.env.BRAND_NAME || 'BabyToyBrand',
-  slogan: process.env.BRAND_SLOGAN || 'Discover the wonderful world together every day',
-  logoPath: process.env.BRAND_LOGO_PATH || `${ASSETS_BASE_URL}/logo.png`
+  name: process.env.BRAND_NAME || 'Googoogaga',
+  slogan: process.env.BRAND_SLOGAN || 'Cùng bé khám phá thế giới diệu kỳ mỗi ngày',
+  logoPath: process.env.BRAND_LOGO_PATH || `${ASSETS_BASE_URL}/googoogaga-logo.png`
 };
 
 const app = express();
