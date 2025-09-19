@@ -19,17 +19,19 @@ class ScenarioGeneratorService {
   }
 
   // 根據產品內容生成三種行銷場景
-  async generateMarketingScenarios(productInfo, contentData) {
+  async generateMarketingScenarios(productInfo, contentData, scenarioType = '親子互動') {
     try {
       // 使用更新的 API 格式
       
       const prompt = `
 基於以下產品資訊和行銷內容，請為這個嬰幼兒玩具產品創建三種不同的行銷場景。
+重點關注「${scenarioType}」使用情境，並創造多樣化的創意變化。
 
 產品資訊：${JSON.stringify(productInfo, null, 2)}
 行銷內容：${JSON.stringify(contentData, null, 2)}
+使用場景：${scenarioType}
 
-請生成三種場景，每種場景都要包含：
+請生成三種「${scenarioType}」場景的創意變化，每種場景都要包含：
 1. 場景名稱
 2. 詳細的場景描述（環境、角色、互動）
 3. 情感氛圍
@@ -98,7 +100,7 @@ class ScenarioGeneratorService {
   }
 
   // 為場景生成詳細的圖片描述
-  async generateImageDescription(scenario, productInfo) {
+  async generateImageDescription(scenario, productInfo, scenarioType = '親子互動') {
     try {
       // 使用更新的 API 格式
       
@@ -140,8 +142,46 @@ class ScenarioGeneratorService {
     }
   }
 
+  // 根據場景類型生成創造性場景詳情
+  generateScenarioDetails(scenarioType) {
+    const scenarioMap = {
+      '親子互動': {
+        setting: 'Cozy family living room or nursery with soft lighting, comfortable seating, books and toys visible',
+        characters: 'Loving parent (mother or father, varying ethnicities) actively playing with a happy toddler (12-24 months old), genuine smiles and eye contact, natural interaction',
+        background: 'Warm home environment with family photos, soft pillows, children books on shelves, educational posters',
+        visualStyle: 'heartwarming family moments, emotional connection emphasis'
+      },
+      '小孩單人使用': {
+        setting: 'Child-safe play area, colorful play mat, age-appropriate surrounding toys',
+        characters: 'Independent toddler (18-30 months) exploring and playing alone, focused and curious expression, natural child behavior',
+        background: 'Bright, safe play environment with soft toys, building blocks, colorful activity mats, safety gates visible',
+        visualStyle: 'child development focus, exploration and discovery theme'
+      },
+      '外出旅遊': {
+        setting: 'Outdoor park, beach, or family-friendly travel destination with natural scenery',
+        characters: 'Family with toddler in portable travel scenario, child in stroller or being carried, outdoor adventure mood',
+        background: 'Beautiful natural landscape, travel-friendly setting like parks, beaches, family picnic areas, travel gear visible',
+        visualStyle: 'adventure and exploration theme, natural outdoor lighting'
+      },
+      '居家遊戲': {
+        setting: 'Well-organized playroom or family room with toys and learning materials',
+        characters: 'Child playing at home with family nearby, comfortable casual clothes, relaxed home atmosphere',
+        background: 'Home interior with toy storage, comfortable furniture, natural window lighting, home comfort elements',
+        visualStyle: 'home comfort theme, daily life naturalism'
+      },
+      '其他': {
+        setting: 'Creative and unique setting that varies each time - could be imaginative themed room, artistic space, or innovative play environment',
+        characters: 'Diverse family scenarios with varying ages, ethnicities, and family structures, creative interaction styles',
+        background: 'Artistic and creative backgrounds that change each generation - themed rooms, colorful artistic spaces, innovative educational environments',
+        visualStyle: 'highly creative and artistic, unique visual approach each time'
+      }
+    };
+    
+    return scenarioMap[scenarioType] || scenarioMap['親子互動'];
+  }
+
   // 自動 Nano Banana 圖片生成（場景專用，使用用戶上傳的產品圖片作為參考）
-  async generateScenarioImage(imageDescription, scenarioName, outputPath, productImagePath = null) {
+  async generateScenarioImage(imageDescription, scenarioName, outputPath, productImagePath = null, scenarioType = '親子互動') {
     try {
       console.log(`🎨 Generating scenario image for: ${scenarioName}`);
       
@@ -165,10 +205,19 @@ class ScenarioGeneratorService {
           mimeType = "image/gif";
         }
 
+        // 根據場景類型添加創造性變化
+        const scenarioDetails = this.generateScenarioDetails(scenarioType);
+        
         enhancedPrompt = `Create a high-quality marketing scenario image for Googoogaga baby toys using the EXACT SAME toy product shown in the reference image:
 
-Scenario: ${scenarioName}
+Scenario: ${scenarioName} (${scenarioType})
 Description: ${imageDescription}
+
+SCENARIO-SPECIFIC CREATIVE ELEMENTS:
+${scenarioDetails.setting}
+Characters: ${scenarioDetails.characters}
+Background: ${scenarioDetails.background}
+Visual Style: ${scenarioDetails.visualStyle}
 
 CRITICAL REQUIREMENTS:
 - Use the EXACT same toy product from the reference image - same colors, same shape, same design details
@@ -199,9 +248,16 @@ Style: Realistic photography, commercial quality, warm family moments, professio
         ];
       } else {
         // 沒有產品圖片時的一般提示詞
+        const scenarioDetails = this.generateScenarioDetails(scenarioType);
+        
         enhancedPrompt = `Create a high-quality marketing scenario image for Googoogaga baby toys:
 
-Scenario: ${scenarioName}
+Scenario: ${scenarioName} (${scenarioType})
+SCENARIO-SPECIFIC CREATIVE ELEMENTS:
+${scenarioDetails.setting}
+Characters: ${scenarioDetails.characters}  
+Background: ${scenarioDetails.background}
+Visual Style: ${scenarioDetails.visualStyle}
 Description: ${imageDescription}
 
 Requirements:

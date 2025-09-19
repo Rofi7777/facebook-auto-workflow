@@ -269,6 +269,7 @@ app.post('/api/generate-platform-content', async (req, res) => {
       platforms = ['shopee', 'tiktok', 'instagram', 'facebook'], 
       language = 'zh-TW',
       generateImages = false,
+      scenarioType = '親子互動',
       productImagePath = null
     } = req.body;
     
@@ -321,7 +322,7 @@ app.post('/api/generate-platform-content', async (req, res) => {
             const imagePath = `assets/generated/${platform}_${Date.now()}.png`;
             
             console.log(`Generating image for ${platform}:`, imagePrompt);
-            const generatedImageResult = await aiService.generateMarketingImage(imagePrompt, imagePath, validatedProductImagePath);
+            const generatedImageResult = await aiService.generateMarketingImage(imagePrompt, imagePath, validatedProductImagePath, scenarioType);
             
             // Check if actual image was generated or just description
             if (generatedImageResult && generatedImageResult.type === 'image' && generatedImageResult.isRealImage) {
@@ -382,7 +383,7 @@ app.post('/api/generate-platform-content', async (req, res) => {
 // Scene generation endpoint for creating marketing scenarios
 app.post('/api/generate-scenarios', async (req, res) => {
   try {
-    const { productInfo, contentData, productImagePath = null } = req.body;
+    const { productInfo, contentData, productImagePath = null, scenarioType = '親子互動' } = req.body;
     
     if (!productInfo || !contentData) {
       return res.status(400).json({ error: 'Product info and content data are required' });
@@ -412,16 +413,16 @@ app.post('/api/generate-scenarios', async (req, res) => {
     }
     
     // Generate three marketing scenarios
-    const scenarios = await scenarioService.generateMarketingScenarios(productInfo, contentData);
+    const scenarios = await scenarioService.generateMarketingScenarios(productInfo, contentData, scenarioType);
     console.log('Scenarios generated successfully');
     
     // Generate detailed image descriptions for each scenario
     const scenariosWithImages = await Promise.all(
       scenarios.scenarios?.map(async (scenario, index) => {
         try {
-          const imageDescription = await scenarioService.generateImageDescription(scenario, productInfo);
+          const imageDescription = await scenarioService.generateImageDescription(scenario, productInfo, scenarioType);
           const imagePath = `assets/scenarios/${Date.now()}_scenario_${index + 1}.png`;
-          const scenarioImageResult = await scenarioService.generateScenarioImage(imageDescription, scenario.name, imagePath, validatedProductImagePath);
+          const scenarioImageResult = await scenarioService.generateScenarioImage(imageDescription, scenario.name, imagePath, validatedProductImagePath, scenarioType);
           
           // Handle both image and design guide results
           const scenarioData = {

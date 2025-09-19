@@ -288,8 +288,51 @@ class GeminiAIService {
     }
   }
 
+  // 根據場景類型生成創造性場景詳情
+  generateScenarioDetails(scenarioType) {
+    const scenarioMap = {
+      '親子互動': {
+        setting: 'Cozy family living room or nursery with soft lighting, comfortable seating, books and toys visible',
+        characters: 'Loving parent (mother or father, varying ethnicities) actively playing with a happy toddler (12-24 months old), genuine smiles and eye contact, natural interaction',
+        background: 'Warm home environment with family photos, soft pillows, children books on shelves, educational posters',
+        specificRequirements: '- Focus on bonding and connection between parent and child\n- Show active engagement and interaction\n- Warm, nurturing atmosphere',
+        visualStyle: 'heartwarming family moments, emotional connection emphasis'
+      },
+      '小孩單人使用': {
+        setting: 'Child-safe play area, colorful play mat, age-appropriate surrounding toys',
+        characters: 'Independent toddler (18-30 months) exploring and playing alone, focused and curious expression, natural child behavior',
+        background: 'Bright, safe play environment with soft toys, building blocks, colorful activity mats, safety gates visible',
+        specificRequirements: '- Emphasize independent play and learning\n- Show child development and exploration\n- Safe, child-proofed environment',
+        visualStyle: 'child development focus, exploration and discovery theme'
+      },
+      '外出旅遊': {
+        setting: 'Outdoor park, beach, or family-friendly travel destination with natural scenery',
+        characters: 'Family with toddler in portable travel scenario, child in stroller or being carried, outdoor adventure mood',
+        background: 'Beautiful natural landscape, travel-friendly setting like parks, beaches, family picnic areas, travel gear visible',
+        specificRequirements: '- Portable and travel-friendly product usage\n- Outdoor adventure theme\n- Family bonding during travel',
+        visualStyle: 'adventure and exploration theme, natural outdoor lighting'
+      },
+      '居家遊戲': {
+        setting: 'Well-organized playroom or family room with toys and learning materials',
+        characters: 'Child playing at home with family nearby, comfortable casual clothes, relaxed home atmosphere',
+        background: 'Home interior with toy storage, comfortable furniture, natural window lighting, home comfort elements',
+        specificRequirements: '- Comfortable home environment\n- Daily play routine atmosphere\n- Organized, child-friendly space',
+        visualStyle: 'home comfort theme, daily life naturalism'
+      },
+      '其他': {
+        setting: 'Creative and unique setting that varies each time - could be imaginative themed room, artistic space, or innovative play environment',
+        characters: 'Diverse family scenarios with varying ages, ethnicities, and family structures, creative interaction styles',
+        background: 'Artistic and creative backgrounds that change each generation - themed rooms, colorful artistic spaces, innovative educational environments',
+        specificRequirements: '- Be highly creative and unique each time\n- Surprise elements and innovative scenarios\n- Varied and diverse family representations',
+        visualStyle: 'highly creative and artistic, unique visual approach each time'
+      }
+    };
+    
+    return scenarioMap[scenarioType] || scenarioMap['親子互動'];
+  }
+
   // 增強版 Nano Banana 圖片生成 (支援真實圖片生成和下載，使用用戶上傳的產品圖片作為參考)
-  async generateMarketingImage(prompt, imagePath, productImagePath = null) {
+  async generateMarketingImage(prompt, imagePath, productImagePath = null, scenarioType = '親子互動') {
     try {
       console.log('🎨 Starting Nano Banana image generation process...');
       
@@ -313,26 +356,37 @@ class GeminiAIService {
           mimeType = "image/gif";
         }
 
+        // 根據場景類型生成創造性的場景描述
+        const scenarioDetails = this.generateScenarioDetails(scenarioType);
+        
         enhancedPrompt = `Create a professional marketing image using the EXACT SAME toy product shown in the reference image.
 
 Marketing Context: ${prompt}
+Usage Scenario: ${scenarioType}
 
 CRITICAL REQUIREMENTS:
 - Use the EXACT same toy product from the reference image - same colors, same shape, same design details
-- Create a marketing scenario around this specific product
-- Warm family atmosphere suitable for babies and toddlers
+- Create a ${scenarioType} scenario around this specific product
+${scenarioDetails.specificRequirements}
 - Bright, safe, educational visual elements  
 - Soft pastel color palette (sky blue to pink gradient)
 - High-quality product photography style
 - Googoogaga brand aesthetic (safe, nurturing, developmental)
 - Composition suitable for social media marketing
 - Professional commercial photography lighting
-- Family-friendly environment (nursery, playroom, or living room)
-- Parents and babies interacting naturally with the SAME product from reference image
+
+SCENARIO SETTING:
+${scenarioDetails.setting}
+
+CHARACTERS & INTERACTION:
+${scenarioDetails.characters}
+
+BACKGROUND & ENVIRONMENT:
+${scenarioDetails.background}
 
 IMPORTANT: The generated image MUST feature the identical toy product shown in the reference image. Do not create a different or similar product - use the exact same one.
 
-Style: Professional product photography, warm family moments, high-quality visual appeal, commercially polished`;
+Style: Professional product photography, warm family moments, high-quality visual appeal, commercially polished, ${scenarioDetails.visualStyle}`;
 
         // 準備多模態內容：產品圖片 + 文字提示
         contentParts = [
@@ -346,12 +400,16 @@ Style: Professional product photography, warm family moments, high-quality visua
         ];
       } else {
         // 沒有產品圖片時的一般提示詞
+        const scenarioDetails = this.generateScenarioDetails(scenarioType);
+        
         enhancedPrompt = `Create a professional marketing image for a baby toy product.
 
 Product: ${prompt}
+Usage Scenario: ${scenarioType}
 
 Requirements:
-- Warm family atmosphere suitable for babies and toddlers
+- Create a ${scenarioType} scenario around this product
+${scenarioDetails.specificRequirements}
 - Bright, safe, educational visual elements  
 - Soft pastel color palette (sky blue to pink gradient)
 - High-quality product photography style
@@ -359,10 +417,17 @@ Requirements:
 - Composition suitable for social media marketing
 - Professional commercial photography lighting
 - Clear focus on the toy product
-- Family-friendly environment (nursery, playroom, or living room)
-- Parents and babies interacting naturally with the product
 
-Style: Professional product photography, warm family moments, high-quality visual appeal, commercially polished`;
+SCENARIO SETTING:
+${scenarioDetails.setting}
+
+CHARACTERS & INTERACTION:
+${scenarioDetails.characters}
+
+BACKGROUND & ENVIRONMENT:
+${scenarioDetails.background}
+
+Style: Professional product photography, warm family moments, high-quality visual appeal, commercially polished, ${scenarioDetails.visualStyle}`;
 
         contentParts = [{ text: enhancedPrompt }];
       }

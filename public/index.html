@@ -329,9 +329,36 @@
                     
                     <div class="form-group">
                         <label>
-                            <input type="checkbox" id="generateImages" name="generateImages">
+                            <input type="checkbox" id="generateImages" name="generateImages" onchange="toggleScenarioOptions()">
                             自動生成行銷圖片 (Generate Marketing Images)
                         </label>
+                    </div>
+                    
+                    <!-- 場景選擇選項 -->
+                    <div class="form-group" id="scenarioOptionsGroup" style="display: none;">
+                        <label>使用場景選擇 / Usage Scenario Selection</label>
+                        <div class="checkbox-group" id="scenarioGroup">
+                            <div class="checkbox-item">
+                                <input type="radio" id="scenario_parent_child" name="scenarioType" value="親子互動" checked>
+                                <label for="scenario_parent_child">👨‍👩‍👧‍👦 親子互動 (Parent-Child Interaction)</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="radio" id="scenario_child_solo" name="scenarioType" value="小孩單人使用">
+                                <label for="scenario_child_solo">🧒 小孩單人使用 (Child Solo Play)</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="radio" id="scenario_outdoor_travel" name="scenarioType" value="外出旅遊">
+                                <label for="scenario_outdoor_travel">🌍 外出旅遊 (Outdoor Travel)</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="radio" id="scenario_home_play" name="scenarioType" value="居家遊戲">
+                                <label for="scenario_home_play">🏠 居家遊戲 (Home Play)</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="radio" id="scenario_other" name="scenarioType" value="其他">
+                                <label for="scenario_other">✨ 其他 (Other Creative)</label>
+                            </div>
+                        </div>
                     </div>
                     
                     <button type="submit" class="btn" id="analyzeBtn">
@@ -421,6 +448,15 @@
                 const language = document.getElementById('language').value;
                 const generateImages = document.getElementById('generateImages').checked;
                 
+                // 獲取場景類型選擇
+                let scenarioType = '親子互動'; // 預設值
+                if (generateImages) {
+                    const selectedScenario = document.querySelector('input[name="scenarioType"]:checked');
+                    if (selectedScenario) {
+                        scenarioType = selectedScenario.value;
+                    }
+                }
+                
                 // Get selected platforms
                 const selectedPlatforms = Array.from(document.querySelectorAll('#platformsGroup input[type="checkbox"]:checked')).map(cb => cb.value);
                 
@@ -494,6 +530,7 @@
                         platforms: selectedPlatforms,
                         language: language,
                         generateImages: generateImages,
+                        scenarioType: scenarioType,
                         productImagePath: uploadedImagePath
                     })
                 });
@@ -537,7 +574,8 @@
                     body: JSON.stringify({
                         productInfo: productAnalysis,
                         contentData: generatedContent,
-                        productImagePath: uploadedImagePath
+                        productImagePath: uploadedImagePath,
+                        scenarioType: scenarioType
                     })
                 });
                 
@@ -781,6 +819,18 @@
             scenariosContainer.style.display = 'block';
         }
         
+        // Toggle scenario options based on generateImages checkbox
+        function toggleScenarioOptions() {
+            const generateImages = document.getElementById('generateImages').checked;
+            const scenarioOptionsGroup = document.getElementById('scenarioOptionsGroup');
+            
+            if (generateImages) {
+                scenarioOptionsGroup.style.display = 'block';
+            } else {
+                scenarioOptionsGroup.style.display = 'none';
+            }
+        }
+
         // Load brand configuration and populate UI
         async function loadBrandConfig() {
             try {
