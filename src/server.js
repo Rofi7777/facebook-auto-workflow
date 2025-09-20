@@ -239,6 +239,7 @@ app.post('/api/analyze-product', async (req, res) => {
     
     // Get language from request or default to zh-TW
     const language = req.body.language || 'zh-TW';
+    console.log('🌐 Analysis request language:', language);
     
     // Analyze product image with AI
     const productAnalysis = await aiService.analyzeProductImage(resolvedImagePath, language);

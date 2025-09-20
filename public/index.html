@@ -514,7 +514,8 @@
                 
                 // Step 2: AI Product Analysis
                 if (uploadedImagePath || productDescription) {
-                    showStatus('🧠 AI 產品分析中...', 'info');
+                    showStatus(`🧠 AI 產品分析中... (${language})`, 'info');
+                    console.log('🌐 Selected language for analysis:', language);
                     
                     const analysisResponse = await fetch('/api/analyze-product', {
                         method: 'POST',
