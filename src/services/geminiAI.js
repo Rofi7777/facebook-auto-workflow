@@ -150,7 +150,7 @@ Vui lòng phân tích và trả về định dạng JSON bằng tiếng Việt:`
 請分析並回傳雙語JSON格式：`
       };
       
-      const prompt = languagePrompts[language] || languagePrompts['zh-TW'];
+      const prompt = `${languagePrompts[language] || languagePrompts['zh-TW']}
       {
         "painPoints": [
           {
