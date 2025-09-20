@@ -237,12 +237,15 @@ app.post('/api/analyze-product', async (req, res) => {
 
     console.log('Analyzing product image:', resolvedImagePath);
     
+    // Get language from request or default to zh-TW
+    const language = req.body.language || 'zh-TW';
+    
     // Analyze product image with AI
-    const productAnalysis = await aiService.analyzeProductImage(resolvedImagePath);
+    const productAnalysis = await aiService.analyzeProductImage(resolvedImagePath, language);
     console.log('Product analysis completed:', productAnalysis);
     
     // Identify pain points and scenarios
-    const painPointsAnalysis = await aiService.identifyPainPointsAndScenarios(productAnalysis);
+    const painPointsAnalysis = await aiService.identifyPainPointsAndScenarios(productAnalysis, language);
     console.log('Pain points analysis completed');
     
     res.json({

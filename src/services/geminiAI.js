@@ -29,7 +29,7 @@ class GeminiAIService {
   }
 
   // 分析產品圖片並識別產品特性
-  async analyzeProductImage(imagePath) {
+  async analyzeProductImage(imagePath, language = 'zh-TW') {
     try {
       const imageBytes = await fs.readFile(imagePath);
       
@@ -39,6 +39,36 @@ class GeminiAIService {
       if (ext === '.png') mimeType = "image/png";
       if (ext === '.gif') mimeType = "image/gif";
       if (ext === '.webp') mimeType = "image/webp";
+      
+      // 根據語言調整分析提示詞
+      const languagePrompts = {
+        'vi': `Hãy phân tích chi tiết hình ảnh sản phẩm đồ chơi trẻ em này và cung cấp thông tin sau:
+        1. Loại sản phẩm và đặc điểm chính
+        2. Độ tuổi phù hợp
+        3. Chức năng chính và giá trị giáo dục
+        4. Tính năng an toàn
+        5. Chất liệu và màu sắc
+        6. Đề xuất tình huống sử dụng
+        Vui lòng trả lời bằng tiếng Việt, định dạng JSON:`,
+        'zh-TW': `請詳細分析這個嬰幼兒玩具產品圖片，提供以下資訊：
+        1. 產品類型和主要特徵
+        2. 適合年齡層
+        3. 主要功能和教育價值
+        4. 安全特性
+        5. 材質和顏色
+        6. 使用場景建議
+        請用繁體中文回答，格式為JSON：`,
+        'bilingual': `請詳細分析這個嬰幼兒玩具產品圖片，提供以下資訊（請用繁體中文和越南文雙語回答）：
+        1. 產品類型和主要特徵
+        2. 適合年齡層
+        3. 主要功能和教育價值
+        4. 安全特性
+        5. 材質和顏色
+        6. 使用場景建議
+        請用繁體中文和越南文雙語回答，格式為JSON：`
+      };
+      
+      const promptText = languagePrompts[language] || languagePrompts['zh-TW'];
       
       const contents = [
         {
@@ -51,14 +81,7 @@ class GeminiAIService {
               },
             },
             {
-              text: `請詳細分析這個嬰幼兒玩具產品圖片，提供以下資訊：
-        1. 產品類型和主要特徵
-        2. 適合年齡層
-        3. 主要功能和教育價值
-        4. 安全特性
-        5. 材質和顏色
-        6. 使用場景建議
-        請用繁體中文回答，格式為JSON：
+              text: `${promptText}
         {
           "productType": "產品類型",
           "ageRange": "適合年齡",
@@ -106,14 +129,28 @@ class GeminiAIService {
   }
 
   // 識別用戶痛點和使用場景
-  async identifyPainPointsAndScenarios(productAnalysis) {
+  async identifyPainPointsAndScenarios(productAnalysis, language = 'zh-TW') {
     try {
-      const prompt = `
-      基於以下產品分析，請識別終端消費者（嬰幼兒家長）可能遇到的痛點，並提出相應的使用場景：
+      // 根據語言調整痛點分析提示詞
+      const languagePrompts = {
+        'vi': `Dựa trên phân tích sản phẩm sau, vui lòng xác định các điểm khó khăn mà người tiêu dùng cuối (cha mẹ có em bé) có thể gặp phải và đề xuất các tình huống sử dụng tương ứng:
 
-      產品分析：${JSON.stringify(productAnalysis, null, 2)}
+Phân tích sản phẩm: ${JSON.stringify(productAnalysis, null, 2)}
 
-      請分析並回傳JSON格式：
+Vui lòng phân tích và trả về định dạng JSON bằng tiếng Việt:`,
+        'zh-TW': `基於以下產品分析，請識別終端消費者（嬰幼兒家長）可能遇到的痛點，並提出相應的使用場景：
+
+產品分析：${JSON.stringify(productAnalysis, null, 2)}
+
+請分析並回傳JSON格式：`,
+        'bilingual': `基於以下產品分析，請識別終端消費者（嬰幼兒家長）可能遇到的痛點，並提出相應的使用場景（請用繁體中文和越南文雙語回答）：
+
+產品分析：${JSON.stringify(productAnalysis, null, 2)}
+
+請分析並回傳雙語JSON格式：`
+      };
+      
+      const prompt = languagePrompts[language] || languagePrompts['zh-TW'];
       {
         "painPoints": [
           {
