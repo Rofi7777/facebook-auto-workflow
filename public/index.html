@@ -276,6 +276,22 @@
             border-radius: 0 8px 8px 0;
         }
         
+        .bilingual-analysis {
+            margin-bottom: 15px;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border: 1px solid #e9ecef;
+        }
+        
+        .bilingual-analysis .language-section {
+            padding: 8px;
+            margin: 4px 0;
+            border-left: 3px solid #e0e0e0;
+            background: #ffffff;
+            border-radius: 0 6px 6px 0;
+        }
+        
         .platform-result .image-preview {
             max-width: 100%;
             border-radius: 8px;
@@ -695,10 +711,31 @@
                 html += '<div class="analysis-section">';
                 html += '<h4>💡 識別的用戶痛點</h4>';
                 painPointsAnalysis.painPoints.forEach(pain => {
-                    html += `<div class="pain-point">
-                        <strong>${pain.category}:</strong> ${pain.description}
-                        <small style="color: #666;"> (${pain.severity})</small>
-                    </div>`;
+                    // Check if bilingual format (contains /) 
+                    if (pain.category && pain.category.includes('/')) {
+                        const [zhCategory, viCategory] = pain.category.split('/');
+                        const [zhDesc, viDesc] = pain.description ? pain.description.split('/') : ['', ''];
+                        const [zhTarget, viTarget] = pain.targetAudience ? pain.targetAudience.split('/') : ['', ''];
+                        const [zhSeverity, viSeverity] = pain.severity ? pain.severity.split('/') : ['', ''];
+                        
+                        html += `<div class="pain-point bilingual-analysis">
+                            <div class="language-section">
+                                <h6 style="color: #d32f2f; margin-bottom: 5px;">🇹🇼</h6>
+                                <strong>${zhCategory.trim()}:</strong> ${zhDesc.trim()}
+                                <br><small style="color: #666;">目標: ${zhTarget.trim()} (${zhSeverity.trim()})</small>
+                            </div>
+                            <div class="language-section" style="margin-top: 8px;">
+                                <h6 style="color: #1976d2; margin-bottom: 5px;">🇻🇳</h6>
+                                <strong>${viCategory.trim()}:</strong> ${viDesc.trim()}
+                                <br><small style="color: #666;">Đối tượng: ${viTarget.trim()} (${viSeverity.trim()})</small>
+                            </div>
+                        </div>`;
+                    } else {
+                        html += `<div class="pain-point">
+                            <strong>${pain.category}:</strong> ${pain.description}
+                            <small style="color: #666;"> (${pain.severity})</small>
+                        </div>`;
+                    }
                 });
                 html += '</div>';
             }
@@ -707,10 +744,33 @@
                 html += '<div class="analysis-section">';
                 html += '<h4>🎬 使用場景建議</h4>';
                 painPointsAnalysis.usageScenarios.forEach(scenario => {
-                    html += `<div class="scenario">
-                        <strong>${scenario.scenario}:</strong> ${scenario.context}
-                        <br><small style="color: #28a745;">${scenario.benefits}</small>
-                    </div>`;
+                    // Check if bilingual format
+                    if (scenario.scenario && scenario.scenario.includes('/')) {
+                        const [zhScenario, viScenario] = scenario.scenario.split('/');
+                        const [zhContext, viContext] = scenario.context ? scenario.context.split('/') : ['', ''];
+                        const [zhBenefits, viBenefits] = scenario.benefits ? scenario.benefits.split('/') : ['', ''];
+                        const [zhEmotions, viEmotions] = scenario.emotions ? scenario.emotions.split('/') : ['', ''];
+                        
+                        html += `<div class="scenario bilingual-analysis">
+                            <div class="language-section">
+                                <h6 style="color: #d32f2f; margin-bottom: 5px;">🇹🇼</h6>
+                                <strong>${zhScenario.trim()}:</strong> ${zhContext.trim()}
+                                <br><small style="color: #28a745;">${zhBenefits.trim()}</small>
+                                <br><small style="color: #ff9800;">情感: ${zhEmotions.trim()}</small>
+                            </div>
+                            <div class="language-section" style="margin-top: 8px;">
+                                <h6 style="color: #1976d2; margin-bottom: 5px;">🇻🇳</h6>
+                                <strong>${viScenario.trim()}:</strong> ${viContext.trim()}
+                                <br><small style="color: #28a745;">${viBenefits.trim()}</small>
+                                <br><small style="color: #ff9800;">Cảm xúc: ${viEmotions.trim()}</small>
+                            </div>
+                        </div>`;
+                    } else {
+                        html += `<div class="scenario">
+                            <strong>${scenario.scenario}:</strong> ${scenario.context}
+                            <br><small style="color: #28a745;">${scenario.benefits}</small>
+                        </div>`;
+                    }
                 });
                 html += '</div>';
             }
