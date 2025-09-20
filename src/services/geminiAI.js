@@ -244,21 +244,49 @@ Vui lòng phân tích và trả về định dạng JSON bằng tiếng Việt:`
       - 最大長度：${spec.maxLength}字
       - 語調：${spec.tone}
 
-      語言：${language === 'vi' ? '越南語' : '繁體中文'}
+      語言：${language === 'vi' ? '越南語' : (language === 'bilingual' ? '繁體中文和越南語雙語' : '繁體中文')}
 
-      請產生適合的內容，包含：
-      1. 主要文案
-      2. 建議的hashtag
-      3. 呼籲行動(CTA)
-      4. 情感連結點
+      ${language === 'bilingual' ? 
+        `請產生雙語內容（繁體中文和越南文），包含：
+        1. 主要文案（雙語版本）
+        2. 建議的hashtag（雙語版本）
+        3. 呼籲行動(CTA)（雙語版本）
+        4. 情感連結點（雙語版本）
 
-      回傳JSON格式：
-      {
-        "mainContent": "主要文案內容",
-        "hashtags": ["#hashtag1", "#hashtag2"],
-        "cta": "呼籲行動文字",
-        "emotionalConnect": "情感連結描述",
-        "imagePrompt": "配圖建議描述"
+        回傳JSON格式：
+        {
+          "mainContent": {
+            "zh-TW": "繁體中文主要文案內容",
+            "vi": "Nội dung chính bằng tiếng Việt"
+          },
+          "hashtags": {
+            "zh-TW": ["#中文hashtag1", "#中文hashtag2"],
+            "vi": ["#hashtag_tiếng_việt1", "#hashtag_tiếng_việt2"]
+          },
+          "cta": {
+            "zh-TW": "繁體中文呼籲行動文字",
+            "vi": "Lời kêu gọi hành động bằng tiếng Việt"
+          },
+          "emotionalConnect": {
+            "zh-TW": "繁體中文情感連結描述",
+            "vi": "Mô tả kết nối cảm xúc bằng tiếng Việt"
+          },
+          "imagePrompt": "配圖建議描述"
+        }` :
+        `請產生適合的內容，包含：
+        1. 主要文案
+        2. 建議的hashtag
+        3. 呼籲行動(CTA)
+        4. 情感連結點
+
+        回傳JSON格式：
+        {
+          "mainContent": "主要文案內容",
+          "hashtags": ["#hashtag1", "#hashtag2"],
+          "cta": "呼籲行動文字",
+          "emotionalConnect": "情感連結描述",
+          "imagePrompt": "配圖建議描述"
+        }`
       }`;
 
       const response = await this.ai.models.generateContent({

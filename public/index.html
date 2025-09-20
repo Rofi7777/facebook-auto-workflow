@@ -259,6 +259,23 @@
             font-weight: 500;
         }
         
+        .hashtags-bilingual {
+            margin-top: 15px;
+            color: #1976d2;
+            font-size: 0.9em;
+            padding: 10px;
+            background: #f5f5f5;
+            border-radius: 8px;
+        }
+        
+        .bilingual-content .language-section {
+            padding: 12px;
+            margin: 8px 0;
+            border-left: 4px solid #e0e0e0;
+            background: #fafafa;
+            border-radius: 0 8px 8px 0;
+        }
+        
         .platform-result .image-preview {
             max-width: 100%;
             border-radius: 8px;
@@ -650,7 +667,26 @@
                 html += `<p><strong>適合年齡:</strong> ${productAnalysis.ageRange}</p>`;
             }
             if (productAnalysis.educationalValue) {
-                html += `<p><strong>教育價值:</strong> ${productAnalysis.educationalValue}</p>`;
+                // Handle array or string format
+                const eduValue = Array.isArray(productAnalysis.educationalValue) 
+                    ? productAnalysis.educationalValue.join('、') 
+                    : productAnalysis.educationalValue;
+                html += `<p><strong>教育價值:</strong> ${eduValue}</p>`;
+            }
+            if (productAnalysis.features) {
+                html += `<p><strong>產品特色:</strong> ${Array.isArray(productAnalysis.features) ? productAnalysis.features.join('、') : productAnalysis.features}</p>`;
+            }
+            if (productAnalysis.safetyFeatures) {
+                html += `<p><strong>安全特性:</strong> ${Array.isArray(productAnalysis.safetyFeatures) ? productAnalysis.safetyFeatures.join('、') : productAnalysis.safetyFeatures}</p>`;
+            }
+            if (productAnalysis.materials) {
+                html += `<p><strong>材質:</strong> ${productAnalysis.materials}</p>`;
+            }
+            if (productAnalysis.colors) {
+                html += `<p><strong>顏色:</strong> ${Array.isArray(productAnalysis.colors) ? productAnalysis.colors.join('、') : productAnalysis.colors}</p>`;
+            }
+            if (productAnalysis.usageScenarios) {
+                html += `<p><strong>使用場景:</strong> ${Array.isArray(productAnalysis.usageScenarios) ? productAnalysis.usageScenarios.join('、') : productAnalysis.usageScenarios}</p>`;
             }
             
             html += '</div>';
@@ -717,14 +753,50 @@
                     </h3>`;
                 
                 if (result.status === 'success' && content) {
-                    html += `<div class="content">${content.mainContent || content.rawContent}</div>`;
-                    
-                    if (content.hashtags && content.hashtags.length > 0) {
-                        html += `<div class="hashtags">${content.hashtags.join(' ')}</div>`;
-                    }
-                    
-                    if (content.cta) {
-                        html += `<div style="margin-top: 10px;"><strong>CTA:</strong> ${content.cta}</div>`;
+                    // Handle bilingual content format
+                    if (typeof content.mainContent === 'object' && content.mainContent['zh-TW'] && content.mainContent['vi']) {
+                        // Bilingual format
+                        html += `<div class="content bilingual-content">
+                            <div class="language-section">
+                                <h5 style="color: #d32f2f; margin-bottom: 8px;">🇹🇼 繁體中文</h5>
+                                <div>${content.mainContent['zh-TW']}</div>
+                            </div>
+                            <div class="language-section" style="margin-top: 15px;">
+                                <h5 style="color: #1976d2; margin-bottom: 8px;">🇻🇳 Tiếng Việt</h5>
+                                <div>${content.mainContent['vi']}</div>
+                            </div>
+                        </div>`;
+                        
+                        // Bilingual hashtags
+                        if (content.hashtags && typeof content.hashtags === 'object') {
+                            html += `<div class="hashtags-bilingual">
+                                <div style="margin-bottom: 8px;">
+                                    <strong>🇹🇼:</strong> ${content.hashtags['zh-TW']?.join(' ') || ''}
+                                </div>
+                                <div>
+                                    <strong>🇻🇳:</strong> ${content.hashtags['vi']?.join(' ') || ''}
+                                </div>
+                            </div>`;
+                        }
+                        
+                        // Bilingual CTA
+                        if (content.cta && typeof content.cta === 'object') {
+                            html += `<div style="margin-top: 10px;">
+                                <div style="margin-bottom: 5px;"><strong>🇹🇼 CTA:</strong> ${content.cta['zh-TW'] || ''}</div>
+                                <div><strong>🇻🇳 CTA:</strong> ${content.cta['vi'] || ''}</div>
+                            </div>`;
+                        }
+                    } else {
+                        // Standard single-language format
+                        html += `<div class="content">${content.mainContent || content.rawContent}</div>`;
+                        
+                        if (content.hashtags && content.hashtags.length > 0) {
+                            html += `<div class="hashtags">${content.hashtags.join(' ')}</div>`;
+                        }
+                        
+                        if (content.cta) {
+                            html += `<div style="margin-top: 10px;"><strong>CTA:</strong> ${content.cta}</div>`;
+                        }
                     }
                     
                     // 顯示生成的圖片或設計描述（帶下載功能）
