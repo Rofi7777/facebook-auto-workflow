@@ -82,7 +82,18 @@ class GeminiAIService {
             },
             {
               text: `${promptText}
-        {
+        ${language === 'bilingual' ? 
+          `{
+          "productType": "積木玩具/Đồ chơi xếp hình",
+          "ageRange": "1-3歲/1-3 tuổi",
+          "features": ["色彩鮮豔/Màu sắc tươi sáng", "質地光滑/Chất liệu mịn màng"],
+          "educationalValue": "促進手眼協調/Thúc đẩy phối hợp tay mắt; 認識顏色形狀/Nhận biết màu sắc hình dạng",
+          "safetyFeatures": ["無尖銳邊角/Không có góc cạnh sắc", "環保材質/Chất liệu thân thiện"],
+          "materials": "環保木材/Gỗ thân thiện với môi trường",
+          "colors": ["藍色/Màu xanh dương", "粉色/Màu hồng"],
+          "usageScenarios": ["居家遊戲/Trò chơi tại nhà", "親子互動/Tương tác cha mẹ con cái"]
+        }` :
+          `{
           "productType": "產品類型",
           "ageRange": "適合年齡",
           "features": ["特徵1", "特徵2"],
@@ -91,6 +102,7 @@ class GeminiAIService {
           "materials": "材質描述",
           "colors": ["顏色1", "顏色2"],
           "usageScenarios": ["使用場景1", "使用場景2"]
+        }`
         }`
             }
           ]
@@ -151,7 +163,27 @@ Vui lòng phân tích và trả về định dạng JSON bằng tiếng Việt:`
       };
       
       const prompt = `${languagePrompts[language] || languagePrompts['zh-TW']}
-      {
+      ${language === 'bilingual' ? 
+        `{
+        "painPoints": [
+          {
+            "category": "收納困擾/Vấn đề lưu trữ",
+            "description": "積木散落各處，難以收拾/Các khối đồ chơi rải rác khắp nơi, khó dọn dẹp",
+            "targetAudience": "所有嬰幼兒家長/Tất cả các bậc phụ huynh có con nhỏ",
+            "severity": "中/Trung bình"
+          }
+        ],
+        "usageScenarios": [
+          {
+            "scenario": "親子共玩時間/Thời gian chơi cùng con",
+            "context": "週末下午親子互動/Chiều cuối tuần tương tác cha mẹ con cái",
+            "benefits": "增進親子關係/Thúc đẩy mối quan hệ cha mẹ - con cái",
+            "emotions": "快樂、滿足/Hạnh phúc, thỏa mãn"
+          }
+        ],
+        "marketingAngles": ["強調安全設計/Nhấn mạnh thiết kế an toàn", "突顯教育價值/Làm nổi bật giá trị giáo dục"]
+      }` :
+        `{
         "painPoints": [
           {
             "category": "痛點類別",
@@ -169,6 +201,7 @@ Vui lòng phân tích và trả về định dạng JSON bằng tiếng Việt:`
           }
         ],
         "marketingAngles": ["行銷角度1", "行銷角度2"]
+      }`
       }`;
 
       const response = await this.ai.models.generateContent({
