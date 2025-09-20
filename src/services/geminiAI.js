@@ -349,7 +349,25 @@ Vui lòng phân tích và trả về định dạng JSON bằng tiếng Việt:`
       
       // If JSON parsing fails, create structured content from raw text
       const lines = contentText.split('\n').filter(line => line.trim());
-      const structured = {
+      const structured = language === 'bilingual' ? {
+        mainContent: {
+          "zh-TW": "",
+          "vi": ""
+        },
+        hashtags: {
+          "zh-TW": [],
+          "vi": []
+        },
+        cta: {
+          "zh-TW": "",
+          "vi": ""
+        },
+        emotionalConnect: {
+          "zh-TW": "",
+          "vi": ""
+        },
+        imagePrompt: ""
+      } : {
         mainContent: "",
         hashtags: [],
         cta: "",
@@ -358,26 +376,49 @@ Vui lòng phân tích và trả về định dạng JSON bằng tiếng Việt:`
       };
       
       // Extract content sections
-      lines.forEach(line => {
-        const trimmed = line.trim();
-        if (trimmed.includes('#') && trimmed.includes('hashtags')) {
-          // Extract hashtags
-          const hashtagMatch = trimmed.match(/#\w+/g);
-          if (hashtagMatch) {
-            structured.hashtags = hashtagMatch;
+      if (language === 'bilingual') {
+        // For bilingual mode, attempt to extract bilingual content
+        const zhContent = lines.filter(l => /[\u4e00-\u9fff]/.test(l)).join(' ');
+        const viContent = lines.filter(l => /[àáạảãâầấậẩẫăằắặẳẵèéẹẻẽêềếệểễìíịỉĩòóọỏõôồốộổỗơờớợởỡùúụủũưừứựửữỳýỵỷỹđ]/i.test(l)).join(' ');
+        
+        structured.mainContent['zh-TW'] = zhContent || contentText.substring(0, contentText.length / 2);
+        structured.mainContent['vi'] = viContent || contentText.substring(contentText.length / 2);
+        
+        // Extract hashtags for both languages
+        const zhHashtags = (zhContent.match(/#[\u4e00-\u9fff\w]+/g) || []);
+        const viHashtags = (viContent.match(/#[a-zA-Z_àáạảãâầấậẩẫăằắặẳẵèéẹẻẽêềếệểễìíịỉĩòóọỏõôồốộổỗơờớợởỡùúụủũưừứựửữỳýỵỷỹđ]+/g) || []);
+        
+        structured.hashtags['zh-TW'] = zhHashtags;
+        structured.hashtags['vi'] = viHashtags;
+        
+        // Extract CTA and emotional connect for both languages
+        structured.cta['zh-TW'] = zhContent.includes('立即') ? zhContent.match(/立即[^。！？]*[。！？]/)?.[0] || '' : '';
+        structured.cta['vi'] = viContent.includes('ngay') ? viContent.match(/[Nn]gay[^.!?]*[.!?]/)?.[0] || '' : '';
+        
+        structured.emotionalConnect['zh-TW'] = zhContent || '溫馨親子時光';
+        structured.emotionalConnect['vi'] = viContent || 'Khoảnh khắc gia đình ấm áp';
+      } else {
+        // Single language fallback
+        lines.forEach(line => {
+          const trimmed = line.trim();
+          if (trimmed.includes('#') && trimmed.includes('hashtags')) {
+            const hashtagMatch = trimmed.match(/#\w+/g);
+            if (hashtagMatch) {
+              structured.hashtags = hashtagMatch;
+            }
+          } else if (trimmed.toLowerCase().includes('cta') || trimmed.includes('行動呼籲')) {
+            structured.cta = trimmed.replace(/^.*?[:：]/, '').trim();
+          } else if (trimmed.includes('情感連結') || trimmed.includes('emotional')) {
+            structured.emotionalConnect = trimmed.replace(/^.*?[:：]/, '').trim();
+          } else if (!structured.mainContent && trimmed.length > 20) {
+            structured.mainContent = trimmed;
           }
-        } else if (trimmed.toLowerCase().includes('cta') || trimmed.includes('行動呼籲')) {
-          structured.cta = trimmed.replace(/^.*?[:：]/, '').trim();
-        } else if (trimmed.includes('情感連結') || trimmed.includes('emotional')) {
-          structured.emotionalConnect = trimmed.replace(/^.*?[:：]/, '').trim();
-        } else if (!structured.mainContent && trimmed.length > 20) {
-          structured.mainContent = trimmed;
+        });
+        
+        // If no structured content found, use the raw text as main content
+        if (!structured.mainContent) {
+          structured.mainContent = contentText.trim();
         }
-      });
-      
-      // If no structured content found, use the raw text as main content
-      if (!structured.mainContent) {
-        structured.mainContent = contentText.trim();
       }
       
       return structured;
