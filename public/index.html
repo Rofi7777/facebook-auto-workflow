@@ -156,6 +156,69 @@
             display: none;
         }
         
+        .image-preview-container {
+            display: none;
+            margin-top: 15px;
+            padding: 15px;
+            border: 1px solid #e1e5e9;
+            border-radius: 8px;
+            background: #f8f9fa;
+        }
+        
+        .image-preview-container.show {
+            display: block;
+        }
+        
+        .image-preview-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .image-preview-item {
+            position: relative;
+            border-radius: 8px;
+            overflow: hidden;
+            background: white;
+            border: 2px solid #e1e5e9;
+        }
+        
+        .image-preview-item img {
+            width: 100%;
+            height: 100px;
+            object-fit: cover;
+            display: block;
+        }
+        
+        .image-preview-item .remove-btn {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: rgba(255, 0, 0, 0.8);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            font-size: 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .image-preview-item .remove-btn:hover {
+            background: rgba(255, 0, 0, 1);
+        }
+        
+        .selected-count {
+            margin-top: 10px;
+            font-weight: 600;
+            color: #333;
+            font-size: 14px;
+        }
+        
         .btn {
             background: linear-gradient(135deg, #87CEEB 0%, #FFB6C1 100%);
             color: white;
@@ -365,12 +428,14 @@
                     </div>
                     
                     <div class="form-group">
-                        <label>產品圖片 / Product Image</label>
+                        <label>產品圖片 / Product Image (支持1-5張圖片同時上傳)</label>
                         <div class="file-upload" onclick="document.getElementById('imageUpload').click()">
-                            <input type="file" id="imageUpload" accept="image/*">
-                            <p>📸 上傳玩具圖片 (Upload toy image)</p>
-                            <small>支援 JPG, PNG (最大 10MB)</small>
+                            <input type="file" id="imageUpload" accept="image/*" multiple>
+                            <p>📸 上傳玩具圖片 (Upload toy images - 最多5張)</p>
+                            <small>支援 JPG, PNG (每張最大 10MB，最多5張圖片)</small>
                         </div>
+                        <div id="imagePreviewContainer" class="image-preview-container"></div>
+                        <div id="selectedImageCount" class="selected-count" style="display: none;"></div>
                     </div>
                     
                     <div class="form-group">
@@ -472,13 +537,89 @@
         const analyzeBtn = document.getElementById('analyzeBtn');
         const generateScenariosBtn = document.getElementById('generateScenariosBtn');
         
-        // File upload handling
+        // File upload handling - Multi-image support
+        let selectedFiles = [];
+        
         fileUpload.addEventListener('change', function(e) {
-            const fileName = e.target.files[0]?.name;
-            if (fileName) {
-                e.target.parentElement.querySelector('p').textContent = `已選擇: ${fileName}`;
+            const files = Array.from(e.target.files);
+            
+            // Limit to maximum 5 files
+            if (files.length > 5) {
+                alert('最多只能選擇5張圖片');
+                files.splice(5);
+                
+                // Reset the input to selected files
+                const dt = new DataTransfer();
+                files.forEach(file => dt.items.add(file));
+                e.target.files = dt.files;
             }
+            
+            selectedFiles = files;
+            updateFileUploadDisplay();
+            updateImagePreview();
         });
+        
+        function updateFileUploadDisplay() {
+            const uploadText = fileUpload.parentElement.querySelector('p');
+            
+            if (selectedFiles.length === 0) {
+                uploadText.textContent = '📸 上傳玩具圖片 (Upload toy images - 最多5張)';
+            } else if (selectedFiles.length === 1) {
+                uploadText.textContent = `已選擇: ${selectedFiles[0].name}`;
+            } else {
+                uploadText.textContent = `已選擇: ${selectedFiles.length} 張圖片`;
+            }
+        }
+        
+        function updateImagePreview() {
+            const previewContainer = document.getElementById('imagePreviewContainer');
+            const countDisplay = document.getElementById('selectedImageCount');
+            
+            if (selectedFiles.length === 0) {
+                previewContainer.classList.remove('show');
+                countDisplay.style.display = 'none';
+                return;
+            }
+            
+            previewContainer.classList.add('show');
+            countDisplay.style.display = 'block';
+            countDisplay.textContent = `已選擇 ${selectedFiles.length}/5 張圖片`;
+            
+            let html = '<div class="image-preview-grid">';
+            
+            selectedFiles.forEach((file, index) => {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const previewItem = document.querySelector(`[data-file-index="${index}"]`);
+                    if (previewItem) {
+                        previewItem.querySelector('img').src = e.target.result;
+                    }
+                };
+                reader.readAsDataURL(file);
+                
+                html += `
+                    <div class="image-preview-item" data-file-index="${index}">
+                        <img src="" alt="預覽圖片 ${index + 1}">
+                        <button class="remove-btn" onclick="removeImage(${index})">×</button>
+                    </div>
+                `;
+            });
+            
+            html += '</div>';
+            previewContainer.innerHTML = html;
+        }
+        
+        function removeImage(index) {
+            selectedFiles.splice(index, 1);
+            
+            // Update the file input
+            const dt = new DataTransfer();
+            selectedFiles.forEach(file => dt.items.add(file));
+            fileUpload.files = dt.files;
+            
+            updateFileUploadDisplay();
+            updateImagePreview();
+        }
         
         // Status display
         function showStatus(message, type) {
@@ -506,7 +647,7 @@
                 const formData = new FormData();
                 const productName = document.getElementById('productName').value;
                 const productDescription = document.getElementById('productDescription').value;
-                const imageFile = document.getElementById('imageUpload').files[0];
+                const imageFiles = Array.from(document.getElementById('imageUpload').files);
                 const language = document.getElementById('language').value;
                 const generateImages = document.getElementById('generateImages').checked;
                 
@@ -526,11 +667,18 @@
                     throw new Error('請至少選擇一個目標平台');
                 }
                 
-                // Step 1: Upload image if provided
-                if (imageFile) {
-                    showStatus('📤 上傳圖片中...', 'info');
+                // Step 1: Upload images if provided
+                let uploadedImagePaths = [];
+                if (imageFiles.length > 0) {
+                    showStatus(`📤 上傳 ${imageFiles.length} 張圖片中...`, 'info');
                     const imageFormData = new FormData();
-                    imageFormData.append('image', imageFile);
+                    
+                    // Append all image files
+                    imageFiles.forEach((file, index) => {
+                        imageFormData.append('images', file);
+                    });
+                    imageFormData.append('productName', productName);
+                    imageFormData.append('productDescription', productDescription || '');
                     
                     const imageResponse = await fetch('/api/upload-image', {
                         method: 'POST',
@@ -542,11 +690,12 @@
                     }
                     
                     const imageResult = await imageResponse.json();
-                    uploadedImagePath = imageResult.path;
+                    uploadedImagePaths = imageResult.paths || [];
+                    uploadedImagePath = uploadedImagePaths[0]; // For backward compatibility
                 }
                 
-                // Step 2: AI Product Analysis
-                if (uploadedImagePath || productDescription) {
+                // Step 2: AI Product Analysis  
+                if (uploadedImagePaths.length > 0 || productDescription) {
                     showStatus(`🧠 AI 產品分析中... (${language})`, 'info');
                     console.log('🌐 Selected language for analysis:', language);
                     
@@ -556,7 +705,8 @@
                             'Content-Type': 'application/json'
                         },
                         body: JSON.stringify({
-                            imagePath: uploadedImagePath,
+                            imagePaths: uploadedImagePaths,
+                            imagePath: uploadedImagePaths[0], // For backward compatibility
                             productInfo: {
                                 name: productName,
                                 description: productDescription
