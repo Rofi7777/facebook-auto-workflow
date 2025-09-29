@@ -31,10 +31,13 @@ app.use(express.json());
 app.use(express.static('public'));
 app.use('/assets', express.static('assets'));
 
-// Configure multer for file uploads with security validation
+// Configure multer for multi-file uploads with security validation
 const upload = multer({
   dest: 'assets/uploads/',
-  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB limit
+  limits: { 
+    fileSize: 10 * 1024 * 1024, // 10MB limit per file
+    files: 5 // Maximum 5 files
+  },
   fileFilter: (req, file, cb) => {
     // Accept only image files
     const allowedMimes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
@@ -193,56 +196,83 @@ app.get('/api/config', (req, res) => {
 });
 
 // Multi-platform workflow endpoints
-app.post('/api/upload-image', upload.single('image'), (req, res) => {
+app.post('/api/upload-image', upload.array('images', 5), (req, res) => {
   try {
-    if (!req.file) {
-      return res.status(400).json({ error: 'No image file provided' });
+    if (!req.files || req.files.length === 0) {
+      return res.status(400).json({ error: 'No image files provided' });
     }
+    
+    console.log(`📤 ${req.files.length} image(s) uploaded successfully`);
+    
+    const uploadedFiles = req.files.map(file => ({
+      filename: file.filename,
+      path: file.path,
+      url: `/assets/uploads/${file.filename}`,
+      originalName: file.originalname,
+      size: file.size
+    }));
     
     res.json({
       success: true,
-      message: 'Image uploaded successfully',
-      filename: req.file.filename,
-      path: req.file.path,
-      url: `/assets/uploads/${req.file.filename}`
+      message: `${req.files.length} image(s) uploaded successfully`,
+      files: uploadedFiles,
+      paths: req.files.map(f => f.path), // For easy access to paths array
+      filename: req.files[0].filename,   // For backward compatibility
+      path: req.files[0].path,          // For backward compatibility
+      url: `/assets/uploads/${req.files[0].filename}`
     });
   } catch (error) {
     res.status(500).json({ error: 'Upload failed: ' + error.message });
   }
 });
 
-// AI-powered product analysis endpoint
+// AI-powered product analysis endpoint - Support multiple images
 app.post('/api/analyze-product', async (req, res) => {
   try {
-    const { imagePath, productInfo } = req.body;
+    const { imagePath, imagePaths, productInfo } = req.body;
     
-    if (!imagePath) {
-      return res.status(400).json({ error: 'Image path is required' });
+    // Support both single image path and multiple paths
+    const pathsToAnalyze = imagePaths && imagePaths.length > 0 ? imagePaths : [imagePath];
+    
+    if (!pathsToAnalyze || pathsToAnalyze.length === 0 || pathsToAnalyze.every(p => !p)) {
+      return res.status(400).json({ error: 'At least one image path is required' });
     }
 
-    // Security: Validate imagePath is within uploads directory
+    // Security: Validate all image paths are within uploads directory
     const uploadsDir = path.resolve('assets/uploads');
-    const resolvedImagePath = path.resolve(imagePath);
+    const validatedPaths = [];
     
-    if (!resolvedImagePath.startsWith(uploadsDir)) {
-      return res.status(400).json({ error: 'Invalid image path' });
+    for (const imgPath of pathsToAnalyze) {
+      if (!imgPath) continue;
+      
+      const resolvedImagePath = path.resolve(imgPath);
+      
+      if (!resolvedImagePath.startsWith(uploadsDir)) {
+        return res.status(400).json({ error: 'Invalid image path detected' });
+      }
+      
+      // 異步檢查文件是否存在
+      try {
+        await fs.access(resolvedImagePath);
+        validatedPaths.push(resolvedImagePath);
+      } catch (accessError) {
+        console.log(`⚠️ Image file not found: ${resolvedImagePath}`);
+        // Continue with other images if one is missing
+      }
     }
     
-    // 異步檢查文件是否存在
-    try {
-      await fs.access(resolvedImagePath);
-    } catch (accessError) {
-      return res.status(400).json({ error: 'Image file not found' });
+    if (validatedPaths.length === 0) {
+      return res.status(400).json({ error: 'No valid image files found' });
     }
 
-    console.log('Analyzing product image:', resolvedImagePath);
+    console.log(`🖼️ Analyzing ${validatedPaths.length} product image(s):`, validatedPaths);
     
     // Get language from request or default to zh-TW
     const language = req.body.language || 'zh-TW';
     console.log('🌐 Analysis request language:', language);
     
-    // Analyze product image with AI
-    const productAnalysis = await aiService.analyzeProductImage(resolvedImagePath, language);
+    // Analyze product image(s) with AI
+    const productAnalysis = await aiService.analyzeProductImage(validatedPaths, language);
     console.log('Product analysis completed:', productAnalysis);
     
     // Identify pain points and scenarios
