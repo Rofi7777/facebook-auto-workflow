@@ -18,28 +18,41 @@ class ScenarioGeneratorService {
     
     // Model configuration with auto-update capability
     this.modelConfig = {
-      primary: "gemini-2.0-flash-exp",     // Latest experimental model
-      fallback: "gemini-2.5-flash",       // Stable fallback
+      primary: "gemini-2.5-flash",        // Latest stable model as requested
+      fallback: "gemini-2.0-flash-exp",   // Experimental fallback
       legacy: "gemini-1.5-flash"          // Legacy support (if needed)
     };
     
     console.log('✅ ScenarioGenerator service initialized successfully');
   }
 
-  // Helper method to get the best available model
+  // Helper method to get the best available model with actual testing
   async getBestAvailableModel() {
-    // Try models in order of preference
     const models = [this.modelConfig.primary, this.modelConfig.fallback];
     
     for (const model of models) {
       try {
-        return model;
+        console.log(`🔍 Testing scenario model availability: ${model}`);
+        
+        // Actually test the model with a simple request
+        const testResponse = await this.ai.models.generateContent({
+          model: model,
+          contents: [{ role: 'user', parts: [{ text: 'Test' }] }]
+        });
+        
+        if (testResponse && testResponse.candidates && testResponse.candidates.length > 0) {
+          console.log(`✅ Scenario model ${model} is available and working`);
+          return model;
+        }
       } catch (error) {
+        console.log(`⚠️ Scenario model ${model} failed test, trying next...`, error.message);
         continue;
       }
     }
     
-    return this.modelConfig.fallback;
+    // If all tests fail, use primary as last resort
+    console.log(`🚨 All scenario model tests failed, falling back to primary: ${this.modelConfig.primary}`);
+    return this.modelConfig.primary;
   }
 
   // 根據產品內容生成三種行銷場景

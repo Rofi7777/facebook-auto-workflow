@@ -28,8 +28,8 @@ class GeminiAIService {
     
     // Model configuration with auto-update capability
     this.modelConfig = {
-      primary: "gemini-2.0-flash-exp",     // Latest experimental model
-      fallback: "gemini-2.5-flash",       // Stable fallback
+      primary: "gemini-2.5-flash",        // Latest stable model as requested
+      fallback: "gemini-2.0-flash-exp",   // Experimental fallback  
       legacy: "gemini-1.5-flash"          // Legacy support (if needed)
     };
     
@@ -37,24 +37,33 @@ class GeminiAIService {
     console.log('✅ GeminiAI service initialized successfully');
   }
 
-  // Helper method to get the best available model
+  // Helper method to get the best available model with actual testing
   async getBestAvailableModel() {
-    // Try models in order of preference
     const models = [this.modelConfig.primary, this.modelConfig.fallback];
     
     for (const model of models) {
       try {
-        // Test the model with a simple request (we could cache this result)
         console.log(`🔍 Testing model availability: ${model}`);
-        return model;
+        
+        // Actually test the model with a simple request
+        const testResponse = await this.ai.models.generateContent({
+          model: model,
+          contents: [{ role: 'user', parts: [{ text: 'Test' }] }]
+        });
+        
+        if (testResponse && testResponse.candidates && testResponse.candidates.length > 0) {
+          console.log(`✅ Model ${model} is available and working`);
+          return model;
+        }
       } catch (error) {
-        console.log(`⚠️ Model ${model} not available, trying next...`);
+        console.log(`⚠️ Model ${model} failed test, trying next...`, error.message);
         continue;
       }
     }
     
-    // If all else fails, use the fallback
-    return this.modelConfig.fallback;
+    // If all tests fail, use primary as last resort
+    console.log(`🚨 All model tests failed, falling back to primary: ${this.modelConfig.primary}`);
+    return this.modelConfig.primary;
   }
 
   // 分析產品圖片並識別產品特性 - 支援多張圖片
