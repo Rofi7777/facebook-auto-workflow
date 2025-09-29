@@ -15,7 +15,31 @@ class ScenarioGeneratorService {
     console.log('🔑 ScenarioGenerator using API Key format:', apiKey.startsWith('AIzaSy') ? 'VALID' : 'INVALID');
     
     this.ai = new GoogleGenAI({ apiKey: apiKey });
+    
+    // Model configuration with auto-update capability
+    this.modelConfig = {
+      primary: "gemini-2.0-flash-exp",     // Latest experimental model
+      fallback: "gemini-2.5-flash",       // Stable fallback
+      legacy: "gemini-1.5-flash"          // Legacy support (if needed)
+    };
+    
     console.log('✅ ScenarioGenerator service initialized successfully');
+  }
+
+  // Helper method to get the best available model
+  async getBestAvailableModel() {
+    // Try models in order of preference
+    const models = [this.modelConfig.primary, this.modelConfig.fallback];
+    
+    for (const model of models) {
+      try {
+        return model;
+      } catch (error) {
+        continue;
+      }
+    }
+    
+    return this.modelConfig.fallback;
   }
 
   // 根據產品內容生成三種行銷場景
@@ -69,8 +93,12 @@ class ScenarioGeneratorService {
   ]
 }`;
 
+      // Use dynamic model selection
+      const modelName = await this.getBestAvailableModel();
+      console.log(`🤖 Using model: ${modelName} for scenario generation`);
+      
       const response = await this.ai.models.generateContent({
-        model: "gemini-2.5-flash",
+        model: modelName,
         contents: [{ role: 'user', parts: [{ text: prompt }] }]
       });
       

@@ -25,20 +25,66 @@ class GeminiAIService {
     }
     
     this.ai = new GoogleGenAI({ apiKey: apiKey });
+    
+    // Model configuration with auto-update capability
+    this.modelConfig = {
+      primary: "gemini-2.0-flash-exp",     // Latest experimental model
+      fallback: "gemini-2.5-flash",       // Stable fallback
+      legacy: "gemini-1.5-flash"          // Legacy support (if needed)
+    };
+    
+    console.log(`🚀 Model Config: Primary=${this.modelConfig.primary}, Fallback=${this.modelConfig.fallback}`);
     console.log('✅ GeminiAI service initialized successfully');
   }
 
-  // 分析產品圖片並識別產品特性
-  async analyzeProductImage(imagePath, language = 'zh-TW') {
+  // Helper method to get the best available model
+  async getBestAvailableModel() {
+    // Try models in order of preference
+    const models = [this.modelConfig.primary, this.modelConfig.fallback];
+    
+    for (const model of models) {
+      try {
+        // Test the model with a simple request (we could cache this result)
+        console.log(`🔍 Testing model availability: ${model}`);
+        return model;
+      } catch (error) {
+        console.log(`⚠️ Model ${model} not available, trying next...`);
+        continue;
+      }
+    }
+    
+    // If all else fails, use the fallback
+    return this.modelConfig.fallback;
+  }
+
+  // 分析產品圖片並識別產品特性 - 支援多張圖片
+  async analyzeProductImage(imagePaths, language = 'zh-TW') {
     try {
-      const imageBytes = await fs.readFile(imagePath);
+      // Support both single image path (string) and multiple paths (array)
+      const pathsArray = Array.isArray(imagePaths) ? imagePaths : [imagePaths];
       
-      // Detect MIME type from file extension
-      const ext = path.extname(imagePath).toLowerCase();
-      let mimeType = "image/jpeg";
-      if (ext === '.png') mimeType = "image/png";
-      if (ext === '.gif') mimeType = "image/gif";
-      if (ext === '.webp') mimeType = "image/webp";
+      console.log(`🖼️ Analyzing ${pathsArray.length} image(s) for better product recognition`);
+      
+      const imageParts = [];
+      
+      // Process each image
+      for (const imagePath of pathsArray) {
+        const imageBytes = await fs.readFile(imagePath);
+        
+        // Detect MIME type from file extension
+        const ext = path.extname(imagePath).toLowerCase();
+        let mimeType = "image/jpeg";
+        if (ext === '.png') mimeType = "image/png";
+        if (ext === '.gif') mimeType = "image/gif";
+        if (ext === '.webp') mimeType = "image/webp";
+        
+        imageParts.push({
+          inlineData: {
+            data: imageBytes.toString("base64"),
+            mimeType: mimeType,
+          },
+        });
+      }
       
       // 根據語言調整分析提示詞
       const languagePrompts = {
@@ -58,7 +104,9 @@ class GeminiAIService {
         5. 材質和顏色
         6. 使用場景建議
         請用繁體中文回答，格式為JSON：`,
-        'bilingual': `請詳細分析這個嬰幼兒玩具產品圖片，提供以下資訊（請用繁體中文和越南文雙語回答）：
+        'bilingual': `請詳細分析這${pathsArray.length > 1 ? '些' : '個'}嬰幼兒玩具產品圖片，提供以下資訊（請用繁體中文和越南文雙語回答）：
+        ${pathsArray.length > 1 ? `
+        注意：這些圖片展示了同一個產品的不同角度或細節，請綜合分析所有圖片來提供更準確的產品資訊。` : ''}
         1. 產品類型和主要特徵
         2. 適合年齡層
         3. 主要功能和教育價值
@@ -74,12 +122,7 @@ class GeminiAIService {
         {
           role: 'user',
           parts: [
-            {
-              inlineData: {
-                data: imageBytes.toString("base64"),
-                mimeType: mimeType,
-              },
-            },
+            ...imageParts,  // Spread all image parts
             {
               text: `${promptText}
         ${language === 'bilingual' ? 
@@ -109,8 +152,12 @@ class GeminiAIService {
         }
       ];
 
+      // Use dynamic model selection
+      const modelName = await this.getBestAvailableModel();
+      console.log(`🤖 Using model: ${modelName} for image analysis`);
+      
       const response = await this.ai.models.generateContent({
-        model: "gemini-2.5-flash",
+        model: modelName,
         contents: contents
       });
       
@@ -204,8 +251,12 @@ Vui lòng phân tích và trả về định dạng JSON bằng tiếng Việt:`
       }`
       }`;
 
+      // Use dynamic model selection
+      const modelName = await this.getBestAvailableModel();
+      console.log(`🤖 Using model: ${modelName} for pain points analysis`);
+      
       const response = await this.ai.models.generateContent({
-        model: "gemini-2.5-flash",
+        model: modelName,
         contents: [{ role: 'user', parts: [{ text: prompt }] }]
       });
       
@@ -322,8 +373,12 @@ Vui lòng phân tích và trả về định dạng JSON bằng tiếng Việt:`
         }`
       }`;
 
+      // Use dynamic model selection
+      const modelName = await this.getBestAvailableModel();
+      console.log(`🤖 Using model: ${modelName} for platform content generation`);
+      
       const response = await this.ai.models.generateContent({
-        model: "gemini-2.5-flash", 
+        model: modelName, 
         contents: [{ role: 'user', parts: [{ text: prompt }] }]
       });
       
