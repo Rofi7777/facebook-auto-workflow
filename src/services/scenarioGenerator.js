@@ -70,7 +70,7 @@ class ScenarioGeneratorService {
 }`;
 
       const response = await this.ai.models.generateContent({
-        model: "gemini-1.5-flash",
+        model: "gemini-2.5-flash",
         contents: [{ role: 'user', parts: [{ text: prompt }] }]
       });
       
@@ -124,7 +124,7 @@ class ScenarioGeneratorService {
 請用一段詳細的描述文字回答，適合直接用於 AI 圖像生成工具。`;
 
       const response = await this.ai.models.generateContent({
-        model: "gemini-1.5-flash", 
+        model: "gemini-2.5-flash", 
         contents: [{ role: 'user', parts: [{ text: prompt }] }]
       });
       
@@ -352,7 +352,7 @@ Provide detailed specifications for:
 Make this guide professional enough for a commercial photographer or AI generation tool.`;
 
       const response = await this.ai.models.generateContent({
-        model: "gemini-1.5-flash",
+        model: "gemini-2.5-flash",
         contents: [{ role: 'user', parts: [{ text: enhancedPrompt }] }]
       });
       

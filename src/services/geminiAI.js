@@ -110,7 +110,7 @@ class GeminiAIService {
       ];
 
       const response = await this.ai.models.generateContent({
-        model: "gemini-1.5-flash",
+        model: "gemini-2.5-flash",
         contents: contents
       });
       
@@ -205,7 +205,7 @@ Vui lòng phân tích và trả về định dạng JSON bằng tiếng Việt:`
       }`;
 
       const response = await this.ai.models.generateContent({
-        model: "gemini-1.5-flash",
+        model: "gemini-2.5-flash",
         contents: [{ role: 'user', parts: [{ text: prompt }] }]
       });
       
@@ -323,7 +323,7 @@ Vui lòng phân tích và trả về định dạng JSON bằng tiếng Việt:`
       }`;
 
       const response = await this.ai.models.generateContent({
-        model: "gemini-1.5-flash", 
+        model: "gemini-2.5-flash", 
         contents: [{ role: 'user', parts: [{ text: prompt }] }]
       });
       
@@ -647,7 +647,7 @@ Please provide detailed specifications including:
 Make this specification detailed enough for any designer or AI tool to recreate the exact vision.`;
 
       const response = await this.ai.models.generateContent({
-        model: "gemini-1.5-flash",
+        model: "gemini-2.5-flash",
         contents: [{ role: 'user', parts: [{ text: specPrompt }] }]
       });
       
