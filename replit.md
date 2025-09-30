@@ -1,9 +1,19 @@
-# Googoogaga Facebook Auto Workflow
+# Googoogaga Multi-Platform Content Generator
 
 ## Overview
-A Node.js web application for automatically generating Googoogaga Facebook promotional materials for baby toys. This project provides a bilingual web interface where users can upload toy images, select campaign types and templates, and generate Facebook marketing workflows in Vietnamese and Traditional Chinese.
+A comprehensive multi-industry AI-powered content generation platform supporting Fashion, Mother&Kids, Art Toy, and other product categories. The system integrates Google Gemini 2.5 Flash AI for intelligent product analysis and automated content generation across multiple platforms (Shopee, TikTok, Instagram, Facebook).
 
 ## Recent Changes
+- **2025-09-30**: Multi-industry expansion and workflow optimization
+  - Added Industry Category selection (Fashion, Mother&Kids, Art Toy, Others)
+  - Implemented scenario switching feature for quick platform changes
+  - Industry-specific AI prompts for accurate content generation
+  - Enhanced user workflow to reduce repetitive input
+- **2025-09-29**: Gemini 2.5 Flash upgrade and multi-image support
+  - Upgraded to Gemini 2.5 Flash model with automatic fallback
+  - Implemented multi-image upload (1-5 images) with grid preview
+  - Enhanced AI accuracy with multi-angle product analysis
+  - Improved model availability testing and selection
 - **2025-09-19**: Initial project setup and structure creation
   - Set up Node.js server with Express.js framework
   - Created responsive web frontend with HTML/CSS/JavaScript
@@ -30,21 +40,22 @@ A Node.js web application for automatically generating Googoogaga Facebook promo
 - **Dependencies**: Express, CORS, Multer, Dotenv, Axios, Node-cron
 
 ## Key Features
-- Baby toy image upload (supports JPG, PNG up to 10MB)
-- Bilingual campaign generation (Vietnamese/Traditional Chinese)
-- Campaign types: 新玩具上市, 教育學習, 安全第一, 發展成長, 季節限定
-- Template styles: 溫和柔軟, 活潑可愛, 教育啟發, 值得信賴
-- Automatic fallback content generation with baby toy marketing language
-- Design briefs with baby-appropriate color schemes and layouts
-- RESTful API with enhanced workflow generation
-- Real-time bilingual status feedback
+- **Multi-Industry Support**: Fashion, Mother&Kids, Art Toy, Others with industry-specific AI prompts
+- **Scenario Switching**: Quick platform switching without re-entering product information
+- **Multi-Image Upload**: 1-5 images with comprehensive multi-angle analysis
+- **AI Model**: Gemini 2.5 Flash with automatic fallback to Gemini 2.0 Flash Experimental
+- **Multi-Platform**: Shopee, TikTok, Instagram, Facebook content generation
+- **Bilingual Support**: Vietnamese and Traditional Chinese with automatic translation
+- **Smart Analysis**: AI-powered product recognition, pain point identification, and scenario suggestions
+- **Automated Image Generation**: Optional marketing scenario images with real product integration
+- **Real-time Processing**: Live status updates with progress indicators
 
 ## User Preferences
-- Language: Bilingual Vietnamese and Traditional Chinese for Googoogaga branding
-- Style: Baby-friendly gradient design (sky blue to pink)
-- Target Audience: Babies, toddlers and parents
-- Brand Voice: Safe, educational, developmental, nurturing
-- Functionality: Bilingual baby toy marketing automation
+- Language: Bilingual Vietnamese and Traditional Chinese
+- Industries: Fashion, Mother&Kids, Art Toy, General Products
+- Style: Clean gradient design (sky blue to pink)
+- Target Audience: Multi-industry consumers
+- Functionality: AI-powered multi-platform marketing content automation with workflow optimization
 
 ## Environment Setup
 - Server binds to `0.0.0.0:5000` for Replit compatibility
@@ -67,4 +78,4 @@ A Node.js web application for automatically generating Googoogaga Facebook promo
 - ✅ Replit environment optimized
 
 ## Current State
-The application is fully functional and ready for use. The server is running on port 5000 with a responsive web interface for generating Facebook promotional workflows for Googoogaga baby toys with bilingual content support.
+The application is a comprehensive multi-industry content generation platform. Users can select from Fashion, Mother&Kids, Art Toy, or Others categories, upload 1-5 product images, and generate platform-specific marketing content. The scenario switching feature allows users to quickly change platforms without re-entering product information, significantly improving workflow efficiency. The system uses Gemini 2.5 Flash AI for intelligent analysis and content generation across all platforms.
