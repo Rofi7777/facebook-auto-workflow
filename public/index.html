@@ -418,8 +418,18 @@
                 
                 <form id="productForm">
                     <div class="form-group">
+                        <label for="industryCategory">產業類別 / Industry Category</label>
+                        <select id="industryCategory" name="industryCategory" required>
+                            <option value="mother-kids">👶 Mother & Kids (母嬰用品)</option>
+                            <option value="fashion">👗 Fashion (時尚服飾)</option>
+                            <option value="art-toy">🎨 Art Toy (藝術玩具)</option>
+                            <option value="others">✨ Others (其他)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
                         <label for="productName">產品名稱 / Product Name</label>
-                        <input type="text" id="productName" name="productName" placeholder="輸入玩具名稱" required>
+                        <input type="text" id="productName" name="productName" placeholder="輸入產品名稱" required>
                     </div>
                     
                     <div class="form-group">
@@ -490,6 +500,10 @@
                     
                     <button type="submit" class="btn" id="analyzeBtn">
                         🧠 分析產品並生成內容
+                    </button>
+                    
+                    <button type="button" class="btn" id="switchScenarioBtn" style="display: none; background: #28a745;">
+                        🔄 切換場景重新生成 (同產品不同平台)
                     </button>
                     
                     <button type="button" class="btn btn-secondary" id="generateScenariosBtn" style="display: none;">
@@ -645,6 +659,7 @@
             
             try {
                 const formData = new FormData();
+                const industryCategory = document.getElementById('industryCategory').value;
                 const productName = document.getElementById('productName').value;
                 const productDescription = document.getElementById('productDescription').value;
                 const imageFiles = Array.from(document.getElementById('imageUpload').files);
@@ -709,7 +724,8 @@
                             imagePath: uploadedImagePaths[0], // For backward compatibility
                             productInfo: {
                                 name: productName,
-                                description: productDescription
+                                description: productDescription,
+                                industryCategory: industryCategory
                             },
                             language: language
                         })
@@ -738,7 +754,8 @@
                         productInfo: productAnalysis || {
                             name: productName,
                             description: productDescription,
-                            productType: productName
+                            productType: productName,
+                            industryCategory: industryCategory
                         },
                         painPointsAnalysis: painPointsAnalysis || {},
                         platforms: selectedPlatforms,
@@ -758,8 +775,9 @@
                 displayPlatformResults(contentResult.results);
                 showStatus('✅ 多平台內容生成完成！', 'success');
                 
-                // Show scenario generation button
+                // Show scenario generation and switch scenario buttons
                 generateScenariosBtn.style.display = 'block';
+                document.getElementById('switchScenarioBtn').style.display = 'block';
                 
             } catch (error) {
                 showStatus(`❌ 錯誤: ${error.message}`, 'error');
@@ -816,6 +834,74 @@
             } finally {
                 generateScenariosBtn.disabled = false;
                 generateScenariosBtn.innerHTML = '🎬 生成行銷場景';
+            }
+        });
+        
+        // Switch scenario button handler - Quick platform switching without re-entering product info
+        const switchScenarioBtn = document.getElementById('switchScenarioBtn');
+        switchScenarioBtn.addEventListener('click', async function() {
+            if (!productAnalysis || !painPointsAnalysis) {
+                showStatus('⚠️ 請先完成產品分析', 'error');
+                return;
+            }
+            
+            try {
+                // Get selected platforms
+                const selectedPlatforms = Array.from(document.querySelectorAll('#platformsGroup input[type="checkbox"]:checked')).map(cb => cb.value);
+                
+                if (selectedPlatforms.length === 0) {
+                    showStatus('⚠️ 請選擇至少一個目標平台', 'error');
+                    return;
+                }
+                
+                const language = document.getElementById('language').value;
+                const generateImages = document.getElementById('generateImages').checked;
+                const industryCategory = document.getElementById('industryCategory').value;
+                
+                // 獲取場景類型選擇
+                let scenarioType = '親子互動'; // 預設值
+                if (generateImages) {
+                    const selectedScenario = document.querySelector('input[name="scenarioType"]:checked');
+                    if (selectedScenario) {
+                        scenarioType = selectedScenario.value;
+                    }
+                }
+                
+                showStatus('🔄 使用相同產品資訊，切換平台重新生成內容...', 'info');
+                switchScenarioBtn.disabled = true;
+                switchScenarioBtn.innerHTML = '<span class="loading"></span>重新生成中...';
+                
+                // Generate platform content with existing product analysis
+                const contentResponse = await fetch('/api/generate-platform-content', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        productInfo: productAnalysis,
+                        painPointsAnalysis: painPointsAnalysis,
+                        platforms: selectedPlatforms,
+                        language: language,
+                        generateImages: generateImages,
+                        scenarioType: scenarioType,
+                        productImagePath: uploadedImagePath
+                    })
+                });
+                
+                if (!contentResponse.ok) {
+                    throw new Error('內容生成失敗');
+                }
+                
+                const contentResult = await contentResponse.json();
+                generatedContent = contentResult.results;
+                displayPlatformResults(contentResult.results);
+                showStatus('✅ 場景切換成功！新平台內容已生成！', 'success');
+                
+            } catch (error) {
+                showStatus(`❌ 場景切換錯誤: ${error.message}`, 'error');
+            } finally {
+                switchScenarioBtn.disabled = false;
+                switchScenarioBtn.innerHTML = '🔄 切換場景重新生成 (同產品不同平台)';
             }
         });
         
