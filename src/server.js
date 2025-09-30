@@ -267,12 +267,14 @@ app.post('/api/analyze-product', async (req, res) => {
 
     console.log(`🖼️ Analyzing ${validatedPaths.length} product image(s):`, validatedPaths);
     
-    // Get language from request or default to zh-TW
+    // Get language and industry category from request
     const language = req.body.language || 'zh-TW';
+    const industryCategory = productInfo?.industryCategory || 'mother-kids';
     console.log('🌐 Analysis request language:', language);
+    console.log('🏭 Industry category:', industryCategory);
     
     // Analyze product image(s) with AI
-    const productAnalysis = await aiService.analyzeProductImage(validatedPaths, language);
+    const productAnalysis = await aiService.analyzeProductImage(validatedPaths, language, industryCategory);
     console.log('Product analysis completed:', productAnalysis);
     
     // Identify pain points and scenarios

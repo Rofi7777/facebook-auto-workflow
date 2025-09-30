@@ -66,13 +66,13 @@ class GeminiAIService {
     return this.modelConfig.primary;
   }
 
-  // 分析產品圖片並識別產品特性 - 支援多張圖片
-  async analyzeProductImage(imagePaths, language = 'zh-TW') {
+  // 分析產品圖片並識別產品特性 - 支援多張圖片和多產業
+  async analyzeProductImage(imagePaths, language = 'zh-TW', industryCategory = 'mother-kids') {
     try {
       // Support both single image path (string) and multiple paths (array)
       const pathsArray = Array.isArray(imagePaths) ? imagePaths : [imagePaths];
       
-      console.log(`🖼️ Analyzing ${pathsArray.length} image(s) for better product recognition`);
+      console.log(`🖼️ Analyzing ${pathsArray.length} image(s) for ${industryCategory} industry`);
       
       const imageParts = [];
       
@@ -95,37 +95,120 @@ class GeminiAIService {
         });
       }
       
-      // 根據語言調整分析提示詞
-      const languagePrompts = {
-        'vi': `Hãy phân tích chi tiết hình ảnh sản phẩm đồ chơi trẻ em này và cung cấp thông tin sau:
-        1. Loại sản phẩm và đặc điểm chính
-        2. Độ tuổi phù hợp
-        3. Chức năng chính và giá trị giáo dục
-        4. Tính năng an toàn
-        5. Chất liệu và màu sắc
-        6. Đề xuất tình huống sử dụng
-        Vui lòng trả lời bằng tiếng Việt, định dạng JSON:`,
-        'zh-TW': `請詳細分析這個嬰幼兒玩具產品圖片，提供以下資訊：
-        1. 產品類型和主要特徵
-        2. 適合年齡層
-        3. 主要功能和教育價值
-        4. 安全特性
-        5. 材質和顏色
-        6. 使用場景建議
-        請用繁體中文回答，格式為JSON：`,
-        'bilingual': `請詳細分析這${pathsArray.length > 1 ? '些' : '個'}嬰幼兒玩具產品圖片，提供以下資訊（請用繁體中文和越南文雙語回答）：
-        ${pathsArray.length > 1 ? `
-        注意：這些圖片展示了同一個產品的不同角度或細節，請綜合分析所有圖片來提供更準確的產品資訊。` : ''}
-        1. 產品類型和主要特徵
-        2. 適合年齡層
-        3. 主要功能和教育價值
-        4. 安全特性
-        5. 材質和顏色
-        6. 使用場景建議
-        請用繁體中文和越南文雙語回答，格式為JSON：`
+      // 根據產業類別和語言調整分析提示詞
+      const industryPrompts = {
+        'fashion': {
+          'vi': `Hãy phân tích chi tiết hình ảnh sản phẩm thời trang này và cung cấp thông tin sau:
+          1. Loại sản phẩm và phong cách
+          2. Chất liệu và thiết kế
+          3. Màu sắc và họa tiết
+          4. Đối tượng khách hàng phù hợp
+          5. Xu hướng thời trang hiện tại
+          6. Tình huống sử dụng đề xuất
+          Vui lòng trả lời bằng tiếng Việt, định dạng JSON:`,
+          'zh-TW': `請詳細分析這個時尚產品圖片，提供以下資訊：
+          1. 產品類型和風格
+          2. 材質和設計特色
+          3. 顏色和圖案
+          4. 適合客群
+          5. 當前流行趨勢
+          6. 使用場景建議
+          請用繁體中文回答，格式為JSON：`,
+          'bilingual': `請詳細分析這${pathsArray.length > 1 ? '些' : '個'}時尚產品圖片（請用繁體中文和越南文雙語回答）：
+          ${pathsArray.length > 1 ? `注意：這些圖片展示了同一個產品的不同角度，請綜合分析。` : ''}
+          1. 產品類型和風格/Loại sản phẩm và phong cách
+          2. 材質和設計/Chất liệu và thiết kế
+          3. 顏色和圖案/Màu sắc và họa tiết
+          4. 適合客群/Đối tượng khách hàng
+          5. 流行趨勢/Xu hướng thời trang
+          6. 使用場景/Tình huống sử dụng
+          請用繁體中文和越南文雙語回答，格式為JSON：`
+        },
+        'art-toy': {
+          'vi': `Hãy phân tích chi tiết hình ảnh đồ chơi nghệ thuật/collectible này và cung cấp thông tin sau:
+          1. Loại sản phẩm và phong cách nghệ thuật
+          2. Chất liệu và kỹ thuật sản xuất
+          3. Màu sắc và chi tiết thiết kế
+          4. Đối tượng sưu tập phù hợp
+          5. Giá trị nghệ thuật và độc đáo
+          6. Đề xuất trưng bày và bảo quản
+          Vui lòng trả lời bằng tiếng Việt, định dạng JSON:`,
+          'zh-TW': `請詳細分析這個藝術玩具/收藏品圖片，提供以下資訊：
+          1. 產品類型和藝術風格
+          2. 材質和製作工藝
+          3. 顏色和設計細節
+          4. 適合收藏族群
+          5. 藝術價值和獨特性
+          6. 展示和保存建議
+          請用繁體中文回答，格式為JSON：`,
+          'bilingual': `請詳細分析這${pathsArray.length > 1 ? '些' : '個'}藝術玩具產品圖片（請用繁體中文和越南文雙語回答）：
+          ${pathsArray.length > 1 ? `注意：這些圖片展示了同一個產品的不同角度，請綜合分析。` : ''}
+          1. 產品類型和風格/Loại sản phẩm và phong cách nghệ thuật
+          2. 材質和工藝/Chất liệu và kỹ thuật
+          3. 顏色和設計/Màu sắc và thiết kế
+          4. 收藏族群/Đối tượng sưu tập
+          5. 藝術價值/Giá trị nghệ thuật
+          6. 展示建議/Đề xuất trưng bày
+          請用繁體中文和越南文雙語回答，格式為JSON：`
+        },
+        'mother-kids': {
+          'vi': `Hãy phân tích chi tiết hình ảnh sản phẩm đồ chơi trẻ em/mẹ và bé này và cung cấp thông tin sau:
+          1. Loại sản phẩm và đặc điểm chính
+          2. Độ tuổi phù hợp
+          3. Chức năng chính và giá trị giáo dục
+          4. Tính năng an toàn
+          5. Chất liệu và màu sắc
+          6. Đề xuất tình huống sử dụng
+          Vui lòng trả lời bằng tiếng Việt, định dạng JSON:`,
+          'zh-TW': `請詳細分析這個嬰幼兒玩具/母嬰產品圖片，提供以下資訊：
+          1. 產品類型和主要特徵
+          2. 適合年齡層
+          3. 主要功能和教育價值
+          4. 安全特性
+          5. 材質和顏色
+          6. 使用場景建議
+          請用繁體中文回答，格式為JSON：`,
+          'bilingual': `請詳細分析這${pathsArray.length > 1 ? '些' : '個'}嬰幼兒玩具/母嬰產品圖片（請用繁體中文和越南文雙語回答）：
+          ${pathsArray.length > 1 ? `注意：這些圖片展示了同一個產品的不同角度，請綜合分析。` : ''}
+          1. 產品類型和主要特徵/Loại sản phẩm và đặc điểm
+          2. 適合年齡層/Độ tuổi phù hợp
+          3. 教育價值/Giá trị giáo dục
+          4. 安全特性/Tính năng an toàn
+          5. 材質和顏色/Chất liệu và màu sắc
+          6. 使用場景/Tình huống sử dụng
+          請用繁體中文和越南文雙語回答，格式為JSON：`
+        },
+        'others': {
+          'vi': `Hãy phân tích chi tiết hình ảnh sản phẩm này và cung cấp thông tin sau:
+          1. Loại sản phẩm và đặc điểm chính
+          2. Công dụng và tính năng nổi bật
+          3. Chất liệu và màu sắc
+          4. Đối tượng khách hàng phù hợp
+          5. Giá trị và lợi ích
+          6. Đề xuất tình huống sử dụng
+          Vui lòng trả lời bằng tiếng Việt, định dạng JSON:`,
+          'zh-TW': `請詳細分析這個產品圖片，提供以下資訊：
+          1. 產品類型和主要特徵
+          2. 用途和突出功能
+          3. 材質和顏色
+          4. 適合客群
+          5. 價值和優勢
+          6. 使用場景建議
+          請用繁體中文回答，格式為JSON：`,
+          'bilingual': `請詳細分析這${pathsArray.length > 1 ? '些' : '個'}產品圖片（請用繁體中文和越南文雙語回答）：
+          ${pathsArray.length > 1 ? `注意：這些圖片展示了同一個產品的不同角度，請綜合分析。` : ''}
+          1. 產品類型/Loại sản phẩm
+          2. 用途和功能/Công dụng và tính năng
+          3. 材質和顏色/Chất liệu và màu sắc
+          4. 適合客群/Đối tượng khách hàng
+          5. 價值優勢/Giá trị và lợi ích
+          6. 使用場景/Tình huống sử dụng
+          請用繁體中文和越南文雙語回答，格式為JSON：`
+        }
       };
       
-      const promptText = languagePrompts[language] || languagePrompts['zh-TW'];
+      const industryPromptSet = industryPrompts[industryCategory] || industryPrompts['mother-kids'];
+      const promptText = industryPromptSet[language] || industryPromptSet['zh-TW'];
       
       const contents = [
         {
