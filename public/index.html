@@ -492,6 +492,14 @@
                                 <label for="scenario_home_play">🏠 居家遊戲 (Home Play)</label>
                             </div>
                             <div class="checkbox-item">
+                                <input type="radio" id="scenario_personal_styling" name="scenarioType" value="個人穿搭">
+                                <label for="scenario_personal_styling">👔 個人穿搭 (Personal Styling)</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="radio" id="scenario_office_home_decor" name="scenarioType" value="辦公室/居家佈置">
+                                <label for="scenario_office_home_decor">🏢 辦公室/居家佈置 (Office/Home Decoration)</label>
+                            </div>
+                            <div class="checkbox-item">
                                 <input type="radio" id="scenario_other" name="scenarioType" value="其他">
                                 <label for="scenario_other">✨ 其他 (Other Creative)</label>
                             </div>
@@ -982,10 +990,21 @@
                 painPointsAnalysis.usageScenarios.forEach(scenario => {
                     // Check if bilingual format
                     if (scenario.scenario && scenario.scenario.includes('/')) {
-                        const [zhScenario, viScenario] = scenario.scenario.split('/');
-                        const [zhContext, viContext] = scenario.context ? scenario.context.split('/') : ['', ''];
-                        const [zhBenefits, viBenefits] = scenario.benefits ? scenario.benefits.split('/') : ['', ''];
-                        const [zhEmotions, viEmotions] = scenario.emotions ? scenario.emotions.split('/') : ['', ''];
+                        const scenarioParts = scenario.scenario.split('/');
+                        const zhScenario = scenarioParts[0] || '';
+                        const viScenario = scenarioParts[1] || scenarioParts[0] || '';
+                        
+                        const contextParts = scenario.context ? scenario.context.split('/') : ['', ''];
+                        const zhContext = contextParts[0] || '';
+                        const viContext = contextParts[1] || contextParts[0] || '';
+                        
+                        const benefitsParts = scenario.benefits ? scenario.benefits.split('/') : ['', ''];
+                        const zhBenefits = benefitsParts[0] || '';
+                        const viBenefits = benefitsParts[1] || benefitsParts[0] || '';
+                        
+                        const emotionsParts = scenario.emotions ? scenario.emotions.split('/') : ['', ''];
+                        const zhEmotions = emotionsParts[0] || '';
+                        const viEmotions = emotionsParts[1] || emotionsParts[0] || '';
                         
                         html += `<div class="scenario bilingual-analysis">
                             <div class="language-section">
