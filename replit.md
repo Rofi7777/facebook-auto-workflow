@@ -4,6 +4,11 @@
 A comprehensive multi-industry AI-powered content generation platform supporting Fashion, Mother&Kids, Art Toy, and other product categories. The system integrates Google Gemini 2.5 Flash AI for intelligent product analysis and automated content generation across multiple platforms (Shopee, TikTok, Instagram, Facebook).
 
 ## Recent Changes
+- **2025-10-19**: Shopee image generation fixes and optimization
+  - Fixed Shopee platform image generation issue when JSON parsing fails
+  - Removed price tags and promotion badges from Shopee images per user request
+  - Modified Shopee image style to focus on product details and quality showcase
+  - Ensured all platforms generate images consistently regardless of content format
 - **2025-09-30**: Expanded usage scenarios and bug fixes
   - Fixed viContext undefined error in bilingual scenario display
   - Added new usage scenarios: Personal Styling (個人穿搭), Office/Home Decoration (辦公室/居家佈置)
