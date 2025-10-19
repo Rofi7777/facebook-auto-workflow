@@ -352,7 +352,7 @@ app.post('/api/generate-platform-content', async (req, res) => {
         };
         
         // Generate platform-specific images if requested
-        if (generateImages && content.imagePrompt) {
+        if (generateImages) {
           try {
             const imagePrompt = aiService.generateImagePrompt(platform, productInfo, content);
             const imagePath = `assets/generated/${platform}_${Date.now()}.png`;

@@ -4,7 +4,7 @@ const PLATFORM_CONFIGS = {
   shopee: {
     name: 'Shopee',
     displayName: 'Shopee 蝦皮購物',
-    description: '購物導向內容，強調價格優勢和產品特色',
+    description: '購物導向內容，強調產品特色和使用情境',
     contentSpecs: {
       maxLength: 1000,
       style: 'persuasive',
@@ -15,7 +15,7 @@ const PLATFORM_CONFIGS = {
       aspectRatio: '1:1',
       style: 'product-photography',
       background: 'clean-white',
-      elements: ['price-tag', 'promotion-badge']
+      elements: ['product-detail', 'quality-showcase']
     }
   },
   tiktok: {

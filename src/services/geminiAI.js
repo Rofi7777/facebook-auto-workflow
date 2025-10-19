@@ -871,7 +871,7 @@ This specification can be used with:
     const basePrompt = `創建一個吸引人的嬰幼兒玩具行銷圖片，產品：${productInfo.productType || '嬰幼兒玩具'}`;
     
     const platformStyles = {
-      shopee: `${basePrompt}，購物平台風格，清潔的白色背景，產品居中顯示，添加價格標籤和促銷貼紙，明亮的照明，專業的產品攝影風格`,
+      shopee: `${basePrompt}，購物平台風格，清潔的白色或淺色背景，產品居中顯示，明亮的照明，專業的產品攝影風格，展示產品細節和特色`,
       tiktok: `${basePrompt}，適合短影片的直式構圖，活潑多彩的背景，年輕父母和嬰幼兒使用場景，動感的視覺效果，趣味性強`,
       instagram: `${basePrompt}，方形構圖，美好的生活場景，溫馨的家庭氛圍，自然光線，Instagram風格的濾鏡效果，質感優雅`,
       facebook: `${basePrompt}，家庭友善的16:9橫式構圖，溫暖的家庭環境，父母與孩子互動場景，柔和的燈光，強調安全和教育價值`
