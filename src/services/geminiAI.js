@@ -1,6 +1,7 @@
 const { GoogleGenAI, Modality } = require('@google/genai');
 const fs = require('fs-extra');
 const path = require('path');
+const sharp = require('sharp');
 
 // DON'T DELETE THIS COMMENT - Following javascript_gemini integration blueprint
 // Using Gemini AI for multi-platform content generation and image analysis
@@ -617,6 +618,56 @@ Vui lòng phân tích và trả về định dạng JSON bằng tiếng Việt:`
     return scenarioMap[scenarioType] || scenarioMap['親子互動'];
   }
 
+  // 在生成的圖片上疊加 Googoogaga Logo
+  async addLogoToImage(imagePath) {
+    try {
+      const logoPath = path.resolve(__dirname, '../../public/brand/googoogaga-logo.jpg');
+      
+      // 檢查 Logo 是否存在
+      const logoExists = await fs.pathExists(logoPath);
+      if (!logoExists) {
+        console.warn('⚠️ Googoogaga logo not found, skipping logo overlay');
+        return imagePath;
+      }
+      
+      // 讀取原始圖片和 Logo
+      const image = sharp(imagePath);
+      const metadata = await image.metadata();
+      
+      // 計算 Logo 大小（原圖寬度的 20%）
+      const logoWidth = Math.floor(metadata.width * 0.2);
+      
+      // 調整 Logo 大小並轉換為 PNG（支持透明度）
+      const resizedLogo = await sharp(logoPath)
+        .resize(logoWidth, null, { fit: 'contain' })
+        .png()
+        .toBuffer();
+      
+      // 創建臨時文件路徑（安全處理所有擴展名）
+      const parsedPath = path.parse(imagePath);
+      const tempPath = path.join(parsedPath.dir, `${parsedPath.name}_temp${parsedPath.ext}`);
+      
+      // 將 Logo 疊加到右下角
+      await image
+        .composite([{
+          input: resizedLogo,
+          gravity: 'southeast',
+          blend: 'over'
+        }])
+        .toFile(tempPath);
+      
+      // 替換原文件
+      await fs.move(tempPath, imagePath, { overwrite: true });
+      
+      console.log(`✅ Googoogaga logo added to ${imagePath}`);
+      return imagePath;
+      
+    } catch (error) {
+      console.error(`❌ Failed to add logo: ${error.message}`);
+      return imagePath; // 如果失敗，返回原圖片路徑
+    }
+  }
+
   // 增強版 Nano Banana 圖片生成 (支援真實圖片生成和下載，使用用戶上傳的產品圖片作為參考)
   async generateMarketingImage(prompt, imagePath, productImagePath = null, scenarioType = '親子互動') {
     try {
@@ -746,10 +797,17 @@ Style: Professional product photography, warm family moments, high-quality visua
               await fs.writeFile(imagePath, buffer);
               
               console.log(`✅ Real Nano Banana image generated: ${imagePath} (${buffer.length} bytes)`);
+              
+              // 在圖片上疊加 Googoogaga Logo
+              await this.addLogoToImage(imagePath);
+              
+              // 重新讀取添加 Logo 後的圖片大小
+              const finalStats = await fs.stat(imagePath);
+              
               return { 
                 type: 'image', 
                 path: imagePath, 
-                size: buffer.length,
+                size: finalStats.size,
                 downloadUrl: `/api/download-image?path=${encodeURIComponent(imagePath)}`,
                 isRealImage: true
               };

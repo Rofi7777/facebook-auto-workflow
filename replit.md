@@ -4,6 +4,12 @@
 A comprehensive multi-industry AI-powered content generation platform supporting Fashion, Mother&Kids, Art Toy, and other product categories. The system integrates Google Gemini 2.5 Flash AI for intelligent product analysis and automated content generation across multiple platforms (Shopee, TikTok, Instagram, Facebook).
 
 ## Recent Changes
+- **2025-10-29**: Automatic brand logo integration on all generated images
+  - Implemented automatic Googoogaga logo overlay on all platform images (Shopee, TikTok, Instagram, Facebook)
+  - Added logo overlay for scenario marketing images
+  - Used Sharp image processing library for high-quality logo compositing
+  - Logo sized at 20% of image width, positioned at bottom-right corner
+  - Supports all image formats (PNG, JPG, WEBP, etc.)
 - **2025-10-19**: Shopee image generation fixes and optimization
   - Fixed Shopee platform image generation issue when JSON parsing fails
   - Removed price tags and promotion badges from Shopee images per user request
