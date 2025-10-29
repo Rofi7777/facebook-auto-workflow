@@ -4,10 +4,11 @@
 A comprehensive multi-industry AI-powered content generation platform supporting Fashion, Mother&Kids, Art Toy, and other product categories. The system integrates Google Gemini 2.5 Flash AI for intelligent product analysis and automated content generation across multiple platforms (Shopee, TikTok, Instagram, Facebook).
 
 ## Recent Changes
-- **2025-10-29**: Page 2 "AI 廣告顧問" Feature Added
+- **2025-10-29**: Page 2 "AI 廣告顧問" Feature Added & Optional Fields Update
   - Created dual-page tab navigation system (AI 圖片生成 | AI 廣告顧問)
   - Implemented Page 2 UI with left input panel and right analysis results panel
   - Added multi-format file upload support (Image, PDF, Excel, Word, CSV, 1-10 files)
+  - **All input fields are now optional** - users can analyze with just files or just text info
   - Created AdsAnalyzer service using Gemini AI for intelligent ad analysis
   - Implemented 5-section professional report output:
     * Brand Need Summary (品牌需求摘要)
@@ -18,6 +19,7 @@ A comprehensive multi-industry AI-powered content generation platform supporting
   - Added PDF export functionality (using window.print())
   - Supports TikTok, Shopee, Meta, and Zalo ad platforms
   - Backend API endpoint: /api/analyze-ads
+  - Smart validation: requires only files OR text info (not both mandatory)
 - **2025-10-29**: Automatic brand logo integration on all generated images
   - Implemented automatic Googoogaga logo overlay on all platform images (Shopee, TikTok, Instagram, Facebook)
   - Added logo overlay for scenario marketing images

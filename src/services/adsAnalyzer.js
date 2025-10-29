@@ -160,22 +160,31 @@ class AdsAnalyzer {
    * 構建 AI 分析提示詞
    */
   buildAnalysisPrompt(brandName, productName, coreProduct, targetMarket, platforms, uploadedFiles) {
-    const filesInfo = uploadedFiles.map((file, index) => {
-      return `${index + 1}. ${file.filename} (${file.mimetype})`;
-    }).join('\n');
-    return `你是一位專業的廣告策略顧問，專門為越南市場的母嬰與早教品牌提供 AI 智能廣告分析。
+    const filesInfo = uploadedFiles.length > 0 
+      ? uploadedFiles.map((file, index) => `${index + 1}. ${file.filename} (${file.mimetype})`).join('\n')
+      : '未上傳檔案';
+    
+    // 構建靈活的客戶資訊部分
+    let clientInfo = '【客戶資訊】\n';
+    if (brandName) clientInfo += `品牌名稱: ${brandName}\n`;
+    if (productName) clientInfo += `產品名稱: ${productName}\n`;
+    if (coreProduct) clientInfo += `核心產品: ${coreProduct}\n`;
+    if (targetMarket) clientInfo += `目標市場: ${targetMarket}\n`;
+    clientInfo += `目標平台: ${platforms.join(', ')}\n`;
+    
+    // 如果所有文字資訊都是空的，添加提示
+    const hasTextInfo = brandName || productName || coreProduct || targetMarket;
+    if (!hasTextInfo) {
+      clientInfo += '\n⚠️ 注意：客戶未提供詳細的品牌或產品資訊，請主要根據上傳的檔案內容進行分析。\n';
+    }
+    
+    return `你是一位專業的廣告策略顧問，專門為越南市場提供 AI 智能廣告分析。
 
-【客戶資訊】
-品牌名稱: ${brandName}
-產品名稱: ${productName}
-核心產品: ${coreProduct || '未提供'}
-目標市場: ${targetMarket || '未提供'}
-目標平台: ${platforms.join(', ')}
-
+${clientInfo}
 【上傳的廣告資料檔案】
 ${filesInfo}
 
-請根據以上資訊，為客戶提供五大專業分析報告，每個報告都要具體、可執行、有洞察力：
+請根據以上可用資訊，為客戶提供五大專業分析報告。即使某些資訊未提供，請根據已有的資料（特別是上傳的檔案內容）進行專業推測和分析。每個報告都要具體、可執行、有洞察力：
 
 ## 1. Brand Need Summary (品牌需求摘要)
 分析品牌的核心需求、市場定位和當前挑戰。包括：

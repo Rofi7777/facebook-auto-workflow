@@ -698,19 +698,16 @@ app.post('/api/analyze-ads', adsUpload.array('files', 10), async (req, res) => {
     const { brandName, productName, coreProduct, targetMarket, platforms } = req.body;
     const uploadedFiles = req.files || [];
     
-    console.log(`📝 Brand: ${brandName}, Product: ${productName}`);
+    console.log(`📝 Brand: ${brandName || '(未提供)'}, Product: ${productName || '(未提供)'}`);
     console.log(`📁 Files uploaded: ${uploadedFiles.length}`);
     
-    // 驗證必要欄位
-    if (!brandName || !productName) {
-      return res.status(400).json({ 
-        error: '請提供品牌名稱和產品名稱' 
-      });
-    }
+    // 驗證是否有任何可分析的資訊
+    const hasTextInfo = brandName || productName || coreProduct || targetMarket;
+    const hasFiles = uploadedFiles.length > 0;
     
-    if (uploadedFiles.length === 0) {
+    if (!hasTextInfo && !hasFiles) {
       return res.status(400).json({ 
-        error: '請至少上傳一個廣告資料檔案' 
+        error: '請至少上傳檔案或提供品牌/產品資訊' 
       });
     }
     
@@ -728,10 +725,10 @@ app.post('/api/analyze-ads', adsUpload.array('files', 10), async (req, res) => {
       });
     }
     
-    // 準備分析資料
+    // 準備分析資料（允許空值）
     const analysisData = {
-      brandName,
-      productName,
+      brandName: brandName || '',
+      productName: productName || '',
       coreProduct: coreProduct || '',
       targetMarket: targetMarket || '',
       platforms: platformsList,

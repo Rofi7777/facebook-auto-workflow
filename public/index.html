@@ -610,27 +610,27 @@
                     
                     <form id="adsAnalysisForm">
                         <div class="form-group">
-                            <label for="brandName">品牌名稱 / Brand Name</label>
-                            <input type="text" id="brandName" name="brandName" placeholder="輸入品牌名稱" required>
+                            <label for="brandName">品牌名稱 / Brand Name (選填)</label>
+                            <input type="text" id="brandName" name="brandName" placeholder="輸入品牌名稱">
                         </div>
                         
                         <div class="form-group">
-                            <label for="adProductName">產品名稱 / Product Name</label>
-                            <input type="text" id="adProductName" name="adProductName" placeholder="輸入產品名稱" required>
+                            <label for="adProductName">產品名稱 / Product Name (選填)</label>
+                            <input type="text" id="adProductName" name="adProductName" placeholder="輸入產品名稱">
                         </div>
                         
                         <div class="form-group">
-                            <label for="coreProduct">核心產品 / Core Product</label>
+                            <label for="coreProduct">核心產品 / Core Product (選填)</label>
                             <textarea id="coreProduct" name="coreProduct" placeholder="描述核心產品特色..." rows="2"></textarea>
                         </div>
                         
                         <div class="form-group">
-                            <label for="targetMarket">目標與市場 / Target Market</label>
+                            <label for="targetMarket">目標與市場 / Target Market (選填)</label>
                             <textarea id="targetMarket" name="targetMarket" placeholder="描述目標客群與市場定位..." rows="2"></textarea>
                         </div>
                         
                         <div class="form-group">
-                            <label>檔案上傳 / File Upload (支援 1-10 個檔案)</label>
+                            <label>檔案上傳 / File Upload (選填，支援 1-10 個檔案)</label>
                             <div class="file-upload" onclick="document.getElementById('adsFileUpload').click()">
                                 <input type="file" id="adsFileUpload" accept="image/*,.pdf,.xlsx,.xls,.doc,.docx,.csv" multiple>
                                 <p>📁 上傳廣告資料檔案</p>
@@ -1562,22 +1562,27 @@
             adsAnalysisForm.addEventListener('submit', async function(e) {
                 e.preventDefault();
                 
-                const brandName = document.getElementById('brandName').value;
-                const productName = document.getElementById('adProductName').value;
-                const coreProduct = document.getElementById('coreProduct').value;
-                const targetMarket = document.getElementById('targetMarket').value;
+                const brandName = document.getElementById('brandName').value.trim();
+                const productName = document.getElementById('adProductName').value.trim();
+                const coreProduct = document.getElementById('coreProduct').value.trim();
+                const targetMarket = document.getElementById('targetMarket').value.trim();
                 
                 // 獲取選中的平台
                 const selectedPlatforms = Array.from(document.querySelectorAll('input[name="adsPlatform"]:checked'))
                     .map(cb => cb.value);
                 
-                if (selectedPlatforms.length === 0) {
-                    alert('請至少選擇一個廣告平台');
+                // 檢查是否有任何可分析的資訊（檔案或文字資訊）
+                const hasFiles = selectedAdsFiles.length > 0;
+                const hasTextInfo = brandName || productName || coreProduct || targetMarket;
+                const hasPlatformSelection = selectedPlatforms.length > 0;
+                
+                if (!hasFiles && !hasTextInfo) {
+                    alert('請至少上傳檔案或填寫品牌/產品資訊，AI 才能進行分析');
                     return;
                 }
                 
-                if (selectedAdsFiles.length === 0) {
-                    alert('請至少上傳一個廣告資料檔案');
+                if (!hasPlatformSelection) {
+                    alert('請至少選擇一個廣告平台');
                     return;
                 }
                 
