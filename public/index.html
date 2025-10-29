@@ -43,6 +43,47 @@
             font-size: 18px;
         }
         
+        /* 分頁切換樣式 */
+        .tab-navigation {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .tab-btn {
+            padding: 12px 30px;
+            font-size: 16px;
+            font-weight: 600;
+            border: 2px solid #87CEEB;
+            background: white;
+            color: #87CEEB;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .tab-btn:hover {
+            background: #f0f8ff;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(135, 206, 235, 0.3);
+        }
+        
+        .tab-btn.active {
+            background: linear-gradient(135deg, #87CEEB 0%, #FFB6C1 100%);
+            color: white;
+            border-color: transparent;
+        }
+        
+        .page-content {
+            display: none;
+        }
+        
+        .page-content.active {
+            display: block;
+        }
+        
         .workflow-container {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -410,8 +451,20 @@
             <h1 id="brandTitle">🧸 Loading...</h1>
             <p id="brandSlogan">Loading brand information...</p>
             <p>AI 驅動的多平台嬰幼兒玩具行銷內容生成器</p>
+            
+            <!-- 分頁切換導航 -->
+            <div class="tab-navigation">
+                <button class="tab-btn active" onclick="switchPage('page1')">
+                    🎨 AI 圖片生成
+                </button>
+                <button class="tab-btn" onclick="switchPage('page2')">
+                    📊 AI 廣告顧問
+                </button>
+            </div>
         </div>
         
+        <!-- Page 1: AI 圖片生成 -->
+        <div id="page1" class="page-content active">
         <div class="workflow-container">
             <div class="input-panel">
                 <h2 class="panel-title">📝 產品資訊輸入</h2>
@@ -545,6 +598,100 @@
                 <div id="scenarioResults"></div>
             </div>
         </div>
+        </div>
+        <!-- End of Page 1 -->
+
+        <!-- Page 2: AI 廣告顧問 -->
+        <div id="page2" class="page-content">
+            <div class="workflow-container">
+                <!-- 左側：資料輸入區 -->
+                <div class="input-panel">
+                    <h2 class="panel-title">📤 資料輸入區</h2>
+                    
+                    <form id="adsAnalysisForm">
+                        <div class="form-group">
+                            <label for="brandName">品牌名稱 / Brand Name</label>
+                            <input type="text" id="brandName" name="brandName" placeholder="輸入品牌名稱" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="adProductName">產品名稱 / Product Name</label>
+                            <input type="text" id="adProductName" name="adProductName" placeholder="輸入產品名稱" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="coreProduct">核心產品 / Core Product</label>
+                            <textarea id="coreProduct" name="coreProduct" placeholder="描述核心產品特色..." rows="2"></textarea>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="targetMarket">目標與市場 / Target Market</label>
+                            <textarea id="targetMarket" name="targetMarket" placeholder="描述目標客群與市場定位..." rows="2"></textarea>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>檔案上傳 / File Upload (支援 1-10 個檔案)</label>
+                            <div class="file-upload" onclick="document.getElementById('adsFileUpload').click()">
+                                <input type="file" id="adsFileUpload" accept="image/*,.pdf,.xlsx,.xls,.doc,.docx,.csv" multiple>
+                                <p>📁 上傳廣告資料檔案</p>
+                                <small>支援 Image, PDF, Excel, Word, CSV (每個檔案最大 10MB，最多10個檔案)</small>
+                            </div>
+                            <div id="adsFilePreviewContainer" class="image-preview-container"></div>
+                            <div id="selectedAdsFileCount" class="selected-count" style="display: none;"></div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>平台勾選 / Platform Selection</label>
+                            <div class="checkbox-group">
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="platform_tiktok" name="adsPlatform" value="TikTok">
+                                    <label for="platform_tiktok">📱 TikTok Ads</label>
+                                </div>
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="platform_shopee" name="adsPlatform" value="Shopee">
+                                    <label for="platform_shopee">🛍️ Shopee Ads</label>
+                                </div>
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="platform_meta" name="adsPlatform" value="Meta">
+                                    <label for="platform_meta">👥 Meta Ads (Facebook/Instagram)</label>
+                                </div>
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="platform_zalo" name="adsPlatform" value="Zalo">
+                                    <label for="platform_zalo">💬 Zalo Ads</label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <button type="submit" class="btn" id="analyzeAdsBtn">
+                            🧠 開始分析 (Start Analysis)
+                        </button>
+                    </form>
+                    
+                    <div id="adsStatus" class="status"></div>
+                </div>
+                
+                <!-- 右側：AI 分析結果區 -->
+                <div class="output-panel">
+                    <h2 class="panel-title">🤖 AI 分析結果區</h2>
+                    <div id="adsAnalysisResults">
+                        <p style="text-align: center; color: #666; padding: 40px;">
+                            上傳廣告資料並點擊分析按鈕開始 AI 智慧分析
+                        </p>
+                    </div>
+                    
+                    <!-- 報告操作按鈕 -->
+                    <div id="reportActions" style="display: none; margin-top: 20px; text-align: center; gap: 10px;">
+                        <button class="btn" onclick="exportPDF()" style="background: #28a745;">
+                            📄 匯出 PDF
+                        </button>
+                        <button class="btn btn-secondary" onclick="reanalyze()">
+                            🔄 重新分析
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- End of Page 2 -->
     </div>
 
     <script>
@@ -1304,6 +1451,262 @@
             .catch(error => {
                 console.error('API connection failed:', error);
             });
+        
+        // ==================== Page 2: AI 廣告顧問功能 ====================
+        
+        // 分頁切換函數
+        function switchPage(pageId) {
+            // 隱藏所有頁面
+            document.querySelectorAll('.page-content').forEach(page => {
+                page.classList.remove('active');
+            });
+            
+            // 移除所有按鈕的 active 狀態
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // 顯示選中的頁面
+            document.getElementById(pageId).classList.add('active');
+            
+            // 設置對應按鈕為 active
+            event.target.classList.add('active');
+        }
+        
+        // Page 2 檔案上傳處理
+        let selectedAdsFiles = [];
+        const adsFileUpload = document.getElementById('adsFileUpload');
+        
+        if (adsFileUpload) {
+            adsFileUpload.addEventListener('change', function(e) {
+                const files = Array.from(e.target.files);
+                
+                // 限制最多 10 個檔案
+                if (files.length > 10) {
+                    alert('最多只能選擇10個檔案');
+                    files.splice(10);
+                    
+                    const dt = new DataTransfer();
+                    files.forEach(file => dt.items.add(file));
+                    e.target.files = dt.files;
+                }
+                
+                selectedAdsFiles = files;
+                displayAdsFilePreview(files);
+            });
+        }
+        
+        // 顯示 Page 2 檔案預覽
+        function displayAdsFilePreview(files) {
+            const container = document.getElementById('adsFilePreviewContainer');
+            const countDiv = document.getElementById('selectedAdsFileCount');
+            
+            if (files.length === 0) {
+                container.style.display = 'none';
+                countDiv.style.display = 'none';
+                return;
+            }
+            
+            container.innerHTML = '';
+            container.classList.add('show');
+            countDiv.style.display = 'block';
+            countDiv.textContent = `已選擇 ${files.length} 個檔案`;
+            
+            const grid = document.createElement('div');
+            grid.className = 'image-preview-grid';
+            
+            files.forEach((file, index) => {
+                const item = document.createElement('div');
+                item.className = 'image-preview-item';
+                
+                // 根據檔案類型顯示不同圖示
+                let fileIcon = '📄';
+                if (file.type.startsWith('image/')) {
+                    fileIcon = '🖼️';
+                } else if (file.type.includes('pdf')) {
+                    fileIcon = '📕';
+                } else if (file.type.includes('sheet') || file.type.includes('excel')) {
+                    fileIcon = '📊';
+                } else if (file.type.includes('word') || file.type.includes('document')) {
+                    fileIcon = '📝';
+                }
+                
+                item.innerHTML = `
+                    <div style="padding: 15px; text-align: center; background: #f0f0f0; height: 100px; display: flex; flex-direction: column; justify-content: center;">
+                        <div style="font-size: 32px;">${fileIcon}</div>
+                        <div style="font-size: 10px; margin-top: 5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${file.name}</div>
+                    </div>
+                    <button class="remove-btn" onclick="removeAdsFile(${index})">×</button>
+                `;
+                
+                grid.appendChild(item);
+            });
+            
+            container.appendChild(grid);
+        }
+        
+        // 移除 Page 2 檔案
+        function removeAdsFile(index) {
+            selectedAdsFiles.splice(index, 1);
+            
+            const dt = new DataTransfer();
+            selectedAdsFiles.forEach(file => dt.items.add(file));
+            document.getElementById('adsFileUpload').files = dt.files;
+            
+            displayAdsFilePreview(selectedAdsFiles);
+        }
+        
+        // Page 2 表單提交處理
+        const adsAnalysisForm = document.getElementById('adsAnalysisForm');
+        if (adsAnalysisForm) {
+            adsAnalysisForm.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                const brandName = document.getElementById('brandName').value;
+                const productName = document.getElementById('adProductName').value;
+                const coreProduct = document.getElementById('coreProduct').value;
+                const targetMarket = document.getElementById('targetMarket').value;
+                
+                // 獲取選中的平台
+                const selectedPlatforms = Array.from(document.querySelectorAll('input[name="adsPlatform"]:checked'))
+                    .map(cb => cb.value);
+                
+                if (selectedPlatforms.length === 0) {
+                    alert('請至少選擇一個廣告平台');
+                    return;
+                }
+                
+                if (selectedAdsFiles.length === 0) {
+                    alert('請至少上傳一個廣告資料檔案');
+                    return;
+                }
+                
+                const statusDiv = document.getElementById('adsStatus');
+                const resultsDiv = document.getElementById('adsAnalysisResults');
+                const analyzeBtn = document.getElementById('analyzeAdsBtn');
+                
+                // 顯示載入狀態
+                analyzeBtn.disabled = true;
+                analyzeBtn.textContent = '🔄 分析中...';
+                statusDiv.innerHTML = '<p style="color: #87CEEB;">⏳ 正在上傳檔案並分析廣告資料...</p>';
+                
+                try {
+                    // 準備表單數據
+                    const formData = new FormData();
+                    formData.append('brandName', brandName);
+                    formData.append('productName', productName);
+                    formData.append('coreProduct', coreProduct);
+                    formData.append('targetMarket', targetMarket);
+                    formData.append('platforms', JSON.stringify(selectedPlatforms));
+                    
+                    // 添加所有檔案
+                    selectedAdsFiles.forEach((file, index) => {
+                        formData.append('files', file);
+                    });
+                    
+                    // 發送到後端 API
+                    const response = await fetch('/api/analyze-ads', {
+                        method: 'POST',
+                        body: formData
+                    });
+                    
+                    if (!response.ok) {
+                        throw new Error('分析請求失敗');
+                    }
+                    
+                    const result = await response.json();
+                    
+                    // 顯示分析結果
+                    displayAdsAnalysisResults(result);
+                    
+                    statusDiv.innerHTML = '<p style="color: #28a745;">✅ 分析完成！</p>';
+                    document.getElementById('reportActions').style.display = 'block';
+                    
+                } catch (error) {
+                    console.error('分析錯誤:', error);
+                    statusDiv.innerHTML = '<p style="color: #dc3545;">❌ 分析失敗，請稍後再試</p>';
+                } finally {
+                    analyzeBtn.disabled = false;
+                    analyzeBtn.textContent = '🧠 開始分析 (Start Analysis)';
+                }
+            });
+        }
+        
+        // 顯示廣告分析結果
+        function displayAdsAnalysisResults(result) {
+            const resultsDiv = document.getElementById('adsAnalysisResults');
+            
+            let html = '<div style="text-align: left;">';
+            
+            // 1. Brand Need Summary
+            if (result.brandNeedSummary) {
+                html += `
+                    <div style="margin-bottom: 25px; padding: 20px; background: #f8f9fa; border-left: 4px solid #87CEEB; border-radius: 8px;">
+                        <h3 style="color: #87CEEB; margin-bottom: 10px;">📌 Brand Need Summary (品牌需求摘要)</h3>
+                        <p style="white-space: pre-wrap; line-height: 1.6;">${result.brandNeedSummary}</p>
+                    </div>
+                `;
+            }
+            
+            // 2. Performance Insight
+            if (result.performanceInsight) {
+                html += `
+                    <div style="margin-bottom: 25px; padding: 20px; background: #fff3cd; border-left: 4px solid #ffc107; border-radius: 8px;">
+                        <h3 style="color: #ffc107; margin-bottom: 10px;">📊 Performance Insight (效能洞察)</h3>
+                        <p style="white-space: pre-wrap; line-height: 1.6;">${result.performanceInsight}</p>
+                    </div>
+                `;
+            }
+            
+            // 3. Creative Strategy
+            if (result.creativeStrategy) {
+                html += `
+                    <div style="margin-bottom: 25px; padding: 20px; background: #d1ecf1; border-left: 4px solid #17a2b8; border-radius: 8px;">
+                        <h3 style="color: #17a2b8; margin-bottom: 10px;">🎨 Creative Strategy (創意策略)</h3>
+                        <p style="white-space: pre-wrap; line-height: 1.6;">${result.creativeStrategy}</p>
+                    </div>
+                `;
+            }
+            
+            // 4. Optimization Plan
+            if (result.optimizationPlan) {
+                html += `
+                    <div style="margin-bottom: 25px; padding: 20px; background: #d4edda; border-left: 4px solid #28a745; border-radius: 8px;">
+                        <h3 style="color: #28a745; margin-bottom: 10px;">🚀 Optimization Plan (優化計劃)</h3>
+                        <p style="white-space: pre-wrap; line-height: 1.6;">${result.optimizationPlan}</p>
+                    </div>
+                `;
+            }
+            
+            // 5. Advertising Review Report
+            if (result.advertisingReviewReport) {
+                html += `
+                    <div style="margin-bottom: 25px; padding: 20px; background: #f8d7da; border-left: 4px solid #dc3545; border-radius: 8px;">
+                        <h3 style="color: #dc3545; margin-bottom: 10px;">📝 Advertising Review Report (廣告檢視報告)</h3>
+                        <p style="white-space: pre-wrap; line-height: 1.6;">${result.advertisingReviewReport}</p>
+                    </div>
+                `;
+            }
+            
+            html += '</div>';
+            resultsDiv.innerHTML = html;
+        }
+        
+        // PDF 匯出功能
+        function exportPDF() {
+            window.print();
+        }
+        
+        // 重新分析功能
+        function reanalyze() {
+            document.getElementById('adsAnalysisResults').innerHTML = `
+                <p style="text-align: center; color: #666; padding: 40px;">
+                    上傳廣告資料並點擊分析按鈕開始 AI 智慧分析
+                </p>
+            `;
+            document.getElementById('reportActions').style.display = 'none';
+            document.getElementById('adsStatus').innerHTML = '';
+        }
     </script>
 </body>
 </html>

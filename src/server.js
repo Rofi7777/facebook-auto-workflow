@@ -6,6 +6,7 @@ const multer = require('multer');
 const fs = require('fs-extra');
 const GeminiAIService = require('./services/geminiAI');
 const ScenarioGeneratorService = require('./services/scenarioGenerator');
+const AdsAnalyzer = require('./services/adsAnalyzer');
 const { PLATFORM_CONFIGS, CONTENT_TEMPLATES, BABY_TOY_CATEGORIES } = require('./schemas/platforms');
 
 dotenv.config();
@@ -13,6 +14,7 @@ dotenv.config();
 // Initialize AI services
 const aiService = new GeminiAIService();
 const scenarioService = new ScenarioGeneratorService();
+const adsAnalyzer = new AdsAnalyzer();
 
 // Brand configuration from environment variables
 const ASSETS_BASE_URL = process.env.ASSETS_BASE_URL || '/brand';
@@ -31,7 +33,7 @@ app.use(express.json());
 app.use(express.static('public'));
 app.use('/assets', express.static('assets'));
 
-// Configure multer for multi-file uploads with security validation
+// Configure multer for multi-file uploads with security validation (Product Images)
 const upload = multer({
   dest: 'assets/uploads/',
   limits: { 
@@ -48,6 +50,33 @@ const upload = multer({
       cb(null, true);
     } else {
       cb(new Error('Only image files (JPEG, PNG, GIF) are allowed'), false);
+    }
+  }
+});
+
+// Configure multer for ads analysis files (images, PDF, Excel, Word, CSV)
+const adsUpload = multer({
+  dest: 'assets/ads-uploads/',
+  limits: { 
+    fileSize: 10 * 1024 * 1024, // 10MB limit per file
+    files: 10 // Maximum 10 files
+  },
+  fileFilter: (req, file, cb) => {
+    // Accept images, PDF, Excel, Word, CSV
+    const allowedMimes = [
+      'image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp',
+      'application/pdf',
+      'application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      'text/csv', 'application/csv'
+    ];
+    const allowedExts = ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.pdf', '.xls', '.xlsx', '.doc', '.docx', '.csv'];
+    const ext = path.extname(file.originalname).toLowerCase();
+    
+    if (allowedMimes.includes(file.mimetype) && allowedExts.includes(ext)) {
+      cb(null, true);
+    } else {
+      cb(new Error('只支援 Image, PDF, Excel, Word, CSV 檔案'), false);
     }
   }
 });
@@ -658,6 +687,88 @@ function getDesignBrief(template) {
   
   return briefs[template] || briefs['gentle'];
 }
+
+// ==================== Page 2: AI 廣告顧問 API ====================
+
+// API endpoint for ads analysis
+app.post('/api/analyze-ads', adsUpload.array('files', 10), async (req, res) => {
+  try {
+    console.log('📊 Received ads analysis request');
+    
+    const { brandName, productName, coreProduct, targetMarket, platforms } = req.body;
+    const uploadedFiles = req.files || [];
+    
+    console.log(`📝 Brand: ${brandName}, Product: ${productName}`);
+    console.log(`📁 Files uploaded: ${uploadedFiles.length}`);
+    
+    // 驗證必要欄位
+    if (!brandName || !productName) {
+      return res.status(400).json({ 
+        error: '請提供品牌名稱和產品名稱' 
+      });
+    }
+    
+    if (uploadedFiles.length === 0) {
+      return res.status(400).json({ 
+        error: '請至少上傳一個廣告資料檔案' 
+      });
+    }
+    
+    // 解析平台資訊
+    let platformsList = [];
+    try {
+      platformsList = JSON.parse(platforms);
+    } catch (e) {
+      platformsList = [platforms];
+    }
+    
+    if (platformsList.length === 0) {
+      return res.status(400).json({ 
+        error: '請至少選擇一個廣告平台' 
+      });
+    }
+    
+    // 準備分析資料
+    const analysisData = {
+      brandName,
+      productName,
+      coreProduct: coreProduct || '',
+      targetMarket: targetMarket || '',
+      platforms: platformsList,
+      uploadedFiles: uploadedFiles.map(file => ({
+        filename: file.originalname,
+        path: file.path,
+        mimetype: file.mimetype,
+        size: file.size
+      }))
+    };
+    
+    console.log('🤖 Calling AI ads analyzer...');
+    
+    // 調用 AI 分析服務
+    const analysisResult = await adsAnalyzer.analyzeAds(analysisData);
+    
+    console.log('✅ Ads analysis completed successfully');
+    
+    // 返回分析結果
+    res.json({
+      success: true,
+      brandNeedSummary: analysisResult.brandNeedSummary,
+      performanceInsight: analysisResult.performanceInsight,
+      creativeStrategy: analysisResult.creativeStrategy,
+      optimizationPlan: analysisResult.optimizationPlan,
+      advertisingReviewReport: analysisResult.advertisingReviewReport,
+      timestamp: analysisResult.timestamp
+    });
+    
+  } catch (error) {
+    console.error('❌ Ads analysis error:', error);
+    res.status(500).json({ 
+      error: '廣告分析失敗',
+      message: error.message 
+    });
+  }
+});
 
 // Start server - CRITICAL: Must bind to 0.0.0.0 for Replit
 app.listen(PORT, '0.0.0.0', () => {
