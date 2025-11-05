@@ -1956,6 +1956,7 @@
                     formData.append('coreProduct', coreProduct);
                     formData.append('targetMarket', targetMarket);
                     formData.append('platforms', JSON.stringify(selectedPlatforms));
+                    formData.append('language', currentLanguage); // 添加當前語言
                     
                     // 添加所有檔案
                     selectedAdsFiles.forEach((file, index) => {
@@ -2176,6 +2177,7 @@
                 const formData = new FormData();
                 formData.append('message', message);
                 formData.append('chatHistory', JSON.stringify(chatHistory));
+                formData.append('language', currentLanguage); // 添加當前語言
                 if (analysisContext) {
                     formData.append('analysisContext', JSON.stringify(analysisContext));
                 }
