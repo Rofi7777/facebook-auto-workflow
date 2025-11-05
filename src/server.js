@@ -7,6 +7,7 @@ const fs = require('fs-extra');
 const GeminiAIService = require('./services/geminiAI');
 const ScenarioGeneratorService = require('./services/scenarioGenerator');
 const AdsAnalyzer = require('./services/adsAnalyzer');
+const ChatAdvisor = require('./services/chatAdvisor');
 const { PLATFORM_CONFIGS, CONTENT_TEMPLATES, BABY_TOY_CATEGORIES } = require('./schemas/platforms');
 
 dotenv.config();
@@ -15,6 +16,7 @@ dotenv.config();
 const aiService = new GeminiAIService();
 const scenarioService = new ScenarioGeneratorService();
 const adsAnalyzer = new AdsAnalyzer();
+const chatAdvisor = new ChatAdvisor();
 
 // Brand configuration from environment variables
 const ASSETS_BASE_URL = process.env.ASSETS_BASE_URL || '/brand';
@@ -747,7 +749,11 @@ app.post('/api/analyze-ads', adsUpload.array('files', 10), async (req, res) => {
     
     console.log('✅ Ads analysis completed successfully');
     
-    // 返回分析結果
+    // 生成建議問題
+    console.log('💡 Generating suggested questions...');
+    const suggestedQuestions = await chatAdvisor.generateSuggestedQuestions(analysisResult);
+    
+    // 返回分析結果和建議問題
     res.json({
       success: true,
       brandNeedSummary: analysisResult.brandNeedSummary,
@@ -755,6 +761,7 @@ app.post('/api/analyze-ads', adsUpload.array('files', 10), async (req, res) => {
       creativeStrategy: analysisResult.creativeStrategy,
       optimizationPlan: analysisResult.optimizationPlan,
       advertisingReviewReport: analysisResult.advertisingReviewReport,
+      suggestedQuestions: suggestedQuestions,
       timestamp: analysisResult.timestamp
     });
     
@@ -762,6 +769,94 @@ app.post('/api/analyze-ads', adsUpload.array('files', 10), async (req, res) => {
     console.error('❌ Ads analysis error:', error);
     res.status(500).json({ 
       error: '廣告分析失敗',
+      message: error.message 
+    });
+  }
+});
+
+// Configure multer for chat advisor files
+const chatUpload = multer({
+  dest: 'assets/chat-uploads/',
+  limits: { 
+    fileSize: 10 * 1024 * 1024, // 10MB limit per file
+    files: 5 // Maximum 5 files per message
+  },
+  fileFilter: (req, file, cb) => {
+    const allowedMimes = [
+      'image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp',
+      'application/pdf',
+      'application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      'text/csv', 'application/csv'
+    ];
+    const allowedExts = ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.pdf', '.xls', '.xlsx', '.doc', '.docx', '.csv'];
+    const ext = path.extname(file.originalname).toLowerCase();
+    
+    if (allowedMimes.includes(file.mimetype) && allowedExts.includes(ext)) {
+      cb(null, true);
+    } else {
+      cb(new Error('不支援的檔案格式'), false);
+    }
+  }
+});
+
+// API endpoint for chat with advisor
+app.post('/api/chat-with-advisor', chatUpload.array('files', 5), async (req, res) => {
+  try {
+    console.log('💬 Received chat message');
+    
+    const { message, chatHistory, analysisContext } = req.body;
+    const uploadedFiles = req.files || [];
+    
+    console.log(`📝 Message: ${message ? message.substring(0, 50) + '...' : '(無訊息)'}`);
+    console.log(`📁 Files uploaded: ${uploadedFiles.length}`);
+    
+    // 解析對話歷史和分析上下文
+    let parsedChatHistory = [];
+    let parsedAnalysisContext = null;
+    
+    try {
+      if (chatHistory) {
+        parsedChatHistory = JSON.parse(chatHistory);
+      }
+      if (analysisContext) {
+        parsedAnalysisContext = JSON.parse(analysisContext);
+      }
+    } catch (parseError) {
+      console.warn('⚠️  Failed to parse chat history or context:', parseError);
+    }
+    
+    // 準備檔案資訊
+    const fileInfos = uploadedFiles.map(file => ({
+      filename: file.originalname,
+      path: file.path,
+      mimetype: file.mimetype,
+      size: file.size
+    }));
+    
+    console.log('🤖 Calling chat advisor...');
+    
+    // 調用對話服務
+    const chatResult = await chatAdvisor.chat(
+      message || '',
+      parsedChatHistory,
+      parsedAnalysisContext,
+      fileInfos
+    );
+    
+    console.log('✅ Chat response generated successfully');
+    
+    // 返回對話結果
+    res.json({
+      success: true,
+      response: chatResult.response,
+      timestamp: chatResult.timestamp
+    });
+    
+  } catch (error) {
+    console.error('❌ Chat error:', error);
+    res.status(500).json({ 
+      error: '對話處理失敗',
       message: error.message 
     });
   }

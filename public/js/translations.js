@@ -1,0 +1,296 @@
+// 多語言翻譯系統
+const translations = {
+  'zh-TW': {
+    // 標題和主要文字
+    'app_title': 'Googoogaga Multi-Platform Generator',
+    'app_subtitle_line1': 'Cùng bé khám phá thế giới diệu kỳ mỗi ngày',
+    'app_subtitle_line2': 'AI 驅動的多平台嬰幼兒玩具營銷內容生成器',
+    
+    // 分頁標籤
+    'tab_image_generation': 'AI 圖片生成',
+    'tab_ads_advisor': 'AI 廣告顧問',
+    
+    // Page 1: AI 圖片生成
+    'product_info_input': '產品資訊輸入',
+    'industry_category': '產業類別 / Industry Category',
+    'product_name': '產品名稱 / Product Name',
+    'product_name_placeholder': '輸入 Googoogaga 玩具名稱',
+    'product_description': '產品說明 / Description',
+    'product_description_placeholder': '描述這個玩具的特色、材質、適合年齡...',
+    'image_upload': '產品圖片上傳 / Product Image Upload',
+    'image_upload_text': '上傳產品圖片',
+    'image_upload_hint': '支援 JPG, PNG (最多5張，每張最大 10MB)',
+    'target_platform': '目標平台 / Target Platform',
+    'campaign_type': '活動類型 / Campaign Type',
+    'template_style': '範本風格 / Template Style',
+    'analyze_button': '開始分析 (Start Analysis)',
+    'ai_analysis_result': 'AI 分析結果',
+    'ai_analysis_wait': '上傳產品圖片並點擊分析按鈕開始 AI 智慧分析',
+    'multi_platform_result': '多平台內容生成結果',
+    'ai_marketing_scenario': 'AI 生成行銷場景',
+    
+    // Page 2: AI 廣告顧問
+    'data_input_area': '資料輸入區',
+    'brand_name': '品牌名稱 / Brand Name (選填)',
+    'brand_name_placeholder': '輸入品牌名稱',
+    'product_name_optional': '產品名稱 / Product Name (選填)',
+    'product_name_optional_placeholder': '輸入產品名稱',
+    'core_product': '核心產品 / Core Product (選填)',
+    'core_product_placeholder': '描述核心產品特色...',
+    'target_market': '目標與市場 / Target Market (選填)',
+    'target_market_placeholder': '描述目標客群與市場定位...',
+    'file_upload': '檔案上傳 / File Upload (選填，支援 1-10 個檔案)',
+    'file_upload_text': '上傳廣告資料檔案',
+    'file_upload_hint': '支援 Image, PDF, Excel, Word, CSV (每個檔案最大 10MB，最多10個檔案)',
+    'platform_selection': '平台勾選 / Platform Selection',
+    'platform_tiktok': 'TikTok Ads',
+    'platform_shopee': 'Shopee Ads',
+    'platform_meta': 'Meta Ads (Facebook/Instagram)',
+    'platform_zalo': 'Zalo Ads',
+    'start_analysis': '開始分析 (Start Analysis)',
+    'ai_analysis_results_area': 'AI 分析結果區',
+    'ai_analysis_results_wait': '上傳廣告資料並點擊分析按鈕開始 AI 智慧分析',
+    'export_pdf': '匯出 PDF',
+    'reanalyze': '重新分析',
+    
+    // 互動對話視窗
+    'chat_advisor_title': 'AI 廣告顧問對話',
+    'chat_placeholder': '輸入您的問題...',
+    'chat_send': '發送',
+    'chat_upload_file': '上傳檔案',
+    'ai_suggested_questions': 'AI 建議的問題：',
+    
+    // 產業類別
+    'industry_fashion': 'Fashion (時尚服飾)',
+    'industry_mother_kids': 'Mother & Kids (母嬰用品)',
+    'industry_art_toy': 'Art Toy (藝術玩具)',
+    'industry_others': 'Others (其他產品)',
+    
+    // 按鈕和動作
+    'generate_scenarios': '生成場景圖片 (Generate Scenarios)',
+    'switch_scenario': '快速切換場景',
+    
+    // 狀態訊息
+    'uploading': '上傳中...',
+    'analyzing': '分析中...',
+    'generating': '生成中...',
+    'completed': '完成',
+    
+    // 報告區塊標題
+    'brand_need_summary': '品牌需求摘要',
+    'performance_insight': '效能洞察',
+    'creative_strategy': '創意策略',
+    'optimization_plan': '優化計劃',
+    'advertising_review_report': '廣告檢視報告'
+  },
+  
+  'en': {
+    // 標題和主要文字
+    'app_title': 'Googoogaga Multi-Platform Generator',
+    'app_subtitle_line1': 'Explore the wonderful world with your baby every day',
+    'app_subtitle_line2': 'AI-Powered Multi-Platform Baby Toy Marketing Content Generator',
+    
+    // 分頁標籤
+    'tab_image_generation': 'AI Image Generation',
+    'tab_ads_advisor': 'AI Ads Advisor',
+    
+    // Page 1: AI 圖片生成
+    'product_info_input': 'Product Information Input',
+    'industry_category': 'Industry Category',
+    'product_name': 'Product Name',
+    'product_name_placeholder': 'Enter Googoogaga toy name',
+    'product_description': 'Product Description',
+    'product_description_placeholder': 'Describe the toy features, materials, suitable age...',
+    'image_upload': 'Product Image Upload',
+    'image_upload_text': 'Upload Product Images',
+    'image_upload_hint': 'Supports JPG, PNG (Max 5 images, 10MB each)',
+    'target_platform': 'Target Platform',
+    'campaign_type': 'Campaign Type',
+    'template_style': 'Template Style',
+    'analyze_button': 'Start Analysis',
+    'ai_analysis_result': 'AI Analysis Results',
+    'ai_analysis_wait': 'Upload product images and click analyze button to start AI analysis',
+    'multi_platform_result': 'Multi-Platform Content Generation Results',
+    'ai_marketing_scenario': 'AI Generated Marketing Scenarios',
+    
+    // Page 2: AI 廣告顧問
+    'data_input_area': 'Data Input Area',
+    'brand_name': 'Brand Name (Optional)',
+    'brand_name_placeholder': 'Enter brand name',
+    'product_name_optional': 'Product Name (Optional)',
+    'product_name_optional_placeholder': 'Enter product name',
+    'core_product': 'Core Product (Optional)',
+    'core_product_placeholder': 'Describe core product features...',
+    'target_market': 'Target Market (Optional)',
+    'target_market_placeholder': 'Describe target audience and market positioning...',
+    'file_upload': 'File Upload (Optional, 1-10 files supported)',
+    'file_upload_text': 'Upload Advertising Materials',
+    'file_upload_hint': 'Supports Image, PDF, Excel, Word, CSV (Max 10MB per file, up to 10 files)',
+    'platform_selection': 'Platform Selection',
+    'platform_tiktok': 'TikTok Ads',
+    'platform_shopee': 'Shopee Ads',
+    'platform_meta': 'Meta Ads (Facebook/Instagram)',
+    'platform_zalo': 'Zalo Ads',
+    'start_analysis': 'Start Analysis',
+    'ai_analysis_results_area': 'AI Analysis Results Area',
+    'ai_analysis_results_wait': 'Upload advertising materials and click analyze button to start AI analysis',
+    'export_pdf': 'Export PDF',
+    'reanalyze': 'Re-analyze',
+    
+    // 互動對話視窗
+    'chat_advisor_title': 'AI Advertising Advisor Chat',
+    'chat_placeholder': 'Enter your question...',
+    'chat_send': 'Send',
+    'chat_upload_file': 'Upload File',
+    'ai_suggested_questions': 'AI Suggested Questions:',
+    
+    // 產業類別
+    'industry_fashion': 'Fashion',
+    'industry_mother_kids': 'Mother & Kids',
+    'industry_art_toy': 'Art Toy',
+    'industry_others': 'Others',
+    
+    // 按鈕和動作
+    'generate_scenarios': 'Generate Scenario Images',
+    'switch_scenario': 'Quick Switch Scenario',
+    
+    // 狀態訊息
+    'uploading': 'Uploading...',
+    'analyzing': 'Analyzing...',
+    'generating': 'Generating...',
+    'completed': 'Completed',
+    
+    // 報告區塊標題
+    'brand_need_summary': 'Brand Need Summary',
+    'performance_insight': 'Performance Insight',
+    'creative_strategy': 'Creative Strategy',
+    'optimization_plan': 'Optimization Plan',
+    'advertising_review_report': 'Advertising Review Report'
+  },
+  
+  'vi': {
+    // 標題和主要文字
+    'app_title': 'Googoogaga Multi-Platform Generator',
+    'app_subtitle_line1': 'Cùng bé khám phá thế giới diệu kỳ mỗi ngày',
+    'app_subtitle_line2': 'Trình tạo nội dung marketing đồ chơi trẻ em đa nền tảng được hỗ trợ bởi AI',
+    
+    // 分頁標籤
+    'tab_image_generation': 'Tạo hình ảnh AI',
+    'tab_ads_advisor': 'Cố vấn quảng cáo AI',
+    
+    // Page 1: AI 圖片生成
+    'product_info_input': 'Nhập thông tin sản phẩm',
+    'industry_category': 'Danh mục ngành',
+    'product_name': 'Tên sản phẩm',
+    'product_name_placeholder': 'Nhập tên đồ chơi Googoogaga',
+    'product_description': 'Mô tả sản phẩm',
+    'product_description_placeholder': 'Mô tả đặc điểm, chất liệu, độ tuổi phù hợp của đồ chơi...',
+    'image_upload': 'Tải lên hình ảnh sản phẩm',
+    'image_upload_text': 'Tải lên hình ảnh sản phẩm',
+    'image_upload_hint': 'Hỗ trợ JPG, PNG (Tối đa 5 ảnh, mỗi ảnh 10MB)',
+    'target_platform': 'Nền tảng mục tiêu',
+    'campaign_type': 'Loại chiến dịch',
+    'template_style': 'Phong cách mẫu',
+    'analyze_button': 'Bắt đầu phân tích',
+    'ai_analysis_result': 'Kết quả phân tích AI',
+    'ai_analysis_wait': 'Tải lên hình ảnh sản phẩm và nhấp vào nút phân tích để bắt đầu phân tích AI thông minh',
+    'multi_platform_result': 'Kết quả tạo nội dung đa nền tảng',
+    'ai_marketing_scenario': 'Kịch bản marketing được tạo bởi AI',
+    
+    // Page 2: AI 廣告顧問
+    'data_input_area': 'Khu vực nhập dữ liệu',
+    'brand_name': 'Tên thương hiệu (Tùy chọn)',
+    'brand_name_placeholder': 'Nhập tên thương hiệu',
+    'product_name_optional': 'Tên sản phẩm (Tùy chọn)',
+    'product_name_optional_placeholder': 'Nhập tên sản phẩm',
+    'core_product': 'Sản phẩm cốt lõi (Tùy chọn)',
+    'core_product_placeholder': 'Mô tả đặc điểm sản phẩm cốt lõi...',
+    'target_market': 'Thị trường mục tiêu (Tùy chọn)',
+    'target_market_placeholder': 'Mô tả đối tượng mục tiêu và định vị thị trường...',
+    'file_upload': 'Tải lên tệp (Tùy chọn, hỗ trợ 1-10 tệp)',
+    'file_upload_text': 'Tải lên tài liệu quảng cáo',
+    'file_upload_hint': 'Hỗ trợ Image, PDF, Excel, Word, CSV (Tối đa 10MB mỗi tệp, tối đa 10 tệp)',
+    'platform_selection': 'Lựa chọn nền tảng',
+    'platform_tiktok': 'TikTok Ads',
+    'platform_shopee': 'Shopee Ads',
+    'platform_meta': 'Meta Ads (Facebook/Instagram)',
+    'platform_zalo': 'Zalo Ads',
+    'start_analysis': 'Bắt đầu phân tích',
+    'ai_analysis_results_area': 'Khu vực kết quả phân tích AI',
+    'ai_analysis_results_wait': 'Tải lên tài liệu quảng cáo và nhấp vào nút phân tích để bắt đầu phân tích AI thông minh',
+    'export_pdf': 'Xuất PDF',
+    'reanalyze': 'Phân tích lại',
+    
+    // 互動對話視窗
+    'chat_advisor_title': 'Trò chuyện với cố vấn quảng cáo AI',
+    'chat_placeholder': 'Nhập câu hỏi của bạn...',
+    'chat_send': 'Gửi',
+    'chat_upload_file': 'Tải lên tệp',
+    'ai_suggested_questions': 'Câu hỏi được AI đề xuất:',
+    
+    // 產業類別
+    'industry_fashion': 'Thời trang',
+    'industry_mother_kids': 'Mẹ và bé',
+    'industry_art_toy': 'Đồ chơi nghệ thuật',
+    'industry_others': 'Khác',
+    
+    // 按鈕和動作
+    'generate_scenarios': 'Tạo hình ảnh kịch bản',
+    'switch_scenario': 'Chuyển đổi kịch bản nhanh',
+    
+    // 狀態訊息
+    'uploading': 'Đang tải lên...',
+    'analyzing': 'Đang phân tích...',
+    'generating': 'Đang tạo...',
+    'completed': 'Hoàn thành',
+    
+    // 報告區塊標題
+    'brand_need_summary': 'Tóm tắt nhu cầu thương hiệu',
+    'performance_insight': 'Thông tin hiệu suất',
+    'creative_strategy': 'Chiến lược sáng tạo',
+    'optimization_plan': 'Kế hoạch tối ưu hóa',
+    'advertising_review_report': 'Báo cáo đánh giá quảng cáo'
+  }
+};
+
+// 當前語言設定（預設繁體中文）
+let currentLanguage = localStorage.getItem('preferredLanguage') || 'zh-TW';
+
+// 翻譯函數
+function t(key) {
+  return translations[currentLanguage][key] || key;
+}
+
+// 切換語言
+function switchLanguage(lang) {
+  currentLanguage = lang;
+  localStorage.setItem('preferredLanguage', lang);
+  updatePageLanguage();
+}
+
+// 更新頁面所有翻譯文字
+function updatePageLanguage() {
+  document.querySelectorAll('[data-i18n]').forEach(element => {
+    const key = element.getAttribute('data-i18n');
+    const translation = t(key);
+    
+    if (element.tagName === 'INPUT' || element.tagName === 'TEXTAREA') {
+      if (element.hasAttribute('placeholder')) {
+        element.setAttribute('placeholder', translation);
+      }
+    } else {
+      element.textContent = translation;
+    }
+  });
+  
+  // 更新語言選擇器顯示
+  const langDisplay = document.getElementById('currentLanguageDisplay');
+  if (langDisplay) {
+    const langNames = {
+      'zh-TW': '繁體中文',
+      'en': 'English',
+      'vi': 'Tiếng Việt'
+    };
+    langDisplay.textContent = langNames[currentLanguage];
+  }
+}

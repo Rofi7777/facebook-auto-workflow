@@ -30,6 +30,78 @@
             padding: 30px;
             text-align: center;
             margin-bottom: 30px;
+            position: relative;
+        }
+        
+        /* 語言切換器樣式 */
+        .language-switcher {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 100;
+        }
+        
+        .language-dropdown {
+            position: relative;
+            display: inline-block;
+        }
+        
+        .language-btn {
+            background: linear-gradient(135deg, #87CEEB 0%, #FFB6C1 100%);
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s;
+        }
+        
+        .language-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(135, 206, 235, 0.4);
+        }
+        
+        .language-menu {
+            display: none;
+            position: absolute;
+            top: 100%;
+            right: 0;
+            margin-top: 8px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+            overflow: hidden;
+            min-width: 180px;
+            z-index: 1000;
+        }
+        
+        .language-menu.active {
+            display: block;
+        }
+        
+        .language-option {
+            padding: 12px 20px;
+            cursor: pointer;
+            transition: background 0.2s;
+            font-size: 14px;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .language-option:hover {
+            background: #f0f8ff;
+        }
+        
+        .language-option.active {
+            background: linear-gradient(135deg, #87CEEB 0%, #FFB6C1 100%);
+            color: white;
         }
         
         .header h1 {
@@ -422,6 +494,224 @@
             border-left: 4px solid #87CEEB;
         }
         
+        /* 對話視窗樣式 */
+        .chat-advisor-container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            padding: 25px;
+            margin-top: 20px;
+            display: none;
+        }
+        
+        .chat-advisor-container.active {
+            display: block;
+        }
+        
+        .chat-header {
+            font-size: 20px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #e1e5e9;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .chat-messages {
+            height: 400px;
+            overflow-y: auto;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .chat-message {
+            margin-bottom: 15px;
+            display: flex;
+            gap: 10px;
+        }
+        
+        .chat-message.user {
+            flex-direction: row-reverse;
+        }
+        
+        .chat-message-content {
+            max-width: 70%;
+            padding: 12px 16px;
+            border-radius: 15px;
+            line-height: 1.5;
+        }
+        
+        .chat-message.ai .chat-message-content {
+            background: linear-gradient(135deg, #87CEEB 0%, #FFB6C1 100%);
+            color: white;
+        }
+        
+        .chat-message.user .chat-message-content {
+            background: white;
+            color: #333;
+            border: 2px solid #e1e5e9;
+        }
+        
+        .chat-message-avatar {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+        
+        .chat-message.ai .chat-message-avatar {
+            background: linear-gradient(135deg, #87CEEB 0%, #FFB6C1 100%);
+        }
+        
+        .chat-message.user .chat-message-avatar {
+            background: #e1e5e9;
+        }
+        
+        .suggested-questions {
+            margin-bottom: 15px;
+            padding: 15px;
+            background: #fff3cd;
+            border-radius: 10px;
+            border-left: 4px solid #ffc107;
+        }
+        
+        .suggested-questions h4 {
+            margin-bottom: 10px;
+            color: #856404;
+            font-size: 14px;
+        }
+        
+        .suggested-question-btn {
+            display: block;
+            width: 100%;
+            text-align: left;
+            padding: 10px 15px;
+            margin-bottom: 8px;
+            background: white;
+            border: 1px solid #ffc107;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 14px;
+            color: #856404;
+        }
+        
+        .suggested-question-btn:hover {
+            background: #ffc107;
+            color: white;
+            transform: translateX(5px);
+        }
+        
+        .chat-input-area {
+            display: flex;
+            gap: 10px;
+            align-items: flex-end;
+        }
+        
+        .chat-input-wrapper {
+            flex: 1;
+            position: relative;
+        }
+        
+        .chat-input {
+            width: 100%;
+            padding: 12px 100px 12px 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 25px;
+            font-size: 14px;
+            resize: none;
+            font-family: inherit;
+            max-height: 100px;
+        }
+        
+        .chat-input:focus {
+            outline: none;
+            border-color: #87CEEB;
+        }
+        
+        .chat-file-upload-btn {
+            position: absolute;
+            right: 50px;
+            bottom: 8px;
+            background: #f0f0f0;
+            border: none;
+            border-radius: 50%;
+            width: 35px;
+            height: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 18px;
+        }
+        
+        .chat-file-upload-btn:hover {
+            background: #87CEEB;
+            color: white;
+        }
+        
+        .chat-send-btn {
+            background: linear-gradient(135deg, #87CEEB 0%, #FFB6C1 100%);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 45px;
+            height: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 20px;
+        }
+        
+        .chat-send-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 10px rgba(135, 206, 235, 0.4);
+        }
+        
+        .chat-send-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .chat-file-preview {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 10px;
+        }
+        
+        .chat-file-item {
+            background: #f0f0f0;
+            padding: 6px 12px;
+            border-radius: 15px;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .chat-file-remove {
+            cursor: pointer;
+            color: #999;
+            font-weight: bold;
+        }
+        
+        .chat-file-remove:hover {
+            color: #ff4444;
+        }
+        
         @media (max-width: 768px) {
             .workflow-container {
                 grid-template-columns: 1fr;
@@ -447,18 +737,38 @@
 <body>
     <div class="main-container">
         <div class="header">
+            <!-- 語言切換器 -->
+            <div class="language-switcher">
+                <div class="language-dropdown">
+                    <button class="language-btn" onclick="toggleLanguageMenu()">
+                        🌐 <span id="currentLanguageDisplay">繁體中文</span> ▼
+                    </button>
+                    <div class="language-menu" id="languageMenu">
+                        <div class="language-option active" onclick="selectLanguage('zh-TW')">
+                            🇹🇼 繁體中文
+                        </div>
+                        <div class="language-option" onclick="selectLanguage('en')">
+                            🇬🇧 English
+                        </div>
+                        <div class="language-option" onclick="selectLanguage('vi')">
+                            🇻🇳 Tiếng Việt
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
             <img id="brandLogo" src="" alt="Brand Logo" style="max-height: 120px; margin-bottom: 15px; border-radius: 10px; display: none;">
             <h1 id="brandTitle">🧸 Loading...</h1>
             <p id="brandSlogan">Loading brand information...</p>
-            <p>AI 驅動的多平台嬰幼兒玩具行銷內容生成器</p>
+            <p data-i18n="app_subtitle_line2">AI 驅動的多平台嬰幼兒玩具行銷內容生成器</p>
             
             <!-- 分頁切換導航 -->
             <div class="tab-navigation">
                 <button class="tab-btn active" onclick="switchPage('page1')">
-                    🎨 AI 圖片生成
+                    <span data-i18n="tab_image_generation">🎨 AI 圖片生成</span>
                 </button>
                 <button class="tab-btn" onclick="switchPage('page2')">
-                    📊 AI 廣告顧問
+                    <span data-i18n="tab_ads_advisor">📊 AI 廣告顧問</span>
                 </button>
             </div>
         </div>
@@ -668,11 +978,55 @@
                     </form>
                     
                     <div id="adsStatus" class="status"></div>
+                    
+                    <!-- AI 廣告顧問對話視窗 -->
+                    <div class="chat-advisor-container" id="chatAdvisorContainer">
+                        <div class="chat-header">
+                            💬 <span data-i18n="chat_advisor_title">AI 廣告顧問對話</span>
+                        </div>
+                        
+                        <!-- 建議問題區 -->
+                        <div class="suggested-questions" id="suggestedQuestions" style="display: none;">
+                            <h4 data-i18n="ai_suggested_questions">AI 建議的問題：</h4>
+                            <div id="suggestedQuestionsList"></div>
+                        </div>
+                        
+                        <!-- 對話訊息區 -->
+                        <div class="chat-messages" id="chatMessages">
+                            <div class="chat-message ai">
+                                <div class="chat-message-avatar">🤖</div>
+                                <div class="chat-message-content">
+                                    您好！我是您的 AI 廣告顧問。完成廣告分析後，我會為您提供三個專業問題幫助您深入思考，您也可以隨時向我提問或上傳更多資料進行分析。
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 對話輸入區 -->
+                        <div class="chat-input-area">
+                            <div class="chat-input-wrapper">
+                                <div class="chat-file-preview" id="chatFilePreview"></div>
+                                <textarea 
+                                    class="chat-input" 
+                                    id="chatInput" 
+                                    placeholder="輸入您的問題..." 
+                                    rows="1"
+                                    data-i18n-placeholder="chat_placeholder"
+                                ></textarea>
+                                <input type="file" id="chatFileUpload" accept="image/*,.pdf,.xlsx,.xls,.doc,.docx,.csv" multiple style="display: none;">
+                                <button class="chat-file-upload-btn" onclick="document.getElementById('chatFileUpload').click()" title="上傳檔案">
+                                    📎
+                                </button>
+                            </div>
+                            <button class="chat-send-btn" id="chatSendBtn" onclick="sendChatMessage()">
+                                ➤
+                            </button>
+                        </div>
+                    </div>
                 </div>
                 
                 <!-- 右側：AI 分析結果區 -->
                 <div class="output-panel">
-                    <h2 class="panel-title">🤖 AI 分析結果區</h2>
+                    <h2 class="panel-title">🤖 <span data-i18n="ai_analysis_results_area">AI 分析結果區</span></h2>
                     <div id="adsAnalysisResults">
                         <p style="text-align: center; color: #666; padding: 40px;">
                             上傳廣告資料並點擊分析按鈕開始 AI 智慧分析
@@ -1624,7 +1978,24 @@
                     // 顯示分析結果
                     displayAdsAnalysisResults(result);
                     
-                    statusDiv.innerHTML = '<p style="color: #28a745;">✅ 分析完成！</p>';
+                    // 保存分析上下文供對話使用
+                    analysisContext = {
+                        brandNeedSummary: result.brandNeedSummary,
+                        performanceInsight: result.performanceInsight,
+                        creativeStrategy: result.creativeStrategy,
+                        optimizationPlan: result.optimizationPlan,
+                        advertisingReviewReport: result.advertisingReviewReport
+                    };
+                    
+                    // 顯示建議問題和對話視窗
+                    if (result.suggestedQuestions && result.suggestedQuestions.length > 0) {
+                        showSuggestedQuestions(result.suggestedQuestions);
+                    }
+                    
+                    // 顯示對話視窗
+                    document.getElementById('chatAdvisorContainer').classList.add('active');
+                    
+                    statusDiv.innerHTML = '<p style="color: #28a745;">✅ 分析完成！您可以在下方對話視窗向 AI 顧問提問。</p>';
                     document.getElementById('reportActions').style.display = 'block';
                     
                 } catch (error) {
@@ -1712,6 +2083,208 @@
             document.getElementById('reportActions').style.display = 'none';
             document.getElementById('adsStatus').innerHTML = '';
         }
+        
+        // ==================== 語言切換功能 ====================
+        
+        function toggleLanguageMenu() {
+            const menu = document.getElementById('languageMenu');
+            menu.classList.toggle('active');
+        }
+        
+        function selectLanguage(lang) {
+            switchLanguage(lang);
+            const menu = document.getElementById('languageMenu');
+            menu.classList.remove('active');
+            
+            // 更新選中狀態
+            document.querySelectorAll('.language-option').forEach(option => {
+                option.classList.remove('active');
+            });
+            event.target.classList.add('active');
+        }
+        
+        // 點擊外部關閉語言選單
+        document.addEventListener('click', function(event) {
+            const languageSwitcher = document.querySelector('.language-switcher');
+            if (languageSwitcher && !languageSwitcher.contains(event.target)) {
+                document.getElementById('languageMenu').classList.remove('active');
+            }
+        });
+        
+        // ==================== 對話功能 ====================
+        
+        let chatHistory = [];
+        let chatFiles = [];
+        let analysisContext = null; // 儲存分析結果作為對話上下文
+        
+        // 檔案上傳處理
+        const chatFileUpload = document.getElementById('chatFileUpload');
+        if (chatFileUpload) {
+            chatFileUpload.addEventListener('change', function(e) {
+                chatFiles = Array.from(e.target.files);
+                displayChatFilePreview();
+            });
+        }
+        
+        function displayChatFilePreview() {
+            const container = document.getElementById('chatFilePreview');
+            if (chatFiles.length === 0) {
+                container.innerHTML = '';
+                return;
+            }
+            
+            container.innerHTML = chatFiles.map((file, index) => `
+                <div class="chat-file-item">
+                    📎 ${file.name}
+                    <span class="chat-file-remove" onclick="removeChatFile(${index})">×</span>
+                </div>
+            `).join('');
+        }
+        
+        function removeChatFile(index) {
+            chatFiles.splice(index, 1);
+            displayChatFilePreview();
+        }
+        
+        // 發送對話訊息
+        async function sendChatMessage() {
+            const input = document.getElementById('chatInput');
+            const message = input.value.trim();
+            
+            if (!message && chatFiles.length === 0) {
+                alert('請輸入問題或上傳檔案');
+                return;
+            }
+            
+            // 顯示用戶訊息
+            if (message) {
+                addChatMessage('user', message);
+            }
+            if (chatFiles.length > 0) {
+                addChatMessage('user', `📎 已上傳 ${chatFiles.length} 個檔案`);
+            }
+            
+            input.value = '';
+            const sendBtn = document.getElementById('chatSendBtn');
+            sendBtn.disabled = true;
+            
+            // 顯示載入中
+            const loadingId = 'loading-' + Date.now();
+            addChatMessage('ai', '正在思考中...', loadingId);
+            
+            try {
+                // 準備表單數據
+                const formData = new FormData();
+                formData.append('message', message);
+                formData.append('chatHistory', JSON.stringify(chatHistory));
+                if (analysisContext) {
+                    formData.append('analysisContext', JSON.stringify(analysisContext));
+                }
+                
+                // 添加檔案
+                chatFiles.forEach(file => {
+                    formData.append('files', file);
+                });
+                
+                // 發送請求
+                const response = await fetch('/api/chat-with-advisor', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    // 移除載入訊息
+                    document.getElementById(loadingId)?.remove();
+                    
+                    // 顯示AI回覆
+                    addChatMessage('ai', data.response);
+                    
+                    // 更新對話歷史
+                    chatHistory.push({
+                        role: 'user',
+                        content: message,
+                        hasFiles: chatFiles.length > 0
+                    });
+                    chatHistory.push({
+                        role: 'assistant',
+                        content: data.response
+                    });
+                    
+                    // 清空檔案
+                    chatFiles = [];
+                    displayChatFilePreview();
+                } else {
+                    throw new Error(data.error || '對話失敗');
+                }
+            } catch (error) {
+                console.error('對話錯誤:', error);
+                document.getElementById(loadingId)?.remove();
+                addChatMessage('ai', '抱歉，發生錯誤：' + error.message);
+            } finally {
+                sendBtn.disabled = false;
+            }
+        }
+        
+        // 添加對話訊息到界面
+        function addChatMessage(role, content, messageId = null) {
+            const messagesContainer = document.getElementById('chatMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `chat-message ${role}`;
+            if (messageId) messageDiv.id = messageId;
+            
+            const avatar = role === 'ai' ? '🤖' : '👤';
+            
+            messageDiv.innerHTML = `
+                <div class="chat-message-avatar">${avatar}</div>
+                <div class="chat-message-content">${content}</div>
+            `;
+            
+            messagesContainer.appendChild(messageDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+        
+        // 顯示建議問題
+        function showSuggestedQuestions(questions) {
+            const container = document.getElementById('suggestedQuestionsList');
+            const questionsDiv = document.getElementById('suggestedQuestions');
+            
+            container.innerHTML = questions.map((q, index) => `
+                <button class="suggested-question-btn" onclick="askSuggestedQuestion('${q.replace(/'/g, "\\'")}')">
+                    ${index + 1}. ${q}
+                </button>
+            `).join('');
+            
+            questionsDiv.style.display = 'block';
+        }
+        
+        // 點擊建議問題
+        function askSuggestedQuestion(question) {
+            document.getElementById('chatInput').value = question;
+            sendChatMessage();
+            document.getElementById('suggestedQuestions').style.display = 'none';
+        }
+        
+        // Enter 發送訊息
+        const chatInput = document.getElementById('chatInput');
+        if (chatInput) {
+            chatInput.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    sendChatMessage();
+                }
+            });
+        }
+    </script>
+    
+    <!-- 引入多語言翻譯系統 -->
+    <script src="/js/translations.js"></script>
+    <script>
+        // 初始化時應用語言設定
+        document.addEventListener('DOMContentLoaded', function() {
+            updatePageLanguage();
+        });
     </script>
 </body>
 </html>
