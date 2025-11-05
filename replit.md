@@ -4,6 +4,17 @@
 A comprehensive multi-industry AI-powered content generation platform supporting Fashion, Mother&Kids, Art Toy, and other product categories. The system integrates Google Gemini 2.5 Flash AI for intelligent product analysis and automated content generation across multiple platforms (Shopee, TikTok, Instagram, Facebook).
 
 ## Recent Changes
+- **2025-11-05**: Language-Aware AI Responses Implementation
+  - **AI now responds in user's selected language** (Traditional Chinese, English, or Vietnamese)
+  - ChatAdvisor service fully supports multi-language AI prompts and responses
+  - Suggested questions after ad analysis generated in selected language
+  - Interactive chat responses adapt to user's language preference
+  - Language parameter flows from frontend (currentLanguage) → API endpoints → ChatAdvisor service → AI prompts
+  - Implemented comprehensive fallback questions in all three languages (zh-TW, en, vi)
+  - Error messages localized based on user's selected language
+  - AI prompt instructions include language-specific directives for accurate responses
+  - Backend API endpoints (/api/analyze-ads, /api/chat-with-advisor) accept language parameter
+  - All ChatAdvisor methods (generateSuggestedQuestions, chat, buildChatPrompt) language-aware
 - **2025-11-05**: Multi-Language Support & Interactive AI Chat Advisor
   - Implemented comprehensive multi-language switching system (Traditional Chinese, English, Vietnamese)
   - Added language selector in top-right corner with persistent preference via localStorage
