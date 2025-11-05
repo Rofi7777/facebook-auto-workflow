@@ -758,8 +758,8 @@
             </div>
             
             <img id="brandLogo" src="" alt="Brand Logo" style="max-height: 120px; margin-bottom: 15px; border-radius: 10px; display: none;">
-            <h1 id="brandTitle">🧸 Loading...</h1>
-            <p id="brandSlogan">Loading brand information...</p>
+            <h1 id="brandTitle" data-i18n="app_title">🧸 Googoogaga Multi-Platform Generator</h1>
+            <p id="brandSlogan" data-i18n="app_subtitle_line1">Cùng bé khám phá thế giới diệu kỳ mỗi ngày</p>
             <p data-i18n="app_subtitle_line2">AI 驅動的多平台嬰幼兒玩具行銷內容生成器</p>
             
             <!-- 分頁切換導航 -->
@@ -777,42 +777,42 @@
         <div id="page1" class="page-content active">
         <div class="workflow-container">
             <div class="input-panel">
-                <h2 class="panel-title">📝 產品資訊輸入</h2>
+                <h2 class="panel-title">📝 <span data-i18n="product_info_input">產品資訊輸入</span></h2>
                 
                 <form id="productForm">
                     <div class="form-group">
-                        <label for="industryCategory">產業類別 / Industry Category</label>
+                        <label for="industryCategory" data-i18n="industry_category">產業類別 / Industry Category</label>
                         <select id="industryCategory" name="industryCategory" required>
-                            <option value="mother-kids">👶 Mother & Kids (母嬰用品)</option>
-                            <option value="fashion">👗 Fashion (時尚服飾)</option>
-                            <option value="art-toy">🎨 Art Toy (藝術玩具)</option>
-                            <option value="others">✨ Others (其他)</option>
+                            <option value="mother-kids" data-i18n="industry_mother_kids">👶 Mother & Kids (母嬰用品)</option>
+                            <option value="fashion" data-i18n="industry_fashion">👗 Fashion (時尚服飾)</option>
+                            <option value="art-toy" data-i18n="industry_art_toy">🎨 Art Toy (藝術玩具)</option>
+                            <option value="others" data-i18n="industry_others">✨ Others (其他)</option>
                         </select>
                     </div>
                     
                     <div class="form-group">
-                        <label for="productName">產品名稱 / Product Name</label>
-                        <input type="text" id="productName" name="productName" placeholder="輸入產品名稱" required>
+                        <label for="productName" data-i18n="product_name">產品名稱 / Product Name</label>
+                        <input type="text" id="productName" name="productName" data-i18n-placeholder="product_name_placeholder" placeholder="輸入產品名稱" required>
                     </div>
                     
                     <div class="form-group">
-                        <label for="productDescription">產品描述 (可選)</label>
-                        <textarea id="productDescription" name="productDescription" placeholder="描述產品特色、功能、適用年齡等..." rows="3"></textarea>
+                        <label for="productDescription" data-i18n="product_description">產品描述 (可選)</label>
+                        <textarea id="productDescription" name="productDescription" data-i18n-placeholder="product_description_placeholder" placeholder="描述產品特色、功能、適用年齡等..." rows="3"></textarea>
                     </div>
                     
                     <div class="form-group">
-                        <label>產品圖片 / Product Image (支持1-5張圖片同時上傳)</label>
+                        <label data-i18n="image_upload">產品圖片 / Product Image (支持1-5張圖片同時上傳)</label>
                         <div class="file-upload" onclick="document.getElementById('imageUpload').click()">
                             <input type="file" id="imageUpload" accept="image/*" multiple>
-                            <p>📸 上傳玩具圖片 (Upload toy images - 最多5張)</p>
-                            <small>支援 JPG, PNG (每張最大 10MB，最多5張圖片)</small>
+                            <p data-i18n="image_upload_text">📸 上傳玩具圖片 (Upload toy images - 最多5張)</p>
+                            <small data-i18n="image_upload_hint">支援 JPG, PNG (每張最大 10MB，最多5張圖片)</small>
                         </div>
                         <div id="imagePreviewContainer" class="image-preview-container"></div>
                         <div id="selectedImageCount" class="selected-count" style="display: none;"></div>
                     </div>
                     
                     <div class="form-group">
-                        <label>目標平台 / Target Platforms</label>
+                        <label data-i18n="target_platform">目標平台 / Target Platforms</label>
                         <div class="checkbox-group" id="platformsGroup">
                             <!-- Platforms will be loaded dynamically -->
                         </div>
@@ -886,7 +886,7 @@
             </div>
             
             <div class="output-panel">
-                <h2 class="panel-title">📊 AI 分析結果</h2>
+                <h2 class="panel-title">📊 <span data-i18n="ai_analysis_result">AI 分析結果</span></h2>
                 <div id="analysisResults">
                     <p style="text-align: center; color: #666; padding: 40px;">
                         上傳產品圖片並點擊分析按鈕開始 AI 智慧分析
@@ -916,64 +916,64 @@
             <div class="workflow-container">
                 <!-- 左側：資料輸入區 -->
                 <div class="input-panel">
-                    <h2 class="panel-title">📤 資料輸入區</h2>
+                    <h2 class="panel-title">📤 <span data-i18n="data_input_area">資料輸入區</span></h2>
                     
                     <form id="adsAnalysisForm">
                         <div class="form-group">
-                            <label for="brandName">品牌名稱 / Brand Name (選填)</label>
-                            <input type="text" id="brandName" name="brandName" placeholder="輸入品牌名稱">
+                            <label for="brandName" data-i18n="brand_name">品牌名稱 / Brand Name (選填)</label>
+                            <input type="text" id="brandName" name="brandName" data-i18n-placeholder="brand_name_placeholder" placeholder="輸入品牌名稱">
                         </div>
                         
                         <div class="form-group">
-                            <label for="adProductName">產品名稱 / Product Name (選填)</label>
-                            <input type="text" id="adProductName" name="adProductName" placeholder="輸入產品名稱">
+                            <label for="adProductName" data-i18n="product_name_optional">產品名稱 / Product Name (選填)</label>
+                            <input type="text" id="adProductName" name="adProductName" data-i18n-placeholder="product_name_optional_placeholder" placeholder="輸入產品名稱">
                         </div>
                         
                         <div class="form-group">
-                            <label for="coreProduct">核心產品 / Core Product (選填)</label>
-                            <textarea id="coreProduct" name="coreProduct" placeholder="描述核心產品特色..." rows="2"></textarea>
+                            <label for="coreProduct" data-i18n="core_product">核心產品 / Core Product (選填)</label>
+                            <textarea id="coreProduct" name="coreProduct" data-i18n-placeholder="core_product_placeholder" placeholder="描述核心產品特色..." rows="2"></textarea>
                         </div>
                         
                         <div class="form-group">
-                            <label for="targetMarket">目標與市場 / Target Market (選填)</label>
-                            <textarea id="targetMarket" name="targetMarket" placeholder="描述目標客群與市場定位..." rows="2"></textarea>
+                            <label for="targetMarket" data-i18n="target_market">目標與市場 / Target Market (選填)</label>
+                            <textarea id="targetMarket" name="targetMarket" data-i18n-placeholder="target_market_placeholder" placeholder="描述目標客群與市場定位..." rows="2"></textarea>
                         </div>
                         
                         <div class="form-group">
-                            <label>檔案上傳 / File Upload (選填，支援 1-10 個檔案)</label>
+                            <label data-i18n="file_upload">檔案上傳 / File Upload (選填，支援 1-10 個檔案)</label>
                             <div class="file-upload" onclick="document.getElementById('adsFileUpload').click()">
                                 <input type="file" id="adsFileUpload" accept="image/*,.pdf,.xlsx,.xls,.doc,.docx,.csv" multiple>
-                                <p>📁 上傳廣告資料檔案</p>
-                                <small>支援 Image, PDF, Excel, Word, CSV (每個檔案最大 10MB，最多10個檔案)</small>
+                                <p data-i18n="file_upload_text">📁 上傳廣告資料檔案</p>
+                                <small data-i18n="file_upload_hint">支援 Image, PDF, Excel, Word, CSV (每個檔案最大 10MB，最多10個檔案)</small>
                             </div>
                             <div id="adsFilePreviewContainer" class="image-preview-container"></div>
                             <div id="selectedAdsFileCount" class="selected-count" style="display: none;"></div>
                         </div>
                         
                         <div class="form-group">
-                            <label>平台勾選 / Platform Selection</label>
+                            <label data-i18n="platform_selection">平台勾選 / Platform Selection</label>
                             <div class="checkbox-group">
                                 <div class="checkbox-item">
                                     <input type="checkbox" id="platform_tiktok" name="adsPlatform" value="TikTok">
-                                    <label for="platform_tiktok">📱 TikTok Ads</label>
+                                    <label for="platform_tiktok" data-i18n="platform_tiktok">📱 TikTok Ads</label>
                                 </div>
                                 <div class="checkbox-item">
                                     <input type="checkbox" id="platform_shopee" name="adsPlatform" value="Shopee">
-                                    <label for="platform_shopee">🛍️ Shopee Ads</label>
+                                    <label for="platform_shopee" data-i18n="platform_shopee">🛍️ Shopee Ads</label>
                                 </div>
                                 <div class="checkbox-item">
                                     <input type="checkbox" id="platform_meta" name="adsPlatform" value="Meta">
-                                    <label for="platform_meta">👥 Meta Ads (Facebook/Instagram)</label>
+                                    <label for="platform_meta" data-i18n="platform_meta">👥 Meta Ads (Facebook/Instagram)</label>
                                 </div>
                                 <div class="checkbox-item">
                                     <input type="checkbox" id="platform_zalo" name="adsPlatform" value="Zalo">
-                                    <label for="platform_zalo">💬 Zalo Ads</label>
+                                    <label for="platform_zalo" data-i18n="platform_zalo">💬 Zalo Ads</label>
                                 </div>
                             </div>
                         </div>
                         
                         <button type="submit" class="btn" id="analyzeAdsBtn">
-                            🧠 開始分析 (Start Analysis)
+                            🧠 <span data-i18n="start_analysis">開始分析 (Start Analysis)</span>
                         </button>
                     </form>
                     
@@ -1771,9 +1771,8 @@
                 logoElement.src = config.brand.logoPath;
                 logoElement.alt = `${config.brand.name} Logo`;
                 logoElement.style.display = 'block';
-                document.getElementById('brandTitle').textContent = `🧸 ${config.brand.name} Multi-Platform Generator`;
-                document.getElementById('brandSlogan').textContent = config.brand.slogan;
-                document.getElementById('productName').placeholder = `輸入 ${config.brand.name} 玩具名稱`;
+                // brandTitle and brandSlogan now use data-i18n attributes for automatic translation
+                // Title and slogan will be updated by updatePageLanguage() function
                 document.title = `${config.brand.name} Multi-Platform Content Generator`;
                 
                 // Populate platforms

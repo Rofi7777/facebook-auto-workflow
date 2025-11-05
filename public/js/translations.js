@@ -270,6 +270,7 @@ function switchLanguage(lang) {
 
 // 更新頁面所有翻譯文字
 function updatePageLanguage() {
+  // 更新所有 data-i18n 元素的文字內容
   document.querySelectorAll('[data-i18n]').forEach(element => {
     const key = element.getAttribute('data-i18n');
     const translation = t(key);
@@ -278,8 +279,19 @@ function updatePageLanguage() {
       if (element.hasAttribute('placeholder')) {
         element.setAttribute('placeholder', translation);
       }
+    } else if (element.tagName === 'OPTION') {
+      element.textContent = translation;
     } else {
       element.textContent = translation;
+    }
+  });
+  
+  // 更新所有 data-i18n-placeholder 元素的 placeholder
+  document.querySelectorAll('[data-i18n-placeholder]').forEach(element => {
+    const key = element.getAttribute('data-i18n-placeholder');
+    const translation = t(key);
+    if (element.hasAttribute('placeholder')) {
+      element.setAttribute('placeholder', translation);
     }
   });
   
@@ -293,4 +305,15 @@ function updatePageLanguage() {
     };
     langDisplay.textContent = langNames[currentLanguage];
   }
+  
+  // 更新語言選擇器選項的激活狀態
+  document.querySelectorAll('.language-option').forEach(option => {
+    option.classList.remove('active');
+  });
+  document.querySelectorAll('.language-option').forEach((option, index) => {
+    const langs = ['zh-TW', 'en', 'vi'];
+    if (langs[index] === currentLanguage) {
+      option.classList.add('active');
+    }
+  });
 }

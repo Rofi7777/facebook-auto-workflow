@@ -4,6 +4,18 @@
 A comprehensive multi-industry AI-powered content generation platform supporting Fashion, Mother&Kids, Art Toy, and other product categories. The system integrates Google Gemini 2.5 Flash AI for intelligent product analysis and automated content generation across multiple platforms (Shopee, TikTok, Instagram, Facebook).
 
 ## Recent Changes
+- **2025-11-05**: Multi-Language Support & Interactive AI Chat Advisor
+  - Implemented comprehensive multi-language switching system (Traditional Chinese, English, Vietnamese)
+  - Added language selector in top-right corner with persistent preference via localStorage
+  - Created centralized translations.js module with complete translations for all UI elements
+  - Built interactive chat window below analysis button on Page 2
+  - Implemented ChatAdvisor service for continuous user consultation with conversation history
+  - AI automatically generates 3 suggested questions after analysis completion
+  - Supports file uploads during conversation (images, PDFs, documents)
+  - Backend API endpoint: /api/chat-with-advisor
+  - Chat messages distinguished by sender (user vs AI) with proper styling
+  - Conversation context preserved across multiple interactions
+  - All four AI services (GeminiAI, ScenarioGenerator, AdsAnalyzer, ChatAdvisor) fully operational
 - **2025-10-29**: Page 2 "AI 廣告顧問" Feature Added & Optional Fields Update
   - Created dual-page tab navigation system (AI 圖片生成 | AI 廣告顧問)
   - Implemented Page 2 UI with left input panel and right analysis results panel
@@ -71,12 +83,13 @@ A comprehensive multi-industry AI-powered content generation platform supporting
 - **Dependencies**: Express, CORS, Multer, Dotenv, Axios, Node-cron
 
 ## Key Features
+- **Multi-Language Support**: Traditional Chinese, English, Vietnamese with dynamic language switching
+- **Interactive AI Chat Advisor**: Continuous consultation with conversation history and file upload support
 - **Multi-Industry Support**: Fashion, Mother&Kids, Art Toy, Others with industry-specific AI prompts
 - **Scenario Switching**: Quick platform switching without re-entering product information
 - **Multi-Image Upload**: 1-5 images with comprehensive multi-angle analysis
 - **AI Model**: Gemini 2.5 Flash with automatic fallback to Gemini 2.0 Flash Experimental
 - **Multi-Platform**: Shopee, TikTok, Instagram, Facebook content generation
-- **Bilingual Support**: Vietnamese and Traditional Chinese with automatic translation
 - **Smart Analysis**: AI-powered product recognition, pain point identification, and scenario suggestions
 - **Automated Image Generation**: Optional marketing scenario images with real product integration
 - **Real-time Processing**: Live status updates with progress indicators
@@ -99,6 +112,8 @@ A comprehensive multi-industry AI-powered content generation platform supporting
 - `GET /api/health`: Health check endpoint
 - `POST /api/upload-image`: Image upload handling
 - `POST /api/generate-workflow`: Workflow generation
+- `POST /api/analyze-ads`: Ad analysis with AI-generated suggested questions
+- `POST /api/chat-with-advisor`: Interactive chat with AI advisor (supports file uploads)
 
 ## Development Status
 - ✅ Basic project structure complete
