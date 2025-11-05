@@ -697,11 +697,13 @@ app.post('/api/analyze-ads', adsUpload.array('files', 10), async (req, res) => {
   try {
     console.log('📊 Received ads analysis request');
     
-    const { brandName, productName, coreProduct, targetMarket, platforms } = req.body;
+    const { brandName, productName, coreProduct, targetMarket, platforms, language } = req.body;
     const uploadedFiles = req.files || [];
+    const userLanguage = language || 'zh-TW'; // 預設繁體中文
     
     console.log(`📝 Brand: ${brandName || '(未提供)'}, Product: ${productName || '(未提供)'}`);
     console.log(`📁 Files uploaded: ${uploadedFiles.length}`);
+    console.log(`🌐 Language: ${userLanguage}`);
     
     // 驗證是否有任何可分析的資訊
     const hasTextInfo = brandName || productName || coreProduct || targetMarket;
@@ -749,9 +751,9 @@ app.post('/api/analyze-ads', adsUpload.array('files', 10), async (req, res) => {
     
     console.log('✅ Ads analysis completed successfully');
     
-    // 生成建議問題
-    console.log('💡 Generating suggested questions...');
-    const suggestedQuestions = await chatAdvisor.generateSuggestedQuestions(analysisResult);
+    // 生成建議問題（使用用戶選擇的語言）
+    console.log(`💡 Generating suggested questions in ${userLanguage}...`);
+    const suggestedQuestions = await chatAdvisor.generateSuggestedQuestions(analysisResult, userLanguage);
     
     // 返回分析結果和建議問題
     res.json({
@@ -805,11 +807,13 @@ app.post('/api/chat-with-advisor', chatUpload.array('files', 5), async (req, res
   try {
     console.log('💬 Received chat message');
     
-    const { message, chatHistory, analysisContext } = req.body;
+    const { message, chatHistory, analysisContext, language } = req.body;
     const uploadedFiles = req.files || [];
+    const userLanguage = language || 'zh-TW'; // 預設繁體中文
     
     console.log(`📝 Message: ${message ? message.substring(0, 50) + '...' : '(無訊息)'}`);
     console.log(`📁 Files uploaded: ${uploadedFiles.length}`);
+    console.log(`🌐 Language: ${userLanguage}`);
     
     // 解析對話歷史和分析上下文
     let parsedChatHistory = [];
@@ -834,14 +838,15 @@ app.post('/api/chat-with-advisor', chatUpload.array('files', 5), async (req, res
       size: file.size
     }));
     
-    console.log('🤖 Calling chat advisor...');
+    console.log(`🤖 Calling chat advisor in ${userLanguage}...`);
     
-    // 調用對話服務
+    // 調用對話服務（傳入用戶選擇的語言）
     const chatResult = await chatAdvisor.chat(
       message || '',
       parsedChatHistory,
       parsedAnalysisContext,
-      fileInfos
+      fileInfos,
+      userLanguage
     );
     
     console.log('✅ Chat response generated successfully');
