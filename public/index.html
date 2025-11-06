@@ -830,55 +830,55 @@
                     <div class="form-group">
                         <label>
                             <input type="checkbox" id="generateImages" name="generateImages" onchange="toggleScenarioOptions()">
-                            自動生成行銷圖片 (Generate Marketing Images)
+                            <span data-i18n="generate_image_checkbox">自動生成行銷圖片 (Generate Marketing Images)</span>
                         </label>
                     </div>
                     
                     <!-- 場景選擇選項 -->
                     <div class="form-group" id="scenarioOptionsGroup" style="display: none;">
-                        <label>使用場景選擇 / Usage Scenario Selection</label>
+                        <label data-i18n="usage_scenario_selection">使用場景選擇 / Usage Scenario Selection</label>
                         <div class="checkbox-group" id="scenarioGroup">
                             <div class="checkbox-item">
                                 <input type="radio" id="scenario_parent_child" name="scenarioType" value="親子互動" checked>
-                                <label for="scenario_parent_child">👨‍👩‍👧‍👦 親子互動 (Parent-Child Interaction)</label>
+                                <label for="scenario_parent_child">👨‍👩‍👧‍👦 <span data-i18n="scenario_parent_child">親子互動 (Parent-Child Interaction)</span></label>
                             </div>
                             <div class="checkbox-item">
                                 <input type="radio" id="scenario_child_solo" name="scenarioType" value="小孩單人使用">
-                                <label for="scenario_child_solo">🧒 小孩單人使用 (Child Solo Play)</label>
+                                <label for="scenario_child_solo">🧒 <span data-i18n="scenario_child_solo">小孩單人使用 (Child Solo Play)</span></label>
                             </div>
                             <div class="checkbox-item">
                                 <input type="radio" id="scenario_outdoor_travel" name="scenarioType" value="外出旅遊">
-                                <label for="scenario_outdoor_travel">🌍 外出旅遊 (Outdoor Travel)</label>
+                                <label for="scenario_outdoor_travel">🌍 <span data-i18n="scenario_outdoor_travel">外出旅遊 (Outdoor Travel)</span></label>
                             </div>
                             <div class="checkbox-item">
                                 <input type="radio" id="scenario_home_play" name="scenarioType" value="居家遊戲">
-                                <label for="scenario_home_play">🏠 居家遊戲 (Home Play)</label>
+                                <label for="scenario_home_play">🏠 <span data-i18n="scenario_home_play">居家遊戲 (Home Play)</span></label>
                             </div>
                             <div class="checkbox-item">
                                 <input type="radio" id="scenario_personal_styling" name="scenarioType" value="個人穿搭">
-                                <label for="scenario_personal_styling">👔 個人穿搭 (Personal Styling)</label>
+                                <label for="scenario_personal_styling">👔 <span data-i18n="scenario_personal_styling">個人穿搭 (Personal Styling)</span></label>
                             </div>
                             <div class="checkbox-item">
                                 <input type="radio" id="scenario_office_home_decor" name="scenarioType" value="辦公室/居家佈置">
-                                <label for="scenario_office_home_decor">🏢 辦公室/居家佈置 (Office/Home Decoration)</label>
+                                <label for="scenario_office_home_decor">🏢 <span data-i18n="scenario_office_home_decor">辦公室/居家佈置 (Office/Home Decoration)</span></label>
                             </div>
                             <div class="checkbox-item">
                                 <input type="radio" id="scenario_other" name="scenarioType" value="其他">
-                                <label for="scenario_other">✨ 其他 (Other Creative)</label>
+                                <label for="scenario_other">✨ <span data-i18n="scenario_other">其他 (Other Creative)</span></label>
                             </div>
                         </div>
                     </div>
                     
                     <button type="submit" class="btn" id="analyzeBtn">
-                        🧠 分析產品並生成內容
+                        🧠 <span data-i18n="analyze_generate_button">分析產品並生成內容</span>
                     </button>
                     
                     <button type="button" class="btn" id="switchScenarioBtn" style="display: none; background: #28a745;">
-                        🔄 切換場景重新生成 (同產品不同平台)
+                        🔄 <span data-i18n="switch_scenario_button">切換場景重新生成 (同產品不同平台)</span>
                     </button>
                     
                     <button type="button" class="btn btn-secondary" id="generateScenariosBtn" style="display: none;">
-                        🎬 生成行銷場景
+                        🎬 <span data-i18n="generate_scenarios_button">生成行銷場景</span>
                     </button>
                 </form>
                 

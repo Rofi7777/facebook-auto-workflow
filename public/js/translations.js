@@ -67,8 +67,22 @@ const translations = {
     'industry_others': 'Others (其他產品)',
     
     // 按鈕和動作
+    'generate_image_checkbox': '自動生成行銷圖片 (Generate Marketing Images)',
+    'usage_scenario_selection': '使用場景選擇 / Usage Scenario Selection',
+    'analyze_generate_button': '分析產品並生成內容',
+    'switch_scenario_button': '切換場景重新生成 (同產品不同平台)',
+    'generate_scenarios_button': '生成行銷場景',
     'generate_scenarios': '生成場景圖片 (Generate Scenarios)',
     'switch_scenario': '快速切換場景',
+    
+    // 使用場景選項
+    'scenario_parent_child': '親子互動 (Parent-Child Interaction)',
+    'scenario_child_solo': '小孩單人使用 (Child Solo Play)',
+    'scenario_outdoor_travel': '外出旅遊 (Outdoor Travel)',
+    'scenario_home_play': '居家遊戲 (Home Play)',
+    'scenario_personal_styling': '個人穿搭 (Personal Styling)',
+    'scenario_office_home_decor': '辦公室/居家佈置 (Office/Home Decoration)',
+    'scenario_other': '其他 (Other Creative)',
     
     // 狀態訊息
     'uploading': '上傳中...',
@@ -151,8 +165,22 @@ const translations = {
     'industry_others': 'Others',
     
     // 按鈕和動作
+    'generate_image_checkbox': 'Generate Marketing Images',
+    'usage_scenario_selection': 'Usage Scenario Selection',
+    'analyze_generate_button': 'Analyze Product and Generate Content',
+    'switch_scenario_button': 'Switch Scenario and Regenerate (Same Product, Different Platform)',
+    'generate_scenarios_button': 'Generate Marketing Scenarios',
     'generate_scenarios': 'Generate Scenario Images',
     'switch_scenario': 'Quick Switch Scenario',
+    
+    // 使用場景選項
+    'scenario_parent_child': 'Parent-Child Interaction',
+    'scenario_child_solo': 'Child Solo Play',
+    'scenario_outdoor_travel': 'Outdoor Travel',
+    'scenario_home_play': 'Home Play',
+    'scenario_personal_styling': 'Personal Styling',
+    'scenario_office_home_decor': 'Office/Home Decoration',
+    'scenario_other': 'Other Creative',
     
     // 狀態訊息
     'uploading': 'Uploading...',
@@ -235,8 +263,22 @@ const translations = {
     'industry_others': 'Khác',
     
     // 按鈕和動作
+    'generate_image_checkbox': 'Tự động tạo hình ảnh marketing',
+    'usage_scenario_selection': 'Lựa chọn kịch bản sử dụng',
+    'analyze_generate_button': 'Phân tích sản phẩm và tạo nội dung',
+    'switch_scenario_button': 'Chuyển đổi kịch bản và tạo lại (Cùng sản phẩm, khác nền tảng)',
+    'generate_scenarios_button': 'Tạo kịch bản marketing',
     'generate_scenarios': 'Tạo hình ảnh kịch bản',
     'switch_scenario': 'Chuyển đổi kịch bản nhanh',
+    
+    // 使用場景選項
+    'scenario_parent_child': 'Tương tác cha mẹ con cái',
+    'scenario_child_solo': 'Trẻ chơi một mình',
+    'scenario_outdoor_travel': 'Du lịch ngoài trời',
+    'scenario_home_play': 'Chơi tại nhà',
+    'scenario_personal_styling': 'Phong cách cá nhân',
+    'scenario_office_home_decor': 'Trang trí văn phòng/nhà',
+    'scenario_other': 'Sáng tạo khác',
     
     // 狀態訊息
     'uploading': 'Đang tải lên...',
