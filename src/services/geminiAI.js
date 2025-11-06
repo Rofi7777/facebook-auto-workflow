@@ -169,6 +169,14 @@ class GeminiAIService {
           5. 材質和顏色
           6. 使用場景建議
           請用繁體中文回答，格式為JSON：`,
+          'en': `Please analyze this baby toy/mother & kids product image in detail and provide the following information:
+          1. Product type and main features
+          2. Suitable age range
+          3. Main functions and educational value
+          4. Safety features
+          5. Materials and colors
+          6. Usage scenario suggestions
+          Please answer in English, format as JSON:`,
           'bilingual': `請詳細分析這${pathsArray.length > 1 ? '些' : '個'}嬰幼兒玩具/母嬰產品圖片（請用繁體中文和越南文雙語回答）：
           ${pathsArray.length > 1 ? `注意：這些圖片展示了同一個產品的不同角度，請綜合分析。` : ''}
           1. 產品類型和主要特徵/Loại sản phẩm và đặc điểm
@@ -211,15 +219,10 @@ class GeminiAIService {
       const industryPromptSet = industryPrompts[industryCategory] || industryPrompts['mother-kids'];
       const promptText = industryPromptSet[language] || industryPromptSet['zh-TW'];
       
-      const contents = [
-        {
-          role: 'user',
-          parts: [
-            ...imageParts,  // Spread all image parts
-            {
-              text: `${promptText}
-        ${language === 'bilingual' ? 
-          `{
+      // 根據語言選擇 JSON 示例模板
+      let jsonExample;
+      if (language === 'bilingual') {
+        jsonExample = `{
           "productType": "積木玩具/Đồ chơi xếp hình",
           "ageRange": "1-3歲/1-3 tuổi",
           "features": ["色彩鮮豔/Màu sắc tươi sáng", "質地光滑/Chất liệu mịn màng"],
@@ -228,8 +231,31 @@ class GeminiAIService {
           "materials": "環保木材/Gỗ thân thiện với môi trường",
           "colors": ["藍色/Màu xanh dương", "粉色/Màu hồng"],
           "usageScenarios": ["居家遊戲/Trò chơi tại nhà", "親子互動/Tương tác cha mẹ con cái"]
-        }` :
-          `{
+        }`;
+      } else if (language === 'vi') {
+        jsonExample = `{
+          "productType": "Đồ chơi xếp hình",
+          "ageRange": "1-3 tuổi",
+          "features": ["Màu sắc tươi sáng", "Chất liệu mịn màng"],
+          "educationalValue": "Thúc đẩy phối hợp tay mắt; Nhận biết màu sắc hình dạng",
+          "safetyFeatures": ["Không có góc cạnh sắc", "Chất liệu thân thiện"],
+          "materials": "Gỗ thân thiện với môi trường",
+          "colors": ["Màu xanh dương", "Màu hồng"],
+          "usageScenarios": ["Trò chơi tại nhà", "Tương tác cha mẹ con cái"]
+        }`;
+      } else if (language === 'en') {
+        jsonExample = `{
+          "productType": "Building Blocks Toy",
+          "ageRange": "1-3 years old",
+          "features": ["Bright colors", "Smooth texture"],
+          "educationalValue": "Promotes hand-eye coordination; Recognizes colors and shapes",
+          "safetyFeatures": ["No sharp edges", "Eco-friendly materials"],
+          "materials": "Environmental-friendly wood",
+          "colors": ["Blue", "Pink"],
+          "usageScenarios": ["Home play", "Parent-child interaction"]
+        }`;
+      } else {
+        jsonExample = `{
           "productType": "產品類型",
           "ageRange": "適合年齡",
           "features": ["特徵1", "特徵2"],
@@ -238,8 +264,17 @@ class GeminiAIService {
           "materials": "材質描述",
           "colors": ["顏色1", "顏色2"],
           "usageScenarios": ["使用場景1", "使用場景2"]
-        }`
-        }`
+        }`;
+      }
+      
+      const contents = [
+        {
+          role: 'user',
+          parts: [
+            ...imageParts,  // Spread all image parts
+            {
+              text: `${promptText}
+        ${jsonExample}`
             }
           ]
         }
@@ -302,9 +337,10 @@ Vui lòng phân tích và trả về định dạng JSON bằng tiếng Việt:`
 請分析並回傳雙語JSON格式：`
       };
       
-      const prompt = `${languagePrompts[language] || languagePrompts['zh-TW']}
-      ${language === 'bilingual' ? 
-        `{
+      // 根據語言選擇 JSON 示例模板
+      let jsonExample;
+      if (language === 'bilingual') {
+        jsonExample = `{
         "painPoints": [
           {
             "category": "收納困擾/Vấn đề lưu trữ",
@@ -322,8 +358,49 @@ Vui lòng phân tích và trả về định dạng JSON bằng tiếng Việt:`
           }
         ],
         "marketingAngles": ["強調安全設計/Nhấn mạnh thiết kế an toàn", "突顯教育價值/Làm nổi bật giá trị giáo dục"]
-      }` :
-        `{
+      }`;
+      } else if (language === 'vi') {
+        jsonExample = `{
+        "painPoints": [
+          {
+            "category": "Vấn đề lưu trữ",
+            "description": "Các khối đồ chơi rải rác khắp nơi, khó dọn dẹp",
+            "targetAudience": "Tất cả các bậc phụ huynh có con nhỏ",
+            "severity": "Trung bình"
+          }
+        ],
+        "usageScenarios": [
+          {
+            "scenario": "Thời gian chơi cùng con",
+            "context": "Chiều cuối tuần tương tác cha mẹ con cái",
+            "benefits": "Thúc đẩy mối quan hệ cha mẹ - con cái",
+            "emotions": "Hạnh phúc, thỏa mãn"
+          }
+        ],
+        "marketingAngles": ["Nhấn mạnh thiết kế an toàn", "Làm nổi bật giá trị giáo dục"]
+      }`;
+      } else if (language === 'en') {
+        jsonExample = `{
+        "painPoints": [
+          {
+            "category": "Storage Issues",
+            "description": "Building blocks scattered everywhere, difficult to clean up",
+            "targetAudience": "All parents with young children",
+            "severity": "Medium"
+          }
+        ],
+        "usageScenarios": [
+          {
+            "scenario": "Parent-child playtime",
+            "context": "Weekend afternoon parent-child interaction",
+            "benefits": "Enhances parent-child relationship",
+            "emotions": "Happy, satisfied"
+          }
+        ],
+        "marketingAngles": ["Emphasize safety design", "Highlight educational value"]
+      }`;
+      } else {
+        jsonExample = `{
         "painPoints": [
           {
             "category": "痛點類別",
@@ -341,8 +418,11 @@ Vui lòng phân tích và trả về định dạng JSON bằng tiếng Việt:`
           }
         ],
         "marketingAngles": ["行銷角度1", "行銷角度2"]
-      }`
       }`;
+      }
+      
+      const prompt = `${languagePrompts[language] || languagePrompts['zh-TW']}
+      ${jsonExample}`;
 
       // Use dynamic model selection
       const modelName = await this.getBestAvailableModel();
