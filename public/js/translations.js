@@ -95,7 +95,22 @@ const translations = {
     'performance_insight': '效能洞察',
     'creative_strategy': '創意策略',
     'optimization_plan': '優化計劃',
-    'advertising_review_report': '廣告檢視報告'
+    'advertising_review_report': '廣告檢視報告',
+    
+    // 產品分析結果標籤
+    'product_analysis_result': '產品分析結果',
+    'product_type': '產品類型',
+    'age_range': '適合年齡',
+    'educational_value': '教育價值',
+    'product_features': '產品特色',
+    'safety_features': '安全特性',
+    'materials': '材質',
+    'colors': '顏色',
+    'usage_scenarios': '使用場景',
+    'identified_pain_points': '識別的用戶痛點',
+    'usage_scenario_suggestions': '使用場景建議',
+    'target': '目標',
+    'emotions': '情感'
   },
   
   'en': {
@@ -193,7 +208,22 @@ const translations = {
     'performance_insight': 'Performance Insight',
     'creative_strategy': 'Creative Strategy',
     'optimization_plan': 'Optimization Plan',
-    'advertising_review_report': 'Advertising Review Report'
+    'advertising_review_report': 'Advertising Review Report',
+    
+    // 產品分析結果標籤
+    'product_analysis_result': 'Product Analysis Results',
+    'product_type': 'Product Type',
+    'age_range': 'Age Range',
+    'educational_value': 'Educational Value',
+    'product_features': 'Product Features',
+    'safety_features': 'Safety Features',
+    'materials': 'Materials',
+    'colors': 'Colors',
+    'usage_scenarios': 'Usage Scenarios',
+    'identified_pain_points': 'Identified User Pain Points',
+    'usage_scenario_suggestions': 'Usage Scenario Suggestions',
+    'target': 'Target',
+    'emotions': 'Emotions'
   },
   
   'vi': {
@@ -291,7 +321,22 @@ const translations = {
     'performance_insight': 'Thông tin hiệu suất',
     'creative_strategy': 'Chiến lược sáng tạo',
     'optimization_plan': 'Kế hoạch tối ưu hóa',
-    'advertising_review_report': 'Báo cáo đánh giá quảng cáo'
+    'advertising_review_report': 'Báo cáo đánh giá quảng cáo',
+    
+    // 產品分析結果標籤
+    'product_analysis_result': 'Kết quả phân tích sản phẩm',
+    'product_type': 'Loại sản phẩm',
+    'age_range': 'Độ tuổi phù hợp',
+    'educational_value': 'Giá trị giáo dục',
+    'product_features': 'Đặc điểm sản phẩm',
+    'safety_features': 'Tính năng an toàn',
+    'materials': 'Chất liệu',
+    'colors': 'Màu sắc',
+    'usage_scenarios': 'Kịch bản sử dụng',
+    'identified_pain_points': 'Các vấn đề người dùng đã xác định',
+    'usage_scenario_suggestions': 'Đề xuất kịch bản sử dụng',
+    'target': 'Mục tiêu',
+    'emotions': 'Cảm xúc'
   }
 };
 

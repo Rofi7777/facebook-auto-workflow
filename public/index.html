@@ -1419,42 +1419,42 @@
             const resultsDiv = document.getElementById('analysisResults');
             
             let html = '<div class="analysis-section">';
-            html += '<h4>🧸 產品分析結果</h4>';
+            html += `<h4>🧸 ${t('product_analysis_result')}</h4>`;
             
             if (productAnalysis.productType) {
-                html += `<p><strong>產品類型:</strong> ${productAnalysis.productType}</p>`;
+                html += `<p><strong>${t('product_type')}:</strong> ${productAnalysis.productType}</p>`;
             }
             if (productAnalysis.ageRange) {
-                html += `<p><strong>適合年齡:</strong> ${productAnalysis.ageRange}</p>`;
+                html += `<p><strong>${t('age_range')}:</strong> ${productAnalysis.ageRange}</p>`;
             }
             if (productAnalysis.educationalValue) {
                 // Handle array or string format
                 const eduValue = Array.isArray(productAnalysis.educationalValue) 
                     ? productAnalysis.educationalValue.join('、') 
                     : productAnalysis.educationalValue;
-                html += `<p><strong>教育價值:</strong> ${eduValue}</p>`;
+                html += `<p><strong>${t('educational_value')}:</strong> ${eduValue}</p>`;
             }
             if (productAnalysis.features) {
-                html += `<p><strong>產品特色:</strong> ${Array.isArray(productAnalysis.features) ? productAnalysis.features.join('、') : productAnalysis.features}</p>`;
+                html += `<p><strong>${t('product_features')}:</strong> ${Array.isArray(productAnalysis.features) ? productAnalysis.features.join('、') : productAnalysis.features}</p>`;
             }
             if (productAnalysis.safetyFeatures) {
-                html += `<p><strong>安全特性:</strong> ${Array.isArray(productAnalysis.safetyFeatures) ? productAnalysis.safetyFeatures.join('、') : productAnalysis.safetyFeatures}</p>`;
+                html += `<p><strong>${t('safety_features')}:</strong> ${Array.isArray(productAnalysis.safetyFeatures) ? productAnalysis.safetyFeatures.join('、') : productAnalysis.safetyFeatures}</p>`;
             }
             if (productAnalysis.materials) {
-                html += `<p><strong>材質:</strong> ${productAnalysis.materials}</p>`;
+                html += `<p><strong>${t('materials')}:</strong> ${productAnalysis.materials}</p>`;
             }
             if (productAnalysis.colors) {
-                html += `<p><strong>顏色:</strong> ${Array.isArray(productAnalysis.colors) ? productAnalysis.colors.join('、') : productAnalysis.colors}</p>`;
+                html += `<p><strong>${t('colors')}:</strong> ${Array.isArray(productAnalysis.colors) ? productAnalysis.colors.join('、') : productAnalysis.colors}</p>`;
             }
             if (productAnalysis.usageScenarios) {
-                html += `<p><strong>使用場景:</strong> ${Array.isArray(productAnalysis.usageScenarios) ? productAnalysis.usageScenarios.join('、') : productAnalysis.usageScenarios}</p>`;
+                html += `<p><strong>${t('usage_scenarios')}:</strong> ${Array.isArray(productAnalysis.usageScenarios) ? productAnalysis.usageScenarios.join('、') : productAnalysis.usageScenarios}</p>`;
             }
             
             html += '</div>';
             
             if (painPointsAnalysis.painPoints) {
                 html += '<div class="analysis-section">';
-                html += '<h4>💡 識別的用戶痛點</h4>';
+                html += `<h4>💡 ${t('identified_pain_points')}</h4>`;
                 painPointsAnalysis.painPoints.forEach(pain => {
                     // Check if bilingual format (contains /) 
                     if (pain.category && pain.category.includes('/')) {
@@ -1467,12 +1467,12 @@
                             <div class="language-section">
                                 <h6 style="color: #d32f2f; margin-bottom: 5px;">🇹🇼</h6>
                                 <strong>${zhCategory.trim()}:</strong> ${zhDesc.trim()}
-                                <br><small style="color: #666;">目標: ${zhTarget.trim()} (${zhSeverity.trim()})</small>
+                                <br><small style="color: #666;">${t('target')}: ${zhTarget.trim()} (${zhSeverity.trim()})</small>
                             </div>
                             <div class="language-section" style="margin-top: 8px;">
                                 <h6 style="color: #1976d2; margin-bottom: 5px;">🇻🇳</h6>
                                 <strong>${viCategory.trim()}:</strong> ${viDesc.trim()}
-                                <br><small style="color: #666;">Đối tượng: ${viTarget.trim()} (${viSeverity.trim()})</small>
+                                <br><small style="color: #666;">${t('target')}: ${viTarget.trim()} (${viSeverity.trim()})</small>
                             </div>
                         </div>`;
                     } else {
@@ -1487,7 +1487,7 @@
             
             if (painPointsAnalysis.usageScenarios) {
                 html += '<div class="analysis-section">';
-                html += '<h4>🎬 使用場景建議</h4>';
+                html += `<h4>🎬 ${t('usage_scenario_suggestions')}</h4>`;
                 painPointsAnalysis.usageScenarios.forEach(scenario => {
                     // Check if bilingual format
                     if (scenario.scenario && scenario.scenario.includes('/')) {
@@ -1512,13 +1512,13 @@
                                 <h6 style="color: #d32f2f; margin-bottom: 5px;">🇹🇼</h6>
                                 <strong>${zhScenario.trim()}:</strong> ${zhContext.trim()}
                                 <br><small style="color: #28a745;">${zhBenefits.trim()}</small>
-                                <br><small style="color: #ff9800;">情感: ${zhEmotions.trim()}</small>
+                                <br><small style="color: #ff9800;">${t('emotions')}: ${zhEmotions.trim()}</small>
                             </div>
                             <div class="language-section" style="margin-top: 8px;">
                                 <h6 style="color: #1976d2; margin-bottom: 5px;">🇻🇳</h6>
                                 <strong>${viScenario.trim()}:</strong> ${viContext.trim()}
                                 <br><small style="color: #28a745;">${viBenefits.trim()}</small>
-                                <br><small style="color: #ff9800;">Cảm xúc: ${viEmotions.trim()}</small>
+                                <br><small style="color: #ff9800;">${t('emotions')}: ${viEmotions.trim()}</small>
                             </div>
                         </div>`;
                     } else {
