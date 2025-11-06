@@ -212,9 +212,10 @@ class ScenarioGeneratorService {
       'custom': 'creative unique location that varies'
     };
     
-    const ethnicity = nationalityMap[modelNationality] || nationalityMap['taiwan'];
-    const characterDesc = combinationMap[modelCombination] || combinationMap['parents_baby'];
-    const locationDesc = locationMap[sceneLocation] || locationMap['park'];
+    // Use mapped value if available, otherwise use the custom input directly
+    const ethnicity = nationalityMap[modelNationality] || modelNationality;
+    const characterDesc = combinationMap[modelCombination] || modelCombination;
+    const locationDesc = locationMap[sceneLocation] || sceneLocation;
     
     const scenarioMap = {
       '親子互動': {

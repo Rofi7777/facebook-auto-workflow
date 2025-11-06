@@ -847,6 +847,9 @@
                                 <option value="brazil" data-i18n="nationality_brazil">巴西</option>
                                 <option value="custom" data-i18n="nationality_custom">自定義</option>
                             </select>
+                            <div id="customNationalityInput" style="display: none; margin-top: 10px;">
+                                <input type="text" id="customNationalityText" placeholder="請輸入模特兒國籍或種族描述 (例如: 日本、韓國、混血等)" style="width: 100%; padding: 10px; border: 2px solid #e1e5e9; border-radius: 8px; font-size: 14px;" data-i18n-placeholder="custom_nationality_placeholder">
+                            </div>
                         </div>
                         
                         <div class="form-group">
@@ -856,7 +859,11 @@
                                 <option value="mom_baby" data-i18n="combination_mom_baby">媽媽與嬰兒</option>
                                 <option value="dad_baby" data-i18n="combination_dad_baby">爸爸與嬰兒</option>
                                 <option value="couple" data-i18n="combination_couple">夫妻</option>
+                                <option value="custom" data-i18n="combination_custom">自定義</option>
                             </select>
+                            <div id="customCombinationInput" style="display: none; margin-top: 10px;">
+                                <input type="text" id="customCombinationText" placeholder="請輸入人物組合描述 (例如: 祖父母與孫子、三代同堂等)" style="width: 100%; padding: 10px; border: 2px solid #e1e5e9; border-radius: 8px; font-size: 14px;" data-i18n-placeholder="custom_combination_placeholder">
+                            </div>
                         </div>
                         
                         <h4 style="color: #4ECDC4; margin-top: 20px; margin-bottom: 15px;">🌍 <span data-i18n="scene_settings">場景設定</span></h4>
@@ -870,6 +877,9 @@
                                 <option value="park" data-i18n="location_park">公園</option>
                                 <option value="custom" data-i18n="location_custom">自定義</option>
                             </select>
+                            <div id="customLocationInput" style="display: none; margin-top: 10px;">
+                                <input type="text" id="customLocationText" placeholder="請輸入場景地點描述 (例如: 咖啡廳、遊樂場、森林等)" style="width: 100%; padding: 10px; border: 2px solid #e1e5e9; border-radius: 8px; font-size: 14px;" data-i18n-placeholder="custom_location_placeholder">
+                            </div>
                         </div>
                     </div>
                     
@@ -1183,6 +1193,44 @@
             updateImagePreview();
         }
         
+        // Custom input box display/hide handling
+        const modelNationalitySelect = document.getElementById('modelNationality');
+        const customNationalityInput = document.getElementById('customNationalityInput');
+        const modelCombinationSelect = document.getElementById('modelCombination');
+        const customCombinationInput = document.getElementById('customCombinationInput');
+        const sceneLocationSelect = document.getElementById('sceneLocation');
+        const customLocationInput = document.getElementById('customLocationInput');
+        
+        if (modelNationalitySelect && customNationalityInput) {
+            modelNationalitySelect.addEventListener('change', function() {
+                if (this.value === 'custom') {
+                    customNationalityInput.style.display = 'block';
+                } else {
+                    customNationalityInput.style.display = 'none';
+                }
+            });
+        }
+        
+        if (modelCombinationSelect && customCombinationInput) {
+            modelCombinationSelect.addEventListener('change', function() {
+                if (this.value === 'custom') {
+                    customCombinationInput.style.display = 'block';
+                } else {
+                    customCombinationInput.style.display = 'none';
+                }
+            });
+        }
+        
+        if (sceneLocationSelect && customLocationInput) {
+            sceneLocationSelect.addEventListener('change', function() {
+                if (this.value === 'custom') {
+                    customLocationInput.style.display = 'block';
+                } else {
+                    customLocationInput.style.display = 'none';
+                }
+            });
+        }
+        
         // Status display
         function showStatus(message, type) {
             statusDiv.innerHTML = message;
@@ -1231,6 +1279,26 @@
                     modelNationality = document.getElementById('modelNationality').value;
                     modelCombination = document.getElementById('modelCombination').value;
                     sceneLocation = document.getElementById('sceneLocation').value;
+                    
+                    // Use custom text if "custom" is selected
+                    if (modelNationality === 'custom') {
+                        const customText = document.getElementById('customNationalityText').value.trim();
+                        if (customText) {
+                            modelNationality = customText;
+                        }
+                    }
+                    if (modelCombination === 'custom') {
+                        const customText = document.getElementById('customCombinationText').value.trim();
+                        if (customText) {
+                            modelCombination = customText;
+                        }
+                    }
+                    if (sceneLocation === 'custom') {
+                        const customText = document.getElementById('customLocationText').value.trim();
+                        if (customText) {
+                            sceneLocation = customText;
+                        }
+                    }
                 }
                 
                 // Get selected platforms
@@ -1373,6 +1441,26 @@
                     modelNationality = document.getElementById('modelNationality').value;
                     modelCombination = document.getElementById('modelCombination').value;
                     sceneLocation = document.getElementById('sceneLocation').value;
+                    
+                    // Use custom text if "custom" is selected
+                    if (modelNationality === 'custom') {
+                        const customText = document.getElementById('customNationalityText').value.trim();
+                        if (customText) {
+                            modelNationality = customText;
+                        }
+                    }
+                    if (modelCombination === 'custom') {
+                        const customText = document.getElementById('customCombinationText').value.trim();
+                        if (customText) {
+                            modelCombination = customText;
+                        }
+                    }
+                    if (sceneLocation === 'custom') {
+                        const customText = document.getElementById('customLocationText').value.trim();
+                        if (customText) {
+                            sceneLocation = customText;
+                        }
+                    }
                 }
                 
                 const scenarioResponse = await fetch('/api/generate-scenarios', {
@@ -1441,6 +1529,26 @@
                     modelNationality = document.getElementById('modelNationality').value;
                     modelCombination = document.getElementById('modelCombination').value;
                     sceneLocation = document.getElementById('sceneLocation').value;
+                    
+                    // Use custom text if "custom" is selected
+                    if (modelNationality === 'custom') {
+                        const customText = document.getElementById('customNationalityText').value.trim();
+                        if (customText) {
+                            modelNationality = customText;
+                        }
+                    }
+                    if (modelCombination === 'custom') {
+                        const customText = document.getElementById('customCombinationText').value.trim();
+                        if (customText) {
+                            modelCombination = customText;
+                        }
+                    }
+                    if (sceneLocation === 'custom') {
+                        const customText = document.getElementById('customLocationText').value.trim();
+                        if (customText) {
+                            sceneLocation = customText;
+                        }
+                    }
                 }
                 
                 showStatus('🔄 使用相同產品資訊，切換平台重新生成內容...', 'info');

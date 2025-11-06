@@ -85,6 +85,7 @@ const translations = {
     'combination_mom_baby': '媽媽與嬰兒',
     'combination_dad_baby': '爸爸與嬰兒',
     'combination_couple': '夫妻',
+    'combination_custom': '自定義',
     
     // 場景地點選項
     'location_city': '城市',
@@ -92,6 +93,11 @@ const translations = {
     'location_mountain': '山區',
     'location_park': '公園',
     'location_custom': '自定義',
+    
+    // 自定義輸入框 placeholder
+    'custom_nationality_placeholder': '請輸入模特兒國籍或種族描述 (例如: 日本、韓國、混血等)',
+    'custom_combination_placeholder': '請輸入人物組合描述 (例如: 祖父母與孫子、三代同堂等)',
+    'custom_location_placeholder': '請輸入場景地點描述 (例如: 咖啡廳、遊樂場、森林等)',
     
     // 按鈕和動作
     'generate_image_checkbox': '自動生成行銷圖片 (Generate Marketing Images)',
@@ -225,6 +231,7 @@ const translations = {
     'combination_mom_baby': 'Mom with Baby',
     'combination_dad_baby': 'Dad with Baby',
     'combination_couple': 'Couple',
+    'combination_custom': 'Custom',
     
     // 場景地點選項
     'location_city': 'City',
@@ -232,6 +239,11 @@ const translations = {
     'location_mountain': 'Mountain',
     'location_park': 'Park',
     'location_custom': 'Custom',
+    
+    // 自定義輸入框 placeholder
+    'custom_nationality_placeholder': 'Enter model nationality or ethnicity (e.g., Japanese, Korean, Mixed)',
+    'custom_combination_placeholder': 'Enter character combination (e.g., Grandparents with grandchild, Three generations)',
+    'custom_location_placeholder': 'Enter scene location (e.g., Cafe, Playground, Forest)',
     
     // 按鈕和動作
     'generate_image_checkbox': 'Generate Marketing Images',
@@ -365,6 +377,7 @@ const translations = {
     'combination_mom_baby': 'Mẹ với em bé',
     'combination_dad_baby': 'Bố với em bé',
     'combination_couple': 'Cặp đôi',
+    'combination_custom': 'Tùy chỉnh',
     
     // 場景地點選項
     'location_city': 'Thành phố',
@@ -372,6 +385,11 @@ const translations = {
     'location_mountain': 'Vùng núi',
     'location_park': 'Công viên',
     'location_custom': 'Tùy chỉnh',
+    
+    // 自定義輸入框 placeholder
+    'custom_nationality_placeholder': 'Nhập quốc tịch hoặc dân tộc người mẫu (vd: Nhật Bản, Hàn Quốc, Lai)',
+    'custom_combination_placeholder': 'Nhập tổ hợp nhân vật (vd: Ông bà với cháu, Ba thế hệ)',
+    'custom_location_placeholder': 'Nhập địa điểm cảnh (vd: Quán cà phê, Sân chơi, Rừng)',
     
     // 按鈕和動作
     'generate_image_checkbox': 'Tự động tạo hình ảnh marketing',
