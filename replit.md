@@ -4,6 +4,23 @@
 A comprehensive multi-industry AI-powered content generation platform supporting Fashion, Mother&Kids, Art Toy, and other product categories. The system integrates Google Gemini 2.5 Flash AI for intelligent product analysis and automated content generation across multiple platforms (Shopee, TikTok, Instagram, Facebook).
 
 ## Recent Changes
+- **2025-11-06**: Customizable Image Generation Settings
+  - **NEW FEATURE**: Added comprehensive image customization controls for model appearance and scene settings
+  - Users can now customize three key aspects of generated marketing images:
+    * **Model Nationality**: Taiwan (臺灣) / USA (美國) / Russia (俄羅斯) / Brazil (巴西) / Custom (自訂)
+    * **Model Combination**: Parents & Baby (父母與寶寶) / Mom & Baby (媽媽與寶寶) / Dad & Baby (爸爸與寶寶) / Couple (情侶)
+    * **Scene Location**: Park (公園) / City (城市) / Beach (海灘) / Mountain (山區) / Custom (自訂)
+  - Full multi-language support for all dropdown options (Traditional Chinese, English, Vietnamese)
+  - Updated frontend HTML with three new dropdown menus in the image generation section
+  - Modified frontend JavaScript to collect and send customization parameters to backend APIs
+  - Enhanced backend API routes (/api/generate-platform-content, /api/generate-scenarios) to accept new parameters
+  - Updated GeminiAI service: Modified `generateMarketingImage()` to integrate customization into AI prompts
+  - Updated ScenarioGenerator service: Modified `generateScenarioImage()` to integrate customization into AI prompts
+  - Enhanced `generateScenarioDetails()` method in both services with dynamic character/location mapping
+  - AI now generates images with specific ethnic characteristics, family combinations, and location settings
+  - Parameter flow: Frontend dropdowns → API routes → AI services → Image generation prompts
+  - Ensures generated images match user's brand targeting and marketing preferences
+  - Works seamlessly with all scenario types (親子互動, 小孩單人使用, 外出旅遊, 居家遊戲, 其他)
 - **2025-11-06**: Transparent Logo Background Implementation
   - **CRITICAL FIX**: Generated images now show Googoogaga logo with transparent background (no white box)
   - Created new transparent PNG logo file: `googoogaga-logo-transparent.png`

@@ -185,36 +185,66 @@ class ScenarioGeneratorService {
   }
 
   // 根據場景類型生成創造性場景詳情
-  generateScenarioDetails(scenarioType) {
+  generateScenarioDetails(scenarioType, modelNationality = 'taiwan', modelCombination = 'parents_baby', sceneLocation = 'park') {
+    // Map nationality to specific ethnic characteristics
+    const nationalityMap = {
+      'taiwan': 'East Asian/Taiwanese',
+      'usa': 'American (diverse ethnic backgrounds)',
+      'russia': 'Eastern European/Russian',
+      'brazil': 'Latin American/Brazilian',
+      'custom': 'diverse international backgrounds'
+    };
+    
+    // Map model combinations to character descriptions
+    const combinationMap = {
+      'parents_baby': 'Both parents (mother and father) with baby',
+      'mom_baby': 'Mother with baby',
+      'dad_baby': 'Father with baby',
+      'couple': 'Couple together (parents without baby visible in focus)'
+    };
+    
+    // Map locations to scene settings
+    const locationMap = {
+      'city': 'Urban city environment with modern buildings, streets, cafes',
+      'beach': 'Beautiful beach setting with sand, ocean waves, sunny weather',
+      'mountain': 'Mountain landscape with scenic views, fresh air, natural surroundings',
+      'park': 'Public park with green grass, trees, playground equipment',
+      'custom': 'creative unique location that varies'
+    };
+    
+    const ethnicity = nationalityMap[modelNationality] || nationalityMap['taiwan'];
+    const characterDesc = combinationMap[modelCombination] || combinationMap['parents_baby'];
+    const locationDesc = locationMap[sceneLocation] || locationMap['park'];
+    
     const scenarioMap = {
       '親子互動': {
-        setting: 'Cozy family living room or nursery with soft lighting, comfortable seating, books and toys visible',
-        characters: 'Loving parent (mother or father, varying ethnicities) actively playing with a happy toddler (12-24 months old), genuine smiles and eye contact, natural interaction',
-        background: 'Warm home environment with family photos, soft pillows, children books on shelves, educational posters',
+        setting: `${locationDesc}, soft lighting, comfortable atmosphere with the product visible`,
+        characters: `${characterDesc} of ${ethnicity} ethnicity, actively engaging with the product, genuine smiles and eye contact, natural interaction`,
+        background: `${locationDesc} with warm, family-friendly elements and safe environment`,
         visualStyle: 'heartwarming family moments, emotional connection emphasis'
       },
       '小孩單人使用': {
-        setting: 'Child-safe play area, colorful play mat, age-appropriate surrounding toys',
-        characters: 'Independent toddler (18-30 months) exploring and playing alone, focused and curious expression, natural child behavior',
-        background: 'Bright, safe play environment with soft toys, building blocks, colorful activity mats, safety gates visible',
+        setting: `${locationDesc}, child-safe area with the product, colorful and engaging`,
+        characters: `Independent toddler (18-30 months) of ${ethnicity} ethnicity exploring and playing alone with the product, focused and curious expression`,
+        background: `${locationDesc} with safe, child-friendly elements and bright colors`,
         visualStyle: 'child development focus, exploration and discovery theme'
       },
       '外出旅遊': {
-        setting: 'Outdoor park, beach, or family-friendly travel destination with natural scenery',
-        characters: 'Family with toddler in portable travel scenario, child in stroller or being carried, outdoor adventure mood',
-        background: 'Beautiful natural landscape, travel-friendly setting like parks, beaches, family picnic areas, travel gear visible',
+        setting: `${locationDesc}, outdoor travel destination with natural scenery`,
+        characters: `${characterDesc} of ${ethnicity} ethnicity in outdoor adventure with the product, travel-friendly mood`,
+        background: `${locationDesc} with beautiful natural landscape and family-friendly travel setting`,
         visualStyle: 'adventure and exploration theme, natural outdoor lighting'
       },
       '居家遊戲': {
-        setting: 'Well-organized playroom or family room with toys and learning materials',
-        characters: 'Child playing at home with family nearby, comfortable casual clothes, relaxed home atmosphere',
-        background: 'Home interior with toy storage, comfortable furniture, natural window lighting, home comfort elements',
+        setting: `Home interior or ${locationDesc} adapted for play, organized and comfortable`,
+        characters: `${characterDesc} of ${ethnicity} ethnicity playing with the product, comfortable casual clothes, relaxed atmosphere`,
+        background: `Comfortable home-like setting in ${locationDesc} with natural lighting and cozy elements`,
         visualStyle: 'home comfort theme, daily life naturalism'
       },
       '其他': {
-        setting: 'Creative and unique setting that varies each time - could be imaginative themed room, artistic space, or innovative play environment',
-        characters: 'Diverse family scenarios with varying ages, ethnicities, and family structures, creative interaction styles',
-        background: 'Artistic and creative backgrounds that change each generation - themed rooms, colorful artistic spaces, innovative educational environments',
+        setting: `${locationDesc} with creative and unique elements that vary each time`,
+        characters: `${characterDesc} of ${ethnicity} ethnicity in creative interaction with the product, unique scenario`,
+        background: `${locationDesc} with artistic and creative elements, innovative environment`,
         visualStyle: 'highly creative and artistic, unique visual approach each time'
       }
     };
@@ -273,7 +303,7 @@ class ScenarioGeneratorService {
   }
 
   // 自動 Nano Banana 圖片生成（場景專用，使用用戶上傳的產品圖片作為參考）
-  async generateScenarioImage(imageDescription, scenarioName, outputPath, productImagePath = null, scenarioType = '親子互動') {
+  async generateScenarioImage(imageDescription, scenarioName, outputPath, productImagePath = null, scenarioType = '親子互動', modelNationality = 'taiwan', modelCombination = 'parents_baby', sceneLocation = 'park') {
     try {
       console.log(`🎨 Generating scenario image for: ${scenarioName}`);
       
@@ -298,7 +328,7 @@ class ScenarioGeneratorService {
         }
 
         // 根據場景類型添加創造性變化
-        const scenarioDetails = this.generateScenarioDetails(scenarioType);
+        const scenarioDetails = this.generateScenarioDetails(scenarioType, modelNationality, modelCombination, sceneLocation);
         
         enhancedPrompt = `Create a high-quality marketing scenario image for Googoogaga baby toys using the EXACT SAME toy product shown in the reference image:
 
@@ -340,7 +370,7 @@ Style: Realistic photography, commercial quality, warm family moments, professio
         ];
       } else {
         // 沒有產品圖片時的一般提示詞
-        const scenarioDetails = this.generateScenarioDetails(scenarioType);
+        const scenarioDetails = this.generateScenarioDetails(scenarioType, modelNationality, modelCombination, sceneLocation);
         
         enhancedPrompt = `Create a high-quality marketing scenario image for Googoogaga baby toys:
 
