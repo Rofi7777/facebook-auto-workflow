@@ -66,6 +66,33 @@ const translations = {
     'industry_art_toy': 'Art Toy (藝術玩具)',
     'industry_others': 'Others (其他產品)',
     
+    // 模特兒和場景設定
+    'model_settings': '模特兒設定',
+    'model_nationality': '模特兒國籍',
+    'model_combination': '人物組合',
+    'scene_settings': '場景設定',
+    'scene_location': '場景地點',
+    
+    // 國籍選項
+    'nationality_taiwan': '台灣',
+    'nationality_usa': '美國',
+    'nationality_russia': '俄羅斯',
+    'nationality_brazil': '巴西',
+    'nationality_custom': '自定義',
+    
+    // 組合選項
+    'combination_parents_baby': '爸媽與嬰兒',
+    'combination_mom_baby': '媽媽與嬰兒',
+    'combination_dad_baby': '爸爸與嬰兒',
+    'combination_couple': '夫妻',
+    
+    // 場景地點選項
+    'location_city': '城市',
+    'location_beach': '海邊',
+    'location_mountain': '山區',
+    'location_park': '公園',
+    'location_custom': '自定義',
+    
     // 按鈕和動作
     'generate_image_checkbox': '自動生成行銷圖片 (Generate Marketing Images)',
     'usage_scenario_selection': '使用場景選擇 / Usage Scenario Selection',
@@ -179,6 +206,33 @@ const translations = {
     'industry_art_toy': 'Art Toy',
     'industry_others': 'Others',
     
+    // 模特兒和場景設定
+    'model_settings': 'Model Settings',
+    'model_nationality': 'Model Nationality',
+    'model_combination': 'Character Combination',
+    'scene_settings': 'Scene Settings',
+    'scene_location': 'Scene Location',
+    
+    // 國籍選項
+    'nationality_taiwan': 'Taiwan',
+    'nationality_usa': 'USA',
+    'nationality_russia': 'Russia',
+    'nationality_brazil': 'Brazil',
+    'nationality_custom': 'Custom',
+    
+    // 組合選項
+    'combination_parents_baby': 'Parents with Baby',
+    'combination_mom_baby': 'Mom with Baby',
+    'combination_dad_baby': 'Dad with Baby',
+    'combination_couple': 'Couple',
+    
+    // 場景地點選項
+    'location_city': 'City',
+    'location_beach': 'Beach',
+    'location_mountain': 'Mountain',
+    'location_park': 'Park',
+    'location_custom': 'Custom',
+    
     // 按鈕和動作
     'generate_image_checkbox': 'Generate Marketing Images',
     'usage_scenario_selection': 'Usage Scenario Selection',
@@ -291,6 +345,33 @@ const translations = {
     'industry_mother_kids': 'Mẹ và bé',
     'industry_art_toy': 'Đồ chơi nghệ thuật',
     'industry_others': 'Khác',
+    
+    // 模特兒和場景設定
+    'model_settings': 'Cài đặt người mẫu',
+    'model_nationality': 'Quốc tịch người mẫu',
+    'model_combination': 'Tổ hợp nhân vật',
+    'scene_settings': 'Cài đặt cảnh',
+    'scene_location': 'Địa điểm cảnh',
+    
+    // 國籍選項
+    'nationality_taiwan': 'Đài Loan',
+    'nationality_usa': 'Mỹ',
+    'nationality_russia': 'Nga',
+    'nationality_brazil': 'Brazil',
+    'nationality_custom': 'Tùy chỉnh',
+    
+    // 組合選項
+    'combination_parents_baby': 'Bố mẹ với em bé',
+    'combination_mom_baby': 'Mẹ với em bé',
+    'combination_dad_baby': 'Bố với em bé',
+    'combination_couple': 'Cặp đôi',
+    
+    // 場景地點選項
+    'location_city': 'Thành phố',
+    'location_beach': 'Bãi biển',
+    'location_mountain': 'Vùng núi',
+    'location_park': 'Công viên',
+    'location_custom': 'Tùy chỉnh',
     
     // 按鈕和動作
     'generate_image_checkbox': 'Tự động tạo hình ảnh marketing',

@@ -834,6 +834,45 @@
                         </label>
                     </div>
                     
+                    <!-- 模特兒和場景設定選項 -->
+                    <div class="form-group" id="modelSceneOptionsGroup" style="display: none;">
+                        <h4 style="color: #FF6B4A; margin-bottom: 15px;">👥 <span data-i18n="model_settings">模特兒設定</span></h4>
+                        
+                        <div class="form-group">
+                            <label for="modelNationality" data-i18n="model_nationality">模特兒國籍</label>
+                            <select id="modelNationality" name="modelNationality">
+                                <option value="taiwan" data-i18n="nationality_taiwan">台灣</option>
+                                <option value="usa" data-i18n="nationality_usa">美國</option>
+                                <option value="russia" data-i18n="nationality_russia">俄羅斯</option>
+                                <option value="brazil" data-i18n="nationality_brazil">巴西</option>
+                                <option value="custom" data-i18n="nationality_custom">自定義</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="modelCombination" data-i18n="model_combination">人物組合</label>
+                            <select id="modelCombination" name="modelCombination">
+                                <option value="parents_baby" data-i18n="combination_parents_baby">爸媽與嬰兒</option>
+                                <option value="mom_baby" data-i18n="combination_mom_baby">媽媽與嬰兒</option>
+                                <option value="dad_baby" data-i18n="combination_dad_baby">爸爸與嬰兒</option>
+                                <option value="couple" data-i18n="combination_couple">夫妻</option>
+                            </select>
+                        </div>
+                        
+                        <h4 style="color: #4ECDC4; margin-top: 20px; margin-bottom: 15px;">🌍 <span data-i18n="scene_settings">場景設定</span></h4>
+                        
+                        <div class="form-group">
+                            <label for="sceneLocation" data-i18n="scene_location">場景地點</label>
+                            <select id="sceneLocation" name="sceneLocation">
+                                <option value="city" data-i18n="location_city">城市</option>
+                                <option value="beach" data-i18n="location_beach">海邊</option>
+                                <option value="mountain" data-i18n="location_mountain">山區</option>
+                                <option value="park" data-i18n="location_park">公園</option>
+                                <option value="custom" data-i18n="location_custom">自定義</option>
+                            </select>
+                        </div>
+                    </div>
+                    
                     <!-- 場景選擇選項 -->
                     <div class="form-group" id="scenarioOptionsGroup" style="display: none;">
                         <label data-i18n="usage_scenario_selection">使用場景選擇 / Usage Scenario Selection</label>
@@ -1184,6 +1223,16 @@
                     }
                 }
                 
+                // 獲取模特兒和場景設定
+                let modelNationality = 'taiwan';
+                let modelCombination = 'parents_baby';
+                let sceneLocation = 'park';
+                if (generateImages) {
+                    modelNationality = document.getElementById('modelNationality').value;
+                    modelCombination = document.getElementById('modelCombination').value;
+                    sceneLocation = document.getElementById('sceneLocation').value;
+                }
+                
                 // Get selected platforms
                 const selectedPlatforms = Array.from(document.querySelectorAll('#platformsGroup input[type="checkbox"]:checked')).map(cb => cb.value);
                 
@@ -1271,7 +1320,10 @@
                         language: language,
                         generateImages: generateImages,
                         scenarioType: scenarioType,
-                        productImagePath: uploadedImagePath
+                        productImagePath: uploadedImagePath,
+                        modelNationality: modelNationality,
+                        modelCombination: modelCombination,
+                        sceneLocation: sceneLocation
                     })
                 });
                 
@@ -1307,14 +1359,20 @@
                 generateScenariosBtn.disabled = true;
                 generateScenariosBtn.innerHTML = '<span class="loading"></span>場景生成中...';
                 
-                // 重新獲取場景類型選擇
+                // 重新獲取場景類型選擇和模特兒場景設定
                 let scenarioType = '親子互動'; // 預設值
+                let modelNationality = 'taiwan';
+                let modelCombination = 'parents_baby';
+                let sceneLocation = 'park';
                 const generateImages = document.getElementById('generateImages').checked;
                 if (generateImages) {
                     const selectedScenario = document.querySelector('input[name="scenarioType"]:checked');
                     if (selectedScenario) {
                         scenarioType = selectedScenario.value;
                     }
+                    modelNationality = document.getElementById('modelNationality').value;
+                    modelCombination = document.getElementById('modelCombination').value;
+                    sceneLocation = document.getElementById('sceneLocation').value;
                 }
                 
                 const scenarioResponse = await fetch('/api/generate-scenarios', {
@@ -1326,7 +1384,10 @@
                         productInfo: productAnalysis,
                         contentData: generatedContent,
                         productImagePath: uploadedImagePath,
-                        scenarioType: scenarioType
+                        scenarioType: scenarioType,
+                        modelNationality: modelNationality,
+                        modelCombination: modelCombination,
+                        sceneLocation: sceneLocation
                     })
                 });
                 
@@ -1367,13 +1428,19 @@
                 const generateImages = document.getElementById('generateImages').checked;
                 const industryCategory = document.getElementById('industryCategory').value;
                 
-                // 獲取場景類型選擇
+                // 獲取場景類型選擇和模特兒場景設定
                 let scenarioType = '親子互動'; // 預設值
+                let modelNationality = 'taiwan';
+                let modelCombination = 'parents_baby';
+                let sceneLocation = 'park';
                 if (generateImages) {
                     const selectedScenario = document.querySelector('input[name="scenarioType"]:checked');
                     if (selectedScenario) {
                         scenarioType = selectedScenario.value;
                     }
+                    modelNationality = document.getElementById('modelNationality').value;
+                    modelCombination = document.getElementById('modelCombination').value;
+                    sceneLocation = document.getElementById('sceneLocation').value;
                 }
                 
                 showStatus('🔄 使用相同產品資訊，切換平台重新生成內容...', 'info');
@@ -1393,7 +1460,10 @@
                         language: language,
                         generateImages: generateImages,
                         scenarioType: scenarioType,
-                        productImagePath: uploadedImagePath
+                        productImagePath: uploadedImagePath,
+                        modelNationality: modelNationality,
+                        modelCombination: modelCombination,
+                        sceneLocation: sceneLocation
                     })
                 });
                 
@@ -1751,11 +1821,14 @@
         // Toggle scenario options based on generateImages checkbox
         function toggleScenarioOptions() {
             const generateImages = document.getElementById('generateImages').checked;
+            const modelSceneOptionsGroup = document.getElementById('modelSceneOptionsGroup');
             const scenarioOptionsGroup = document.getElementById('scenarioOptionsGroup');
             
             if (generateImages) {
+                modelSceneOptionsGroup.style.display = 'block';
                 scenarioOptionsGroup.style.display = 'block';
             } else {
+                modelSceneOptionsGroup.style.display = 'none';
                 scenarioOptionsGroup.style.display = 'none';
             }
         }

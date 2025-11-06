@@ -337,7 +337,10 @@ app.post('/api/generate-platform-content', async (req, res) => {
       language = 'zh-TW',
       generateImages = false,
       scenarioType = '親子互動',
-      productImagePath = null
+      productImagePath = null,
+      modelNationality = 'taiwan',
+      modelCombination = 'parents_baby',
+      sceneLocation = 'park'
     } = req.body;
     
     console.log('Generating content for platforms:', platforms);
@@ -389,7 +392,15 @@ app.post('/api/generate-platform-content', async (req, res) => {
             const imagePath = `assets/generated/${platform}_${Date.now()}.png`;
             
             console.log(`Generating image for ${platform}:`, imagePrompt);
-            const generatedImageResult = await aiService.generateMarketingImage(imagePrompt, imagePath, validatedProductImagePath, scenarioType);
+            const generatedImageResult = await aiService.generateMarketingImage(
+              imagePrompt, 
+              imagePath, 
+              validatedProductImagePath, 
+              scenarioType,
+              modelNationality,
+              modelCombination,
+              sceneLocation
+            );
             
             // Check if actual image was generated or just description
             if (generatedImageResult && generatedImageResult.type === 'image' && generatedImageResult.isRealImage) {
@@ -450,7 +461,15 @@ app.post('/api/generate-platform-content', async (req, res) => {
 // Scene generation endpoint for creating marketing scenarios
 app.post('/api/generate-scenarios', async (req, res) => {
   try {
-    const { productInfo, contentData, productImagePath = null, scenarioType = '親子互動' } = req.body;
+    const { 
+      productInfo, 
+      contentData, 
+      productImagePath = null, 
+      scenarioType = '親子互動',
+      modelNationality = 'taiwan',
+      modelCombination = 'parents_baby',
+      sceneLocation = 'park'
+    } = req.body;
     
     if (!productInfo || !contentData) {
       return res.status(400).json({ error: 'Product info and content data are required' });
@@ -489,7 +508,16 @@ app.post('/api/generate-scenarios', async (req, res) => {
         try {
           const imageDescription = await scenarioService.generateImageDescription(scenario, productInfo, scenarioType);
           const imagePath = `assets/scenarios/${Date.now()}_scenario_${index + 1}.png`;
-          const scenarioImageResult = await scenarioService.generateScenarioImage(imageDescription, scenario.name, imagePath, validatedProductImagePath, scenarioType);
+          const scenarioImageResult = await scenarioService.generateScenarioImage(
+            imageDescription, 
+            scenario.name, 
+            imagePath, 
+            validatedProductImagePath, 
+            scenarioType,
+            modelNationality,
+            modelCombination,
+            sceneLocation
+          );
           
           // Handle both image and design guide results
           const scenarioData = {
