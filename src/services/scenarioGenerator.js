@@ -225,7 +225,7 @@ class ScenarioGeneratorService {
   // 在生成的圖片上疊加 Googoogaga Logo
   async addLogoToImage(imagePath) {
     try {
-      const logoPath = path.resolve(__dirname, '../../public/brand/googoogaga-logo.jpg');
+      const logoPath = path.resolve(__dirname, '../../public/brand/googoogaga-logo-transparent.png');
       
       // 檢查 Logo 是否存在
       const logoExists = await fs.pathExists(logoPath);
@@ -241,9 +241,9 @@ class ScenarioGeneratorService {
       // 計算 Logo 大小（原圖寬度的 20%）
       const logoWidth = Math.floor(metadata.width * 0.2);
       
-      // 調整 Logo 大小並轉換為 PNG（支持透明度）
+      // 調整 Logo 大小，保持透明背景
       const resizedLogo = await sharp(logoPath)
-        .resize(logoWidth, null, { fit: 'contain' })
+        .resize(logoWidth, null, { fit: 'contain', background: { r: 0, g: 0, b: 0, alpha: 0 } })
         .png()
         .toBuffer();
       
