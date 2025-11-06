@@ -115,6 +115,14 @@ class GeminiAIService {
           5. 當前流行趨勢
           6. 使用場景建議
           請用繁體中文回答，格式為JSON：`,
+          'en': `Please analyze this fashion product image in detail and provide the following information:
+          1. Product type and style
+          2. Material and design features
+          3. Colors and patterns
+          4. Target audience
+          5. Current fashion trends
+          6. Usage scenario suggestions
+          Please answer in English, format as JSON:`,
           'bilingual': `請詳細分析這${pathsArray.length > 1 ? '些' : '個'}時尚產品圖片（請用繁體中文和越南文雙語回答）：
           ${pathsArray.length > 1 ? `注意：這些圖片展示了同一個產品的不同角度，請綜合分析。` : ''}
           1. 產品類型和風格/Loại sản phẩm và phong cách
@@ -142,6 +150,14 @@ class GeminiAIService {
           5. 藝術價值和獨特性
           6. 展示和保存建議
           請用繁體中文回答，格式為JSON：`,
+          'en': `Please analyze this art toy/collectible image in detail and provide the following information:
+          1. Product type and artistic style
+          2. Materials and craftsmanship
+          3. Colors and design details
+          4. Target collector audience
+          5. Artistic value and uniqueness
+          6. Display and preservation suggestions
+          Please answer in English, format as JSON:`,
           'bilingual': `請詳細分析這${pathsArray.length > 1 ? '些' : '個'}藝術玩具產品圖片（請用繁體中文和越南文雙語回答）：
           ${pathsArray.length > 1 ? `注意：這些圖片展示了同一個產品的不同角度，請綜合分析。` : ''}
           1. 產品類型和風格/Loại sản phẩm và phong cách nghệ thuật
@@ -204,6 +220,14 @@ class GeminiAIService {
           5. 價值和優勢
           6. 使用場景建議
           請用繁體中文回答，格式為JSON：`,
+          'en': `Please analyze this product image in detail and provide the following information:
+          1. Product type and main features
+          2. Usage and standout functions
+          3. Materials and colors
+          4. Target audience
+          5. Value and benefits
+          6. Usage scenario suggestions
+          Please answer in English, format as JSON:`,
           'bilingual': `請詳細分析這${pathsArray.length > 1 ? '些' : '個'}產品圖片（請用繁體中文和越南文雙語回答）：
           ${pathsArray.length > 1 ? `注意：這些圖片展示了同一個產品的不同角度，請綜合分析。` : ''}
           1. 產品類型/Loại sản phẩm
@@ -330,6 +354,11 @@ Vui lòng phân tích và trả về định dạng JSON bằng tiếng Việt:`
 產品分析：${JSON.stringify(productAnalysis, null, 2)}
 
 請分析並回傳JSON格式：`,
+        'en': `Based on the following product analysis, please identify the pain points that end consumers (parents with young children) may encounter and propose corresponding usage scenarios:
+
+Product Analysis: ${JSON.stringify(productAnalysis, null, 2)}
+
+Please analyze and return in JSON format:`,
         'bilingual': `基於以下產品分析，請識別終端消費者（嬰幼兒家長）可能遇到的痛點，並提出相應的使用場景（請用繁體中文和越南文雙語回答）：
 
 產品分析：${JSON.stringify(productAnalysis, null, 2)}
