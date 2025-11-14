@@ -15,11 +15,14 @@
     "@google/genai": "^1.20.0",
     "axios": "^1.12.2",
     "cors": "^2.8.5",
+    "docx": "^9.5.1",
     "dotenv": "^17.2.2",
     "express": "^5.1.0",
     "fs-extra": "^11.3.2",
+    "html-docx-js": "^0.3.1",
     "multer": "^2.0.2",
     "node-cron": "^4.2.1",
+    "pdfkit": "^0.17.2",
     "sharp": "^0.34.4"
   }
 }
