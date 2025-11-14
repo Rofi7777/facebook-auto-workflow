@@ -278,6 +278,8 @@ Please provide comprehensive, practical, and immediately usable course content. 
       for (let i = 0; i < Math.min(imagePrompts.length, 3); i++) {
         try {
           const prompt = imagePrompts[i];
+          console.log(`🎨 Generating image ${i + 1}/3 with prompt:`, prompt.substring(0, 100) + '...');
+          
           const imagePath = `assets/courses/${Date.now()}_image_${i + 1}.png`;
           
           const response = await this.ai.models.generateContent({
@@ -288,7 +290,20 @@ Please provide comprehensive, practical, and immediately usable course content. 
             }]
           });
 
+          console.log(`📥 API response received for image ${i + 1}`);
+          console.log('Response structure:', JSON.stringify({
+            hasCandidates: !!response.candidates,
+            candidatesLength: response.candidates?.length,
+            hasContent: !!response.candidates?.[0]?.content,
+            partsLength: response.candidates?.[0]?.content?.parts?.length
+          }));
+
           // 檢查是否有圖片生成
+          if (!response.candidates || !response.candidates[0]) {
+            console.error(`❌ No candidates in response for image ${i + 1}`);
+            continue;
+          }
+
           const imagePart = response.candidates[0].content.parts.find(part => part.inlineData);
           
           if (imagePart && imagePart.inlineData) {
@@ -305,9 +320,13 @@ Please provide comprehensive, practical, and immediately usable course content. 
               prompt: prompt,
               downloadUrl: `/api/download-image?path=${encodeURIComponent(imagePath)}`
             });
+          } else {
+            console.error(`❌ No inline image data found in response for image ${i + 1}`);
+            console.log('Parts:', JSON.stringify(response.candidates[0].content.parts));
           }
         } catch (imageError) {
           console.error(`❌ Failed to generate image ${i + 1}:`, imageError.message);
+          console.error('Full error:', imageError);
         }
       }
 
