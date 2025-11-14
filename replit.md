@@ -1,7 +1,7 @@
 # Googoogaga Multi-Platform Content Generator
 
 ## Overview
-The Googoogaga platform is an AI-powered content generation system designed for various industries including Fashion, Mother&Kids, and Art Toy. It leverages Google Gemini AI for intelligent product analysis and automated content creation tailored for multiple social media and e-commerce platforms (Shopee, TikTok, Instagram, Facebook). The project aims to streamline marketing content creation by offering multi-language support, interactive AI consultation, and customizable image generation, ultimately enhancing brand targeting and marketing efficiency across diverse consumer bases.
+The Googoogaga platform is an AI-powered content generation system designed for various industries including Fashion, Mother&Kids, and Art Toy. It leverages Google Gemini AI for intelligent product analysis and automated content creation tailored for multiple social media and e-commerce platforms (Shopee, TikTok, Instagram, Facebook). **NEW**: Now includes AI Course Editor Expert for educational content generation. The project aims to streamline marketing content creation by offering multi-language support, interactive AI consultation, and customizable image generation, ultimately enhancing brand targeting and marketing efficiency across diverse consumer bases.
 
 ## User Preferences
 - Language: Bilingual Vietnamese and Traditional Chinese
@@ -20,9 +20,9 @@ The project follows a client-server architecture:
 - **Routing**: API endpoints are managed in `/src/routes/` with specific routes for content generation, ad analysis, and chat interactions.
 - **Prompts**: AI prompt templates for various industries and marketing scenarios are stored in `/src/prompts/`.
 - **File Storage**: Uploaded product images are stored in `/assets/uploads/`.
-- **UI/UX**: Features a dual-page tab navigation system ("AI 圖片生成" and "AI 廣告顧問"), grid preview for multi-image uploads, and professional report output with PDF export functionality for ad analysis. All UI elements support dynamic language switching.
+- **UI/UX**: Features a three-page tab navigation system ("AI 圖片生成", "AI 廣告顧問", and "AI 課程編輯專家"), grid preview for multi-image uploads, and professional report output with PDF export functionality. All UI elements support dynamic language switching.
 - **Core Features**:
-    - **Multi-Language Support**: Traditional Chinese, English, Vietnamese with dynamic switching.
+    - **Multi-Language Support**: Traditional Chinese, English, Vietnamese with dynamic switching for all pages.
     - **Interactive AI Chat Advisor**: Continuous consultation with conversation history and file upload.
     - **Multi-Industry Support**: Fashion, Mother&Kids, Art Toy, Others with industry-specific AI prompts.
     - **Scenario Switching**: Quick platform switching without re-entering product information.
@@ -31,6 +31,7 @@ The project follows a client-server architecture:
     - **Smart Analysis**: AI-powered product recognition, pain point identification, and scenario suggestions.
     - **Automated Image Generation**: Customizable marketing scenario images with real product integration and automatic brand logo.
     - **Ad Analysis**: AI-powered analysis for ad campaigns across TikTok, Shopee, Meta, and Zalo, generating professional reports.
+    - **AI Course Editor Expert (NEW)**: Automated educational course content generation for ages 3-14 across multiple subjects (Social, Science, Math, Language, Art) with customizable teaching styles, multi-language support, and professional Word/PDF export capabilities.
 
 ## External Dependencies
 - **AI Services**: Google Gemini 2.5 Flash, Google Gemini 2.0 Flash Experimental
@@ -38,5 +39,6 @@ The project follows a client-server architecture:
 - **Middleware**: CORS, Multer (for file uploads), Dotenv (for environment variables)
 - **HTTP Client**: Axios
 - **Image Processing**: Sharp
-- **Scheduling**: Node-cron (though not explicitly detailed in functionality, listed as dependency)
+- **Document Generation**: docx (Word), pdfkit (PDF), html-docx-js (HTML to Word conversion)
+- **Scheduling**: Node-cron
 - **Deployment Environment**: Replit (requires specific port and host configurations)

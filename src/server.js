@@ -8,6 +8,8 @@ const GeminiAIService = require('./services/geminiAI');
 const ScenarioGeneratorService = require('./services/scenarioGenerator');
 const AdsAnalyzer = require('./services/adsAnalyzer');
 const ChatAdvisor = require('./services/chatAdvisor');
+const CourseGeneratorService = require('./services/courseGenerator');
+const DocumentExportService = require('./services/documentExport');
 const { PLATFORM_CONFIGS, CONTENT_TEMPLATES, BABY_TOY_CATEGORIES } = require('./schemas/platforms');
 
 dotenv.config();
@@ -17,6 +19,8 @@ const aiService = new GeminiAIService();
 const scenarioService = new ScenarioGeneratorService();
 const adsAnalyzer = new AdsAnalyzer();
 const chatAdvisor = new ChatAdvisor();
+const courseGenerator = new CourseGeneratorService(process.env.GEMINI_API_KEY);
+const documentExporter = new DocumentExportService();
 
 // Brand configuration from environment variables
 const ASSETS_BASE_URL = process.env.ASSETS_BASE_URL || '/brand';
@@ -106,7 +110,8 @@ app.get('/api/download-image', async (req, res) => {
     const baseDirs = {
       'assets/generated/': path.resolve(__dirname, '..', 'assets', 'generated'),
       'assets/scenarios/': path.resolve(__dirname, '..', 'assets', 'scenarios'),
-      'assets/uploads/': path.resolve(__dirname, '..', 'assets', 'uploads')
+      'assets/uploads/': path.resolve(__dirname, '..', 'assets', 'uploads'),
+      'assets/exports/': path.resolve(__dirname, '..', 'assets', 'exports')
     };
     
     // 驗證檔案路徑在允許的目錄內
@@ -826,6 +831,153 @@ const chatUpload = multer({
       cb(null, true);
     } else {
       cb(new Error('不支援的檔案格式'), false);
+    }
+  }
+});
+
+// API endpoint for generating course content
+app.post('/api/generate-course', async (req, res) => {
+  try {
+    console.log('📚 Generating course content...');
+    
+    const {
+      targetAge,
+      category,
+      topic,
+      duration,
+      style,
+      outputTypes,
+      language,
+      includeImages
+    } = req.body;
+
+    // Validate required fields
+    if (!targetAge || !category || !topic || !duration || !style || !outputTypes || !language) {
+      return res.status(400).json({ 
+        error: 'Missing required fields',
+        required: ['targetAge', 'category', 'topic', 'duration', 'style', 'outputTypes', 'language']
+      });
+    }
+
+    console.log(`📖 Course: ${topic} (${category}) for ages ${targetAge}`);
+    console.log(`⏱️  Duration: ${duration} minutes | Style: ${style}`);
+    console.log(`🌐 Language: ${language} | Images: ${includeImages}`);
+
+    // Generate course content
+    const courseData = await courseGenerator.generateCourseContent({
+      targetAge,
+      category,
+      topic,
+      duration,
+      style,
+      outputTypes: Array.isArray(outputTypes) ? outputTypes : [outputTypes],
+      language,
+      includeImages: includeImages || 'no'
+    });
+
+    console.log('✅ Course content generated successfully');
+
+    res.json({
+      success: true,
+      message: 'Course content generated successfully',
+      course: courseData
+    });
+
+  } catch (error) {
+    console.error('❌ Course generation error:', error);
+    res.status(500).json({ 
+      error: 'Course generation failed',
+      message: error.message 
+    });
+  }
+});
+
+// API endpoint for exporting course to Word/PDF
+app.post('/api/export-document', async (req, res) => {
+  try {
+    console.log('📄 Exporting course document...');
+    
+    const { courseData, format } = req.body;
+
+    if (!courseData || !format) {
+      return res.status(400).json({ 
+        error: 'Missing required fields',
+        required: ['courseData', 'format']
+      });
+    }
+
+    console.log(`📝 Exporting to ${format.toUpperCase()} format`);
+
+    let exportResult;
+
+    if (format === 'word') {
+      exportResult = await documentExporter.exportToWord(courseData);
+    } else if (format === 'pdf') {
+      exportResult = await documentExporter.exportToPDF(courseData);
+    } else {
+      return res.status(400).json({ 
+        error: 'Invalid format. Must be "word" or "pdf"' 
+      });
+    }
+
+    console.log(`✅ Document exported: ${exportResult.fileName}`);
+
+    res.json({
+      success: true,
+      message: `Course exported to ${format.toUpperCase()} successfully`,
+      ...exportResult
+    });
+
+  } catch (error) {
+    console.error('❌ Document export error:', error);
+    res.status(500).json({ 
+      error: 'Document export failed',
+      message: error.message 
+    });
+  }
+});
+
+// Safe document download endpoint
+app.get('/api/download-document', async (req, res) => {
+  try {
+    const { path: filePath } = req.query;
+    
+    if (!filePath || filePath === 'undefined') {
+      return res.status(400).json({ error: 'File path is required' });
+    }
+    
+    // Define safe base directory for course exports
+    const baseDir = path.resolve(__dirname, '..', 'assets', 'exports');
+    const resolvedFilePath = path.resolve(__dirname, '..', filePath);
+    
+    // Security check: ensure path is within allowed directory
+    if (!resolvedFilePath.startsWith(baseDir)) {
+      console.log('🚨 Forbidden file access attempt:', filePath);
+      console.log('📁 Resolved path:', resolvedFilePath);
+      console.log('📁 Expected base:', baseDir);
+      return res.status(403).json({ error: 'Access denied' });
+    }
+    
+    // Check if file exists
+    const fileExists = await fs.pathExists(resolvedFilePath);
+    if (!fileExists) {
+      return res.status(404).json({ error: 'File not found' });
+    }
+    
+    // Send file
+    res.download(resolvedFilePath, path.basename(resolvedFilePath), (err) => {
+      if (err) {
+        console.error('Download error:', err);
+        if (!res.headersSent) {
+          res.status(500).json({ error: 'Download failed' });
+        }
+      }
+    });
+    
+  } catch (error) {
+    console.error('❌ Document download error:', error);
+    if (!res.headersSent) {
+      res.status(500).json({ error: 'Download failed', message: error.message });
     }
   }
 });

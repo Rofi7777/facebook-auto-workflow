@@ -1,11 +1,11 @@
-const { GoogleGenerativeAI } = require('@google/genai');
+const { GoogleGenAI } = require('@google/genai');
 const path = require('path');
 const fs = require('fs-extra');
 
 class CourseGeneratorService {
   constructor(apiKey) {
     this.apiKey = apiKey;
-    this.ai = new GoogleGenerativeAI(apiKey);
+    this.ai = new GoogleGenAI({ apiKey: apiKey });
     this.primaryModel = 'gemini-2.5-flash';
     this.imageModel = 'gemini-2.5-flash-image-preview';
     console.log(`📚 CourseGenerator initialized with model: ${this.primaryModel}`);
