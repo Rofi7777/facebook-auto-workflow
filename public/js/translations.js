@@ -9,6 +9,7 @@ const translations = {
     // 分頁標籤
     'tab_image_generation': 'AI 圖片生成',
     'tab_ads_advisor': 'AI 廣告顧問',
+    'tab_course_editor': '課程編輯',
     
     // Page 1: AI 圖片生成
     'product_info_input': '產品資訊輸入',
@@ -155,6 +156,7 @@ const translations = {
     // 分頁標籤
     'tab_image_generation': 'AI Image Generation',
     'tab_ads_advisor': 'AI Ads Advisor',
+    'tab_course_editor': 'Course Editor',
     
     // Page 1: AI 圖片生成
     'product_info_input': 'Product Information Input',
@@ -301,6 +303,7 @@ const translations = {
     // 分頁標籤
     'tab_image_generation': 'Tạo hình ảnh AI',
     'tab_ads_advisor': 'Cố vấn quảng cáo AI',
+    'tab_course_editor': 'Chỉnh sửa khóa học',
     
     // Page 1: AI 圖片生成
     'product_info_input': 'Nhập thông tin sản phẩm',
