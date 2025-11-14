@@ -1,0 +1,158 @@
+🚀 PRD — AI 課程編輯專家（第三分頁 / rofiinternal.org）
+
+0. Overview
+
+本專案要在 https://rofiinternal.org/ 網站新增一個 第三分頁（Tab），提供「AI 課程編輯專家」功能。
+使用者透過多個下拉式選單，即可快速生成適合不同年齡層的課程內容，並下載成 Word 或 PDF。
+
+此工具為 免登入、免資料庫 的工具型 Web App。
+
+⸻
+
+1. Product Goals（產品目標）
+	1.	讓一般使用者可在 1–2 分鐘內生成完整的課程內容。
+	2.	支援多種課程格式（課綱、教案、故事、Worksheet、Slides）。
+	3.	自動根據年齡 + 科別生成適合的內容量。
+	4.	可選擇是否加入 AI 圖片（使用 Nano Banana）。
+	5.	使用者不需登入，直接「選 → 生成 → 下載」。
+
+⸻
+
+2. Core Features（核心功能）
+
+2.1 下拉選單（Dropdown Inputs）
+
+① 聽者年齡（Target Age）
+	•	3–5 歲
+	•	6–8 歲
+	•	9–11 歲
+	•	12–14 歲
+	•	自定義輸入框（數字）
+
+⸻
+
+② 科別（Category）
+	•	社會 Social
+	•	自然 Science
+	•	數學 Math
+	•	語文 Language
+	•	藝術 Art
+	•	自定義輸入
+
+⸻
+
+③ 主題（Topic）
+	•	採用 固定模板 + 自定義輸入
+	•	固定模板（依科別）：
+	•	社會：家庭、交通工具、社會角色、文化節日、安全教育
+	•	自然：動物、植物、地球、天氣、五感
+	•	數學：加法、減法、形狀、時間、度量
+	•	語文：字母、詞彙、聽說讀寫、短篇故事
+	•	藝術：顏色、線條、創作、音樂節奏
+	•	另外需有「自定義」選項（text input）
+
+⸻
+
+④ 課程時間（Duration）
+	•	30 分鐘
+	•	60 分鐘
+	•	90 分鐘
+	•	自定義（number input）
+
+時長用來決定「內容量」，而不是字數。
+
+⸻
+
+⑤ 課綱編排風格（Style）
+	•	故事引導式 Story-based
+	•	插畫繪本風 Picture-book
+	•	思辨式 Singapore-style
+	•	遊戲化 Gamified
+	•	Montessori 蒙式
+	•	自定義（text input）
+
+⸻
+
+⑥ 輸出格式（Output Type）→ 可多選（Checkbox）
+	•	課綱 Outline
+	•	教案 Lesson Plan
+	•	故事 Story-based Content
+	•	Worksheet 練習題
+	•	Slides（PPT / Video Script 文字版）
+
+⸻
+
+⑦ 語言（Language）→ 單選
+	•	中文
+	•	英文
+	•	越文
+	•	中英雙語
+	•	英越雙語
+	•	三語版（中英越）
+
+⸻
+
+⑧ 是否要圖片（Include Images）
+	•	是
+	•	否
+
+若是 → 使用 Nano Banana API 生成插圖 / Flashcards。
+
+⸻
+
+2.2 輸出（Output）
+
+生成後需支援：
+	•	Word (.docx)
+	•	PDF (.pdf)
+
+⸻
+
+3. System Architecture（系統架構要求）
+
+3.1 Front-end（前端）
+
+技術：
+	•	HTML + CSS + JS 或 你的現有框架（若網站用 Next.js / React 就沿用）
+	•	放置在 rofiinternal.org 第三個 Tab
+
+前端需要具備：
+	•	下拉選單表單
+	•	生成按鈕
+	•	Loading spinner
+	•	內容預覽區（可折疊）
+	•	下載 Word / PDF 按鈕
+	•	錯誤提示區
+
+⸻
+
+3.2 Backend（後端）
+
+可以使用 Replit 的自動後端框架（Flask / Node.js / Express 任一種）。
+
+後端功能：
+	1.	接收表單資料
+	2.	建立 prompt → 呼叫 LLM（OpenAI GPT-5 或 Gemini 或其他）
+	3.	若需要圖片 → 呼叫 Nano Banana API
+	4.	組裝成完整的文字內容
+	5.	產生 Word
+	6.	產生 PDF
+	7.	回傳檔案給前端
+4. Prompt Generation Rules（AI Prompt 規格）
+
+後端需要組合以下 prompt：
+
+① 課程內容需包含：
+	•	學習目標
+	•	課程流程
+	•	活動設計
+	•	情境故事（若使用故事風格）
+	•	提問引導問題
+	•	評量方式
+	•	家庭延伸活動
+	•	Worksheet（依科目自動決定題型）
+
+② 不同時長 → 不同內容量
+	•	30 分鐘：1–2 個活動
+	•	60 分鐘：2–3 個活動 + 小結
+	•	90 分鐘：3–4 個活動 + 小專案
