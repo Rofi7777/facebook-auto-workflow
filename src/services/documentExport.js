@@ -2,10 +2,26 @@ const { Document, Packer, Paragraph, TextRun, HeadingLevel, AlignmentType } = re
 const PDFDocument = require('pdfkit');
 const fs = require('fs-extra');
 const path = require('path');
+const { execSync } = require('child_process');
 
 class DocumentExportService {
   constructor() {
     console.log('📄 DocumentExportService initialized');
+    // 查找系統中的中文字體
+    this.chineseFont = this.findChineseFont();
+  }
+
+  // 查找系統中的中文字體
+  findChineseFont() {
+    // 使用項目內建的中文字體（OTF 格式）
+    const bundledFont = path.join(__dirname, '../../assets/fonts/SourceHanSansCN-Regular.otf');
+    if (fs.existsSync(bundledFont)) {
+      console.log('✅ Using bundled Chinese font (OTF):', bundledFont);
+      return bundledFont;
+    }
+    
+    console.warn('⚠️ No Chinese font found, Chinese characters may not display correctly');
+    return null;
   }
 
   // 導出為Word文檔
@@ -106,27 +122,34 @@ class DocumentExportService {
             bottom: 50,
             left: 50,
             right: 50
+          },
+          // 啟用 UTF-8 支持
+          info: {
+            Title: title,
+            Author: 'Googoogaga Course Generator'
           }
         });
 
         const stream = fs.createWriteStream(filePath);
         doc.pipe(stream);
 
+        // 設置中文字體（如果可用）
+        if (this.chineseFont) {
+          doc.font(this.chineseFont);
+        }
+
         // 標題
         doc.fontSize(20)
-           .font('Helvetica-Bold')
            .text(title, { align: 'center' });
         
         doc.moveDown(1);
 
         // 課程資訊區塊
         doc.fontSize(16)
-           .font('Helvetica-Bold')
            .text('課程資訊 Course Information');
         
         doc.moveDown(0.5);
-        doc.fontSize(12)
-           .font('Helvetica');
+        doc.fontSize(12);
 
         // 課程參數
         const infoLines = [
@@ -149,10 +172,30 @@ class DocumentExportService {
 
         // 課程內容
         doc.fontSize(16)
-           .font('Helvetica-Bold')
            .text('課程內容 Course Content');
         
         doc.moveDown(0.5);
+
+        // 嵌入課程圖片（如果有的話）
+        if (courseData.images && courseData.images.length > 0) {
+          doc.fontSize(14).text('課程插圖 Course Illustrations');
+          doc.moveDown(0.5);
+          
+          for (const image of courseData.images) {
+            try {
+              if (fs.existsSync(image.path)) {
+                doc.image(image.path, {
+                  fit: [450, 300],
+                  align: 'center'
+                });
+                doc.moveDown(0.5);
+              }
+            } catch (imgError) {
+              console.error('Failed to embed image:', imgError.message);
+            }
+          }
+          doc.moveDown(1);
+        }
 
         // 處理內容（分段、標題等）
         this.addContentToPDF(doc, content);
@@ -303,10 +346,9 @@ class DocumentExportService {
         
         doc.moveDown(0.5);
         doc.fontSize(fontSize)
-           .font('Helvetica-Bold')
            .text(text);
         doc.moveDown(0.3);
-        doc.fontSize(12).font('Helvetica');
+        doc.fontSize(12);
         continue;
       }
 
