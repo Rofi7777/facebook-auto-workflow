@@ -15,11 +15,12 @@ const { PLATFORM_CONFIGS, CONTENT_TEMPLATES, BABY_TOY_CATEGORIES } = require('./
 dotenv.config();
 
 // Initialize AI services
+const apiKey = process.env.GEMINI_API_KEY_NEW || process.env.GEMINI_API_KEY;
 const aiService = new GeminiAIService();
 const scenarioService = new ScenarioGeneratorService();
 const adsAnalyzer = new AdsAnalyzer();
 const chatAdvisor = new ChatAdvisor();
-const courseGenerator = new CourseGeneratorService(process.env.GEMINI_API_KEY);
+const courseGenerator = new CourseGeneratorService(apiKey);
 const documentExporter = new DocumentExportService();
 
 // Brand configuration from environment variables
