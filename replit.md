@@ -40,5 +40,17 @@ The project follows a client-server architecture:
 - **HTTP Client**: Axios
 - **Image Processing**: Sharp
 - **Document Generation**: docx (Word), pdfkit (PDF), html-docx-js (HTML to Word conversion)
+- **Font Support**: Source Han Sans OTF (16MB bundled) for proper CJK character rendering in PDF exports
+- **System Packages**: noto-fonts-cjk-sans, unzip
 - **Scheduling**: Node-cron
 - **Deployment Environment**: Replit (requires specific port and host configurations)
+
+## Recent Changes (November 14, 2025)
+### PDF Chinese Font Support Fix
+- **Issue**: PDF exports displayed Chinese characters as mojibake (����) due to missing CJK font support
+- **Solution**: 
+  - Downloaded genuine Source Han Sans CN Regular OTF font (16MB) from Adobe/jsDelivr CDN
+  - Bundled font in `assets/fonts/SourceHanSansCN-Regular.otf` for deployment reliability
+  - Modified `DocumentExportService` to load bundled OTF font before PDF text rendering
+  - Verified font signature (OTTO) and successful PDFKit integration
+- **Result**: All Traditional Chinese, Simplified Chinese, Japanese, and Korean characters now render correctly in exported PDFs
