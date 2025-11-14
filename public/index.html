@@ -1107,9 +1107,9 @@
                     <h2 class="panel-title">📚 <span data-i18n="course_parameters">課程參數設定</span></h2>
                     
                     <form id="courseForm">
-                        <!-- 1. 聽者年齡 -->
+                        <!-- 1. 目標年齡 -->
                         <div class="form-group">
-                            <label for="targetAge" data-i18n="target_age">聽者年齡 / Target Age</label>
+                            <label for="targetAge" data-i18n="target_age">目標年齡</label>
                             <select id="targetAge" name="targetAge" onchange="handleAgeChange()" required>
                                 <option value="3-5">3-5 歲</option>
                                 <option value="6-8">6-8 歲</option>
@@ -1120,9 +1120,9 @@
                             <input type="number" id="customAgeText" style="display: none; margin-top: 10px;" placeholder="請輸入年齡數字" min="1" max="18">
                         </div>
 
-                        <!-- 2. 科別 -->
+                        <!-- 2. 課程類別 -->
                         <div class="form-group">
-                            <label for="category" data-i18n="category">科別 / Category</label>
+                            <label for="category" data-i18n="category">課程類別</label>
                             <select id="category" name="category" onchange="updateTopicOptions(); handleCategoryChange()" required>
                                 <option value="social">社會 Social</option>
                                 <option value="science">自然 Science</option>
@@ -1134,9 +1134,9 @@
                             <input type="text" id="customCategoryText" style="display: none; margin-top: 10px;" placeholder="請輸入自定義科別">
                         </div>
 
-                        <!-- 3. 主題 -->
+                        <!-- 3. 課程主題 -->
                         <div class="form-group">
-                            <label for="topic" data-i18n="topic">主題 / Topic</label>
+                            <label for="topic" data-i18n="topic">課程主題</label>
                             <select id="topic" name="topic" onchange="handleTopicChange()" required>
                                 <option value="家庭">家庭</option>
                                 <option value="交通工具">交通工具</option>
@@ -1148,9 +1148,9 @@
                             <input type="text" id="customTopicText" style="display: none; margin-top: 10px;" placeholder="請輸入自定義主題">
                         </div>
 
-                        <!-- 4. 課程時間 -->
+                        <!-- 4. 課程時長 -->
                         <div class="form-group">
-                            <label for="duration" data-i18n="duration">課程時間 / Duration (minutes)</label>
+                            <label for="duration" data-i18n="duration">課程時長</label>
                             <select id="duration" name="duration" onchange="handleDurationChange()" required>
                                 <option value="30">30 分鐘</option>
                                 <option value="60">60 分鐘</option>
@@ -1160,9 +1160,9 @@
                             <input type="number" id="customDurationText" style="display: none; margin-top: 10px;" placeholder="請輸入時間 (分鐘)" min="10" max="240">
                         </div>
 
-                        <!-- 5. 課綱編排風格 -->
+                        <!-- 5. 教學風格 -->
                         <div class="form-group">
-                            <label for="style" data-i18n="style">課綱編排風格 / Style</label>
+                            <label for="style" data-i18n="style">教學風格</label>
                             <select id="style" name="style" onchange="handleStyleChange()" required>
                                 <option value="story-based">故事引導式 Story-based</option>
                                 <option value="picture-book">插畫繪本風 Picture-book</option>
@@ -1176,7 +1176,7 @@
 
                         <!-- 6. 輸出格式 (多選) -->
                         <div class="form-group">
-                            <label data-i18n="output_types">輸出格式 / Output Types (可多選)</label>
+                            <label data-i18n="output_types">輸出格式 (可多選)</label>
                             <div class="checkbox-group">
                                 <div class="checkbox-item">
                                     <input type="checkbox" id="outline" name="outputTypes" value="outline" checked>
@@ -1201,9 +1201,9 @@
                             </div>
                         </div>
 
-                        <!-- 7. 語言 -->
+                        <!-- 7. 內容語言 -->
                         <div class="form-group">
-                            <label for="courseLanguage" data-i18n="course_language">語言 / Language</label>
+                            <label for="courseLanguage" data-i18n="course_language">內容語言</label>
                             <select id="courseLanguage" name="courseLanguage" required>
                                 <option value="chinese">中文 Chinese</option>
                                 <option value="english">英文 English</option>
@@ -1214,9 +1214,9 @@
                             </select>
                         </div>
 
-                        <!-- 8. 是否要圖片 -->
+                        <!-- 8. AI 插圖生成 -->
                         <div class="form-group">
-                            <label for="includeImages" data-i18n="include_images">是否要圖片 / Include Images</label>
+                            <label for="includeImages" data-i18n="include_images">AI 插圖生成</label>
                             <select id="includeImages" name="includeImages" required>
                                 <option value="yes">是 Yes (使用 Nano Banana)</option>
                                 <option value="no" selected>否 No</option>
@@ -1225,7 +1225,7 @@
 
                         <!-- 生成按鈕 -->
                         <button type="button" class="btn" id="generateCourseBtn" onclick="generateCourse()">
-                            🎓 生成課程 Generate Course
+                            🎓 <span data-i18n="generate_course_btn">生成課程內容</span>
                         </button>
                     </form>
                 </div>
@@ -1243,10 +1243,10 @@
                     <!-- 下載按鈕區域 -->
                     <div id="downloadActions" style="display: none; margin-top: 20px; text-align: center; gap: 10px;">
                         <button class="btn" onclick="downloadWord()" style="background: #2b579a;">
-                            📄 Download Word
+                            📄 <span data-i18n="download_word">下載 Word</span>
                         </button>
                         <button class="btn" onclick="downloadPDF()" style="background: #d32f2f;">
-                            📕 Download PDF
+                            📕 <span data-i18n="download_pdf">下載 PDF</span>
                         </button>
                     </div>
 

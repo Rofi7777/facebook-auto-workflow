@@ -11,6 +11,21 @@ const translations = {
     'tab_ads_advisor': 'AI 廣告顧問',
     'tab_course_editor': '課程編輯',
     
+    // Page 3: AI 課程編輯專家
+    'course_parameters': '課程參數設定',
+    'target_age': '目標年齡',
+    'category': '課程類別',
+    'topic': '課程主題',
+    'duration': '課程時長',
+    'style': '教學風格',
+    'output_types': '輸出格式 (可多選)',
+    'course_language': '內容語言',
+    'include_images': 'AI 插圖生成',
+    'course_preview': '課程內容預覽',
+    'generate_course_btn': '生成課程內容',
+    'download_word': '下載 Word',
+    'download_pdf': '下載 PDF',
+    
     // Page 1: AI 圖片生成
     'product_info_input': '產品資訊輸入',
     'industry_category': '產業類別 / Industry Category',
@@ -158,7 +173,22 @@ const translations = {
     'tab_ads_advisor': 'AI Ads Advisor',
     'tab_course_editor': 'Course Editor',
     
-    // Page 1: AI 圖片生成
+    // Page 3: AI Course Editor
+    'course_parameters': 'Course Parameters',
+    'target_age': 'Target Age',
+    'category': 'Category',
+    'topic': 'Topic',
+    'duration': 'Duration',
+    'style': 'Teaching Style',
+    'output_types': 'Output Types (Multi-select)',
+    'course_language': 'Content Language',
+    'include_images': 'AI Illustrations',
+    'course_preview': 'Course Content Preview',
+    'generate_course_btn': 'Generate Course',
+    'download_word': 'Download Word',
+    'download_pdf': 'Download PDF',
+    
+    // Page 1: AI Image Generation
     'product_info_input': 'Product Information Input',
     'industry_category': 'Industry Category',
     'product_name': 'Product Name',
@@ -305,7 +335,22 @@ const translations = {
     'tab_ads_advisor': 'Cố vấn quảng cáo AI',
     'tab_course_editor': 'Chỉnh sửa khóa học',
     
-    // Page 1: AI 圖片生成
+    // Page 3: AI Course Editor
+    'course_parameters': 'Tham số khóa học',
+    'target_age': 'Độ tuổi mục tiêu',
+    'category': 'Danh mục khóa học',
+    'topic': 'Chủ đề khóa học',
+    'duration': 'Thời lượng khóa học',
+    'style': 'Phong cách giảng dạy',
+    'output_types': 'Định dạng đầu ra (Nhiều lựa chọn)',
+    'course_language': 'Ngôn ngữ nội dung',
+    'include_images': 'Minh họa AI',
+    'course_preview': 'Xem trước nội dung khóa học',
+    'generate_course_btn': 'Tạo nội dung khóa học',
+    'download_word': 'Tải Word',
+    'download_pdf': 'Tải PDF',
+    
+    // Page 1: Tạo hình ảnh AI
     'product_info_input': 'Nhập thông tin sản phẩm',
     'industry_category': 'Danh mục ngành',
     'product_name': 'Tên sản phẩm',
