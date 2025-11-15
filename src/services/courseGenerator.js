@@ -7,7 +7,7 @@ class CourseGeneratorService {
     this.apiKey = apiKey;
     this.ai = new GoogleGenAI({ apiKey: apiKey });
     this.primaryModel = 'gemini-2.5-flash';
-    this.imageModel = 'gemini-2.5-flash-image'; // Nano Banana 圖片生成模型
+    this.imageModel = 'gemini-2.5-flash-image-preview'; // Nano Banana 圖片生成模型（與Tab 1一致）
     console.log(`📚 CourseGenerator initialized with model: ${this.primaryModel}`);
     console.log(`🎨 Image generation model: ${this.imageModel}`);
   }
@@ -287,7 +287,11 @@ Please provide comprehensive, practical, and immediately usable course content. 
             contents: [{ 
               role: 'user', 
               parts: [{ text: prompt }] 
-            }]
+            }],
+            generationConfig: {
+              responseMimeType: 'image/png',
+              maxOutputTokens: 2048
+            }
           });
 
           console.log(`📥 API response received for image ${i + 1}`);
