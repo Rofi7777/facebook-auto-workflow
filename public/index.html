@@ -2836,23 +2836,31 @@
         function displayCourseContent(course) {
             const preview = document.getElementById('coursePreview');
             
+            console.log('📊 Course data:', course);
+            console.log('🎨 Images data:', course.images);
+            
             // 將Markdown格式的內容轉換為HTML顯示
             const contentHTML = formatCourseContent(course.content);
             
             // 準備圖片HTML（如果有的話）
             let imagesHTML = '';
             if (course.images && course.images.length > 0) {
+                console.log(`✅ Found ${course.images.length} images`);
                 imagesHTML = '<div style="margin: 20px 0;"><h3 style="color: #444; margin-bottom: 15px;">🎨 AI 生成插圖</h3>';
                 course.images.forEach((img, index) => {
+                    console.log(`Image ${index + 1}:`, img.downloadUrl);
                     imagesHTML += `
                         <div style="margin: 15px 0; text-align: center;">
                             <img src="${img.downloadUrl}" alt="課程插圖 ${index + 1}" 
-                                 style="max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);" />
+                                 style="max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);" 
+                                 onerror="console.error('Failed to load image:', '${img.downloadUrl}')" />
                             <p style="color: #666; font-size: 12px; margin-top: 5px;">插圖 ${index + 1}</p>
                         </div>
                     `;
                 });
                 imagesHTML += '</div>';
+            } else {
+                console.warn('❌ No images found in course data');
             }
             
             preview.innerHTML = `
