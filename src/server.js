@@ -112,7 +112,8 @@ app.get('/api/download-image', async (req, res) => {
       'assets/generated/': path.resolve(__dirname, '..', 'assets', 'generated'),
       'assets/scenarios/': path.resolve(__dirname, '..', 'assets', 'scenarios'),
       'assets/uploads/': path.resolve(__dirname, '..', 'assets', 'uploads'),
-      'assets/exports/': path.resolve(__dirname, '..', 'assets', 'exports')
+      'assets/exports/': path.resolve(__dirname, '..', 'assets', 'exports'),
+      'assets/courses/': path.resolve(__dirname, '..', 'assets', 'courses')
     };
     
     // 驗證檔案路徑在允許的目錄內
