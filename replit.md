@@ -14,7 +14,7 @@ The Googoogaga platform is an AI-powered content generation system designed for 
 The project follows a client-server architecture:
 - **Frontend**: Responsive web interface built with HTML, CSS, and JavaScript, served from the `/public` directory. It features a baby-friendly design, multi-language switching, and an interactive chat window.
 - **Backend**: An Express.js server (`/src/server.js`) handling API requests, file uploads, and integrating with AI services. It supports bilingual content generation and intelligent ad analysis.
-- **AI Integration**: Utilizes Google Gemini 3 Pro Preview for advanced text reasoning and prompt optimization, with Gemini 3 Pro Image Preview for high-quality image generation. Fallback models include Gemini 2.5 Flash and 2.0 Flash Experimental. Used for product analysis, pain point identification, scenario suggestions, ad analysis, and educational content generation. AI responses are language-aware.
+- **AI Integration**: Utilizes Google Gemini 3 Pro Preview for advanced text reasoning and prompt optimization, with Gemini 2.5 Flash Image Preview for stable image generation. Fallback models include Gemini 2.5 Flash and 2.0 Flash Experimental. Used for product analysis, pain point identification, scenario suggestions, ad analysis, and educational content generation. AI responses are language-aware.
 - **Image Processing**: Incorporates Sharp library for high-quality image manipulation, including automatic Googoogaga logo overlay with transparent backgrounds and customizable image generation based on user input for model nationality, combination, and scene location.
 - **Data Structures**: TypeScript schemas and interfaces in `/src/schemas/` define data contracts.
 - **Routing**: API endpoints are managed in `/src/routes/` with specific routes for content generation, ad analysis, and chat interactions.
@@ -34,7 +34,7 @@ The project follows a client-server architecture:
     - **AI Course Editor Expert (NEW)**: Automated educational course content generation for ages 3-14 across multiple subjects (Social, Science, Math, Language, Art) with customizable teaching styles, multi-language support, and professional Word/PDF export capabilities.
 
 ## External Dependencies
-- **AI Services**: Google Gemini 3 Pro Preview (text reasoning), Google Gemini 3 Pro Image Preview (image generation), Google Gemini 2.5 Flash (fallback), Google Gemini 2.0 Flash Experimental (legacy)
+- **AI Services**: Google Gemini 3 Pro Preview (text reasoning), Google Gemini 2.5 Flash Image Preview (image generation), Google Gemini 2.5 Flash (fallback), Google Gemini 2.0 Flash Experimental (legacy)
 - **Web Framework**: Express.js
 - **Middleware**: CORS, Multer (for file uploads), Dotenv (for environment variables)
 - **HTTP Client**: Axios
@@ -48,23 +48,23 @@ The project follows a client-server architecture:
 ## Recent Changes
 
 ### AI Model Upgrade to Gemini 3 Pro (November 23, 2025)
-- **Upgrade Scope**: Complete platform-wide AI model upgrade across all tabs and services
-- **Text Reasoning Models Upgraded**:
+- **Upgrade Scope**: Platform-wide AI model upgrade with hybrid configuration
+- **Text Reasoning Models Upgraded** ✅:
   - `geminiAI.js`: gemini-2.5-flash → **gemini-3-pro-preview**
   - `scenarioGenerator.js` (Tab 1): gemini-2.5-flash → **gemini-3-pro-preview**
   - `adsAnalyzer.js` (Tab 2): gemini-2.5-flash → **gemini-3-pro-preview**
   - `chatAdvisor.js`: gemini-2.5-flash → **gemini-3-pro-preview**
   - `courseGenerator.js` (Tab 3): gemini-2.5-flash → **gemini-3-pro-preview**
-- **Image Generation Models Upgraded**:
-  - `geminiAI.js`: gemini-2.5-flash-image-preview → **gemini-3-pro-image-preview**
-  - `scenarioGenerator.js` (Tab 1): gemini-2.5-flash-image-preview → **gemini-3-pro-image-preview**
-  - `courseGenerator.js` (Tab 3): gemini-2.5-flash-image-preview → **gemini-3-pro-image-preview**
+- **Image Generation Models** ⚠️:
+  - **Status**: Kept at **gemini-2.5-flash-image-preview** (stable Replit-supported model)
+  - **Reason**: gemini-3-pro-image-preview is not supported by Replit AI Integrations
+  - **Decision**: Use stable 2.5 Flash Image model for reliable image generation
 - **Benefits**:
-  - Enhanced text reasoning and response quality across all AI-powered features
-  - Improved image generation quality with more accurate visual representations
-  - Better multi-language understanding and content generation
-  - More sophisticated prompt optimization and analysis capabilities
-- **Fallback Strategy**: Maintained backward compatibility with Gemini 2.5 Flash and 2.0 Flash Experimental as fallback models
+  - ✅ Enhanced text reasoning and response quality across all AI-powered features
+  - ✅ Better multi-language understanding and content generation
+  - ✅ More sophisticated prompt optimization and analysis capabilities
+  - ✅ Stable and reliable image generation with proven 2.5 Flash Image model
+- **Fallback Strategy**: Text models use gemini-2.5-flash and gemini-2.0-flash-exp as fallbacks
 
 ### PDF Chinese Font Support Fix (November 14, 2025)
 - **Issue**: PDF exports displayed Chinese characters as mojibake (����) due to missing CJK font support
