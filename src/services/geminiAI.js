@@ -911,10 +911,10 @@ Style: Professional product photography, warm family moments, high-quality visua
 
       // 使用正確的圖片生成模型
       try {
-        console.log('🎨 Attempting real image generation with gemini-3-pro-image-preview...');
+        console.log('🎨 Attempting real image generation with gemini-2.5-flash-image-preview...');
         
         const response = await this.ai.models.generateContent({
-          model: "gemini-3-pro-image-preview",
+          model: "gemini-2.5-flash-image-preview",
           contents: [{ 
             role: 'user', 
             parts: contentParts 
