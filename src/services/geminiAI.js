@@ -29,9 +29,9 @@ class GeminiAIService {
     
     // Model configuration with auto-update capability
     this.modelConfig = {
-      primary: "gemini-2.5-flash",        // Latest stable model as requested
-      fallback: "gemini-2.0-flash-exp",   // Experimental fallback  
-      legacy: "gemini-1.5-flash"          // Legacy support (if needed)
+      primary: "gemini-3-pro-preview",    // Upgraded to Gemini 3 Pro for advanced text reasoning
+      fallback: "gemini-2.5-flash",       // Fallback to stable 2.5 Flash  
+      legacy: "gemini-2.0-flash-exp"      // Legacy support (if needed)
     };
     
     console.log(`🚀 Model Config: Primary=${this.modelConfig.primary}, Fallback=${this.modelConfig.fallback}`);
@@ -911,10 +911,10 @@ Style: Professional product photography, warm family moments, high-quality visua
 
       // 使用正確的圖片生成模型
       try {
-        console.log('🎨 Attempting real image generation with gemini-2.5-flash-image-preview...');
+        console.log('🎨 Attempting real image generation with gemini-3-pro-image-preview...');
         
         const response = await this.ai.models.generateContent({
-          model: "gemini-2.5-flash-image-preview",
+          model: "gemini-3-pro-image-preview",
           contents: [{ 
             role: 'user', 
             parts: contentParts 

@@ -14,8 +14,8 @@ class AdsAnalyzer {
     
     this.apiKey = apiKey;
     this.ai = new GoogleGenAI({ apiKey: apiKey });
-    this.modelName = 'gemini-2.5-flash'; // Primary model
-    this.fallbackModel = 'gemini-2.0-flash-exp'; // Fallback model
+    this.modelName = 'gemini-3-pro-preview'; // Upgraded to Gemini 3 Pro for advanced text reasoning
+    this.fallbackModel = 'gemini-2.5-flash'; // Fallback model
     
     console.log('🚀 AdsAnalyzer initialized with model:', this.modelName);
     console.log('✅ AdsAnalyzer service initialized successfully');

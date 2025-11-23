@@ -13,7 +13,7 @@ class ChatAdvisor {
     
     this.apiKey = apiKey;
     this.ai = new GoogleGenAI({ apiKey: apiKey });
-    this.modelName = 'gemini-2.5-flash';
+    this.modelName = 'gemini-3-pro-preview'; // Upgraded to Gemini 3 Pro for advanced text reasoning
     
     console.log('🗨️  ChatAdvisor initialized with model:', this.modelName);
     console.log('✅ ChatAdvisor service initialized successfully');

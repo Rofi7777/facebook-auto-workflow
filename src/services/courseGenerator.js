@@ -6,8 +6,8 @@ class CourseGeneratorService {
   constructor(apiKey) {
     this.apiKey = apiKey;
     this.ai = new GoogleGenAI({ apiKey: apiKey });
-    this.primaryModel = 'gemini-2.5-flash';
-    this.imageModel = 'gemini-2.5-flash-image-preview'; // Nano Banana 圖片生成模型（與Tab 1一致）
+    this.primaryModel = 'gemini-3-pro-preview'; // Upgraded to Gemini 3 Pro for advanced text reasoning
+    this.imageModel = 'gemini-3-pro-image-preview'; // Upgraded to Gemini 3 Pro Image for advanced image generation
     console.log(`📚 CourseGenerator initialized with model: ${this.primaryModel}`);
     console.log(`🎨 Image generation model: ${this.imageModel}`);
   }
