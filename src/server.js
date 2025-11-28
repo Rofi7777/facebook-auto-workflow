@@ -1159,6 +1159,8 @@ ${context || '無額外描述'}
 請直接輸出完整的 System Prompt，不需要額外的說明或前言。`;
       
     } else if (mode === 'image') {
+      const { imageModel, customModelName } = req.body;
+      
       const styleLabels = {
         'photorealistic': 'photorealistic, ultra-realistic, photograph',
         'anime': 'anime style, manga art, Japanese animation',
@@ -1179,35 +1181,111 @@ ${context || '無額外描述'}
         '3:2': '--ar 3:2'
       };
       
-      systemPrompt = `你是一位專業的 AI 繪圖提示詞工程師，精通 Midjourney、DALL-E 和 Stable Diffusion 的提示詞優化。
+      const targetModel = imageModel || 'midjourney';
+      const modelName = targetModel === 'custom' ? customModelName : targetModel;
+      
+      const platformPromptGuides = {
+        'nanobanana': `【Nano Banana / FLUX 專用提示詞格式】
+Nano Banana 使用 FLUX 模型，特點：
+- 支援自然語言描述，不需要特殊參數格式
+- 擅長理解複雜場景和細節描述
+- 支援中英文混合提示詞
+- 重視光影和材質的描述
 
-用戶想要生成的畫面描述：
-${input}
+輸出格式要求：
+1. 使用流暢的自然語言描述（可中英混合）
+2. 詳細描述場景、主體、光線、氛圍
+3. 包含材質、質感、色調描述
+4. 無需添加特殊參數符號
 
-選擇的藝術風格：${styleLabels[style] || style}
-畫面比例：${ratio}
-品質標籤：${(qualityTags || []).join(', ')}
+範例格式：
+【FLUX Prompt】
+(自然語言描述的完整提示詞)
 
-請生成一個專業的繪圖提示詞（Prompt），需要滿足以下要求：
+【場景細節補充】
+(可選：額外的細節建議)`,
 
-1. 使用英文輸出（Midjourney 標準格式）
-2. 包含主題描述、風格關鍵字、光影效果、構圖指示
-3. 添加適當的品質標籤（如 masterpiece, best quality, highly detailed）
-4. 包含相機/鏡頭參數（如適用）
-5. 添加否定提示詞（Negative Prompt）
-6. 在結尾添加比例參數 ${ratioLabels[ratio] || ''}
+        'gpt': `【GPT / DALL-E 3 專用提示詞格式】
+DALL-E 3 特點：
+- 支援自然語言對話式描述
+- 理解能力強，可處理複雜抽象概念
+- 傾向寫實風格，對細節描述敏感
+- 支援情緒、氛圍的文字描述
+
+輸出格式要求：
+1. 使用完整的英文句子描述
+2. 包含主體、場景、風格、光線、視角
+3. 可加入情緒和故事性描述
+4. 明確指定藝術風格（如 digital art, oil painting 等）
+
+範例格式：
+【DALL-E 3 Prompt】
+A detailed description in natural language...
+
+【風格建議】
+Recommended artistic style specifications`,
+
+        'midjourney': `【Midjourney 專用提示詞格式】
+Midjourney 特點：
+- 使用逗號分隔的關鍵字堆疊
+- 支援特殊參數（--ar, --q, --s, --v 等）
+- 權重語法 (word::weight)
+- 支援負面提示詞 --no
+
+輸出格式要求：
+1. 使用英文關鍵字，逗號分隔
+2. 包含主題、風格、光影、品質標籤
+3. 添加 Midjourney 專屬參數
+4. 包含負面提示詞
+
+範例格式：
+【Positive Prompt】
+subject description, style keywords, lighting, quality tags ${ratioLabels[ratio] || ''} --q 2 --s 750
+
+【Negative Prompt / --no】
+unwanted elements
+
+【完整指令】
+/imagine prompt: (完整可複製的 MJ 指令)`,
+
+        'custom': `【${customModelName} 專用提示詞格式】
+針對自定義平台 "${customModelName}" 優化提示詞。
+
+請根據您對該平台的了解，生成最適合的提示詞格式：
+1. 分析該平台可能的提示詞偏好
+2. 提供通用的高品質提示詞結構
+3. 包含正向和負向提示詞
+4. 建議可能適用的參數
 
 輸出格式：
-【正向提示詞 Positive Prompt】
-(英文提示詞內容)
+【${customModelName} Prompt】
+(優化後的提示詞)
 
-【負向提示詞 Negative Prompt】  
-(避免出現的元素)
+【負向提示詞】
+(需避免的元素)
 
-【建議參數】
-(Midjourney 參數如 --q 2 --s 750 等)
+【參數建議】
+(可能適用的參數)`
+      };
 
-請直接輸出可複製使用的內容。`;
+      systemPrompt = `你是一位專業的 AI 繪圖提示詞工程師，精通各種 AI 繪圖平台的提示詞優化技術。
+
+【目標平台】${modelName === 'nanobanana' ? 'Nano Banana (FLUX)' : modelName === 'gpt' ? 'GPT (DALL-E 3)' : modelName === 'midjourney' ? 'Midjourney' : modelName}
+
+【用戶想要生成的畫面】
+${input}
+
+【選擇的藝術風格】${styleLabels[style] || style}
+【畫面比例】${ratio}
+【品質標籤】${(qualityTags || []).join(', ')}
+
+${platformPromptGuides[targetModel] || platformPromptGuides['custom']}
+
+===== 重要指示 =====
+1. 嚴格按照目標平台的格式要求輸出
+2. 確保提示詞能在該平台上獲得最佳效果
+3. 包含專業的光影、構圖、細節描述
+4. 直接輸出可複製使用的內容，無需額外說明`;
     }
     
     if (!systemPrompt) {

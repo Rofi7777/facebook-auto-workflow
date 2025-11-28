@@ -51,6 +51,17 @@ The project follows a client-server architecture:
 
 ## Recent Changes
 
+### Visual Image Mode - Multi-Platform Image Model Support (November 28, 2025)
+- **New Feature**: Added target image model dropdown in Visual Image mode
+- **Platform Support**: 
+  - **Nano Banana (FLUX)**: Natural language prompts, supports Chinese/English mix, emphasis on lighting and material descriptions
+  - **GPT (DALL-E 3)**: Complete English sentence descriptions, supports emotional and narrative elements
+  - **Midjourney (MJ)**: Keyword-based prompts with --ar, --q, --s, --v parameters and negative prompts
+  - **Custom**: User-defined platform with AI-generated optimized format
+- **Platform-Specific Output**: Each platform generates unique prompt format optimized for that AI model
+- **UI Enhancement**: Toggle for custom model input when "Custom" is selected
+- **Multi-Language Support**: Full i18n for zh-TW, en, vi translations
+
 ### BizPrompt Architect Pro - AI-Powered Deep Prompt Generation (November 28, 2025)
 - **Major Enhancement**: Business Consultant Mode now uses Gemini 3 Pro for deep AI-powered prompt generation instead of simple string templates
 - **Professional Meta-Prompt System**: 

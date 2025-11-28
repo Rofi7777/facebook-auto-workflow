@@ -1378,13 +1378,25 @@
                     <div id="imageMode" class="prompt-mode" style="display: none;">
                         <form id="imagePromptForm">
                             <div class="form-group">
-                                <label for="imageInput">🎨 描述您想生成的畫面</label>
-                                <p style="color: #888; font-size: 13px; margin-bottom: 10px;">例如：「太空中的貓」、「日落時分的海邊咖啡廳」、「未來城市的霓虹街景」</p>
-                                <textarea id="imageInput" rows="5" placeholder="用自然語言描述您想要的畫面..." style="width: 100%; padding: 15px; border: 2px solid #ddd; border-radius: 8px; font-size: 14px; resize: vertical;"></textarea>
+                                <label for="imageInput" data-i18n="img_desc_label">🎨 描述您想生成的畫面</label>
+                                <p style="color: #888; font-size: 13px; margin-bottom: 10px;" data-i18n="img_desc_hint">例如：「太空中的貓」、「日落時分的海邊咖啡廳」、「未來城市的霓虹街景」</p>
+                                <textarea id="imageInput" rows="5" data-i18n-placeholder="img_desc_placeholder" placeholder="用自然語言描述您想要的畫面..." style="width: 100%; padding: 15px; border: 2px solid #ddd; border-radius: 8px; font-size: 14px; resize: vertical;"></textarea>
                             </div>
 
                             <div class="form-group">
-                                <label for="imageStyle">🖼️ 藝術風格</label>
+                                <label for="imageModel" data-i18n="img_model_label">🤖 目標圖像模型</label>
+                                <p style="color: #888; font-size: 13px; margin-bottom: 10px;" data-i18n="img_model_hint">選擇您要使用的 AI 繪圖平台，系統會生成該平台專屬格式的提示詞</p>
+                                <select id="imageModel" style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 8px; font-size: 14px;" onchange="toggleCustomModelInput()">
+                                    <option value="nanobanana" data-i18n="img_model_nanobanana">Nano Banana (FLUX)</option>
+                                    <option value="gpt" data-i18n="img_model_gpt">GPT (DALL-E 3)</option>
+                                    <option value="midjourney" data-i18n="img_model_mj">Midjourney (MJ)</option>
+                                    <option value="custom" data-i18n="img_model_custom">自定義 Custom</option>
+                                </select>
+                                <input type="text" id="customModelName" data-i18n-placeholder="img_model_custom_placeholder" placeholder="輸入自定義模型名稱或平台..." style="display: none; margin-top: 10px; width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 8px; font-size: 14px;">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="imageStyle" data-i18n="img_style_label">🖼️ 藝術風格</label>
                                 <select id="imageStyle" style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 8px; font-size: 14px;">
                                     <option value="photorealistic">寫實攝影 Photorealistic</option>
                                     <option value="anime">動漫風格 Anime</option>
@@ -4228,12 +4240,24 @@
         }
 
         // 生成視覺繪圖 Prompt (調用 AI)
+        function toggleCustomModelInput() {
+            const modelSelect = document.getElementById('imageModel');
+            const customInput = document.getElementById('customModelName');
+            if (modelSelect.value === 'custom') {
+                customInput.style.display = 'block';
+            } else {
+                customInput.style.display = 'none';
+                customInput.value = '';
+            }
+        }
+
         async function generateImagePrompt() {
             const input = document.getElementById('imageInput').value;
             const style = document.getElementById('imageStyle').value;
             const ratio = document.getElementById('imageRatio').value;
+            const imageModel = document.getElementById('imageModel').value;
+            const customModelName = document.getElementById('customModelName')?.value || '';
             
-            // 收集品質標籤
             const qualityTags = [];
             if (document.getElementById('imgQualityHD')?.checked) qualityTags.push('HD');
             if (document.getElementById('imgQuality8K')?.checked) qualityTags.push('8K');
@@ -4245,9 +4269,21 @@
                 return;
             }
 
+            if (imageModel === 'custom' && !customModelName.trim()) {
+                showPromptStatus('請輸入自定義模型名稱', 'error');
+                return;
+            }
+
             const btn = document.getElementById('imageGenerateBtn');
             btn.disabled = true;
             btn.innerHTML = '🔄 AI 處理中...';
+
+            const modelNames = {
+                'nanobanana': 'Nano Banana (FLUX)',
+                'gpt': 'GPT (DALL-E 3)',
+                'midjourney': 'Midjourney',
+                'custom': customModelName
+            };
 
             try {
                 const response = await fetch('/api/refine-prompt', {
@@ -4258,7 +4294,9 @@
                         input: input,
                         style: style,
                         ratio: ratio,
-                        qualityTags: qualityTags
+                        qualityTags: qualityTags,
+                        imageModel: imageModel,
+                        customModelName: customModelName
                     })
                 });
 
@@ -4270,7 +4308,7 @@
 
                 currentGeneratedPrompt = data.refinedPrompt;
                 displayPromptResult(currentGeneratedPrompt);
-                showPromptStatus('✅ 繪圖指令已生成！可複製使用於 Midjourney / DALL-E / Stable Diffusion', 'success');
+                showPromptStatus(`✅ ${modelNames[imageModel]} 專用繪圖指令已生成！`, 'success');
 
             } catch (error) {
                 console.error('Image prompt error:', error);
