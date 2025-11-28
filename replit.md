@@ -51,6 +51,26 @@ The project follows a client-server architecture:
 
 ## Recent Changes
 
+### BizPrompt Architect Pro - Major Expansion (November 28, 2025)
+- **Comprehensive 4-Level Cascading System**: Expanded business consultant mode with 8 domains, 40+ industries, 207 roles, and corresponding frameworks
+- **User-Specific Industries Integrated**:
+  - Fashion/Footwear/Accessories across E-commerce, Product, and Design domains
+  - Mother & Baby across E-commerce, Product, and Design domains
+  - Pet Industry across E-commerce and Product domains
+  - Art Toy (Popmart) across E-commerce, Product, and Design domains
+- **Domain Coverage (8 Total)**:
+  - E-commerce Operations (TikTok Shop, Shopee, FB Marketplace, Fashion, Mother&Baby, Pet, Art Toy)
+  - Marketing (SEO/GEO, Social, Performance, Brand, Content)
+  - Product Management (Fashion, Baby, Pet, Toy, Tech Products)
+  - Product Design (Industrial, Fashion, Toy, UX/UI, Graphic)
+  - Software Development (Vibe Coding, Web, Mobile, AI/ML, E-commerce)
+  - Strategy (E-com, Brand, Growth, Consulting, Startup)
+  - Finance (E-com, Corporate, Accounting, Investment, Business)
+  - Human Resources (Talent, OD, Compensation, Learning, HR Tech)
+- **Role Framework System**: 207 unique roles, each with 5+ professional frameworks plus custom option
+- **Custom Input Support**: Full custom input support at all 4 levels (L1/L2/L3/L4)
+- **Complete Translation Coverage**: All domains, industries, and roles translated in zh-TW, en, vi
+
 ### BizPrompt Architect Pro - New Tab 4 (November 28, 2025)
 - **New Feature**: Added 4th tab "AI 指令架構師" (BizPrompt Architect Pro) to the platform
 - **Three-Mode System**:
