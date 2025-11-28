@@ -51,6 +51,18 @@ The project follows a client-server architecture:
 
 ## Recent Changes
 
+### BizPrompt Architect Pro - AI-Powered Deep Prompt Generation (November 28, 2025)
+- **Major Enhancement**: Business Consultant Mode now uses Gemini 3 Pro for deep AI-powered prompt generation instead of simple string templates
+- **Professional Meta-Prompt System**: 
+  - 🎯 System Role: Generates 10+ years experience professional profiles with 5-8 required skills
+  - 📌 Expected Outputs: 5-7 specific work items with sub-tasks and deliverables
+  - 🧠 Analysis Framework: 4-6 structured analysis dimensions tailored to selected framework
+  - 🗣️ Tone & Style: Professional communication guidelines
+  - 📥 Required User Inputs: 5-7 key questions for AI to gather context
+- **Reference Quality**: Outputs match professional-level prompts like the "越南母嬰市場商業顧問 × Nuby 品牌 MD" example
+- **Async UI Flow**: Added loading states, error handling, and proper button state management
+- **API Enhancement**: `/api/refine-prompt` now handles 'business' mode with sophisticated meta-prompt
+
 ### BizPrompt Architect Pro - Complete Framework Translation (November 28, 2025)
 - **Framework Translation System**: Added comprehensive multi-language translation for all L4 frameworks
 - **Translation Coverage**: 1254 unique frameworks × 3 languages = 3762+ translations
