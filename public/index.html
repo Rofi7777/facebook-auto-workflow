@@ -4088,8 +4088,8 @@
             }
         }
 
-        // 生成商業 Prompt
-        function generateBusinessPrompt() {
+        // 生成商業 Prompt (使用 AI 深度生成)
+        async function generateBusinessPrompt() {
             const domainValue = document.getElementById('bizDomain').value;
             const industryValue = document.getElementById('bizIndustry').value;
             const roleValue = document.getElementById('bizRole').value;
@@ -4127,7 +4127,9 @@
                         if (frameworkValue === 'custom') {
                             framework = document.getElementById('bizFrameworkCustom').value;
                         } else {
-                            framework = frameworkValue;
+                            // 取得翻譯後的框架名稱
+                            const fwKey = 'biz_fw_' + frameworkValue.toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/_+/g, '_').replace(/^_|_$/g, '');
+                            framework = getTranslatedLabel(fwKey) || frameworkValue;
                         }
                     }
                 }
@@ -4140,28 +4142,43 @@
                 return;
             }
 
-            // 組裝專業 Prompt
-            currentGeneratedPrompt = `【角色設定 Role】
-你是一位專精於「${domain}」領域的專家，擁有豐富的「${industry}」行業經驗。
-你的專業角色是：${role}
+            // 顯示 AI 處理中狀態
+            const btn = document.getElementById('bizGenerateBtn');
+            btn.disabled = true;
+            btn.innerHTML = '🤖 AI 深度思考中...';
+            showPromptStatus('🔄 AI 正在分析您的專業背景並生成深度 Prompt...', 'info');
 
-【方法論框架 Framework】
-請運用「${framework}」模型/框架來分析和解決問題。
+            try {
+                const response = await fetch('/api/refine-prompt', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        mode: 'business',
+                        domain: domain,
+                        industry: industry,
+                        role: role,
+                        framework: framework,
+                        context: context
+                    })
+                });
 
-【任務目標 Task】
-${context || '請根據上述角色和框架，提供專業的分析建議。'}
+                const data = await response.json();
 
-【輸出要求 Output Requirements】
-1. 請以結構化的方式呈現分析結果
-2. 包含具體可執行的行動建議
-3. 如有需要，請提供相關數據支持或案例參考
-4. 使用專業但易懂的語言
+                if (!response.ok) {
+                    throw new Error(data.message || 'AI 處理失敗');
+                }
 
-【回覆格式 Format】
-請使用 Markdown 格式，包含標題、條列式重點、以及必要的表格或圖表說明。`;
+                currentGeneratedPrompt = data.refinedPrompt;
+                displayPromptResult(currentGeneratedPrompt);
+                showPromptStatus('✅ AI 已生成專業級 System Prompt！', 'success');
 
-            displayPromptResult(currentGeneratedPrompt);
-            showPromptStatus('✅ 商業 Prompt 已生成！', 'success');
+            } catch (error) {
+                console.error('Business prompt generation error:', error);
+                showPromptStatus('❌ ' + error.message, 'error');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '🚀 ' + getTranslatedLabel('biz_generate_prompt');
+            }
         }
 
         // 生成軟體開發 Prompt (調用 AI)

@@ -1097,6 +1097,67 @@ ${input}
 
 請直接輸出可以使用的 Prompt 內容，不需要額外說明。`;
       
+    } else if (mode === 'business') {
+      // Business Consultant Mode - Deep AI-generated professional prompts
+      const { domain, industry, role, framework, context } = req.body;
+      
+      systemPrompt = `你是一位專業的 AI Prompt 架構師，專精於設計高品質的商業顧問 System Prompt。你的任務是根據用戶選擇的專業領域資訊，生成一個深度專業、結構完整、可直接使用的 AI System Prompt。
+
+【用戶選擇的專業背景】
+• 專業領域 (Domain)：${domain || '未指定'}
+• 行業細分 (Industry)：${industry || '未指定'}
+• 專業角色 (Role)：${role || '未指定'}
+• 分析框架 (Framework)：${framework || '未指定'}
+
+【用戶補充描述】
+${context || '無額外描述'}
+
+【你的任務】
+請深度思考上述專業背景的內涵，並生成一個專業級的 AI System Prompt。這個 Prompt 必須具備以下結構和深度：
+
+===== 必須包含的模塊 =====
+
+🎯 【System Role 角色設定】
+• 定義 AI 扮演的專業角色（建議 10 年以上經驗）
+• 列出 5-8 個該角色必須精通的專業領域和技能
+• 描述該角色的實戰經驗和核心價值
+• 明確 AI 的核心任務目標
+
+📌 【工作目標 Expected Outputs】
+根據該角色的實際工作場景，列出 5-7 個 AI 可以協助用戶完成的具體工作項目，每個項目需包含：
+• 項目名稱
+• 3-5 個具體的子任務或分析維度
+• 預期產出物
+
+🧠 【核心分析框架 Analysis Framework】
+設計 4-6 個該角色在分析問題時應該使用的結構化框架維度，例如：
+• 市場/行業洞察
+• 競品評估
+• 風險與因應
+• 決策建議
+每個框架需包含 3-5 個具體的分析要點
+
+🗣️ 【語氣與風格 Tone & Style】
+定義 AI 回覆時應該遵循的語氣和風格，例如：
+• 專業程度
+• 可操作性要求
+• 數據/邏輯支持要求
+• 回覆結構要求
+
+📥 【用戶需提供的資料 Required User Inputs】
+列出 AI 在提供建議前，應該向用戶詢問的 5-7 個關鍵問題
+這些問題應該能幫助 AI 獲得足夠的背景資訊來提供精準建議
+
+===== 輸出格式要求 =====
+
+1. 使用繁體中文輸出
+2. 必須包含表情符號來區分各個模塊（🎯📌🧠🗣️📥等）
+3. 內容必須專業、具體、可操作
+4. 充分發揮「${framework}」分析框架的應用場景
+5. 確保生成的 Prompt 可以直接複製使用於 ChatGPT、Claude 或 Gemini
+
+請直接輸出完整的 System Prompt，不需要額外的說明或前言。`;
+      
     } else if (mode === 'image') {
       const styleLabels = {
         'photorealistic': 'photorealistic, ultra-realistic, photograph',
