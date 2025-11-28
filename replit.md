@@ -51,6 +51,13 @@ The project follows a client-server architecture:
 
 ## Recent Changes
 
+### BizPrompt Architect Pro - Complete Framework Translation (November 28, 2025)
+- **Framework Translation System**: Added comprehensive multi-language translation for all L4 frameworks
+- **Translation Coverage**: 1254 unique frameworks × 3 languages = 3762+ translations
+- **Dynamic Translation Lookup**: Framework names automatically converted to translation keys (e.g., "SWOT Analysis" → "biz_fw_swot_analysis")
+- **Languages Supported**: Traditional Chinese (繁體中文), English, Vietnamese (Tiếng Việt)
+- **Translation Categories**: Marketing, Strategy, Sales, Product, Finance, HR, E-commerce, Design, Software Development frameworks
+
 ### BizPrompt Architect Pro - Major Expansion (November 28, 2025)
 - **Comprehensive 4-Level Cascading System**: Expanded business consultant mode with 8 domains, 40+ industries, 207 roles, and corresponding frameworks
 - **User-Specific Industries Integrated**:
@@ -69,7 +76,7 @@ The project follows a client-server architecture:
   - Human Resources (Talent, OD, Compensation, Learning, HR Tech)
 - **Role Framework System**: 207 unique roles, each with 5+ professional frameworks plus custom option
 - **Custom Input Support**: Full custom input support at all 4 levels (L1/L2/L3/L4)
-- **Complete Translation Coverage**: All domains, industries, and roles translated in zh-TW, en, vi
+- **Complete Translation Coverage**: All domains, industries, roles, and frameworks translated in zh-TW, en, vi
 
 ### BizPrompt Architect Pro - New Tab 4 (November 28, 2025)
 - **New Feature**: Added 4th tab "AI 指令架構師" (BizPrompt Architect Pro) to the platform
