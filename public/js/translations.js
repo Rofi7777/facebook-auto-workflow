@@ -159,7 +159,33 @@ const translations = {
     'identified_pain_points': '識別的用戶痛點',
     'usage_scenario_suggestions': '使用場景建議',
     'target': '目標',
-    'emotions': '情感'
+    'emotions': '情感',
+    
+    // Page 4: BizPrompt Architect Pro
+    'tab_prompt_architect': 'AI 指令架構師',
+    'prompt_architect_title': 'BizPrompt Architect Pro',
+    'prompt_architect_subtitle': '全方位 AI 指令架構師 - 讓您產出專家級 Prompt',
+    'generated_prompt': '生成的專業 Prompt',
+    'mode_business': '商業顧問',
+    'mode_coding': '軟體開發',
+    'mode_image': '視覺繪圖',
+    'biz_domain': 'L1 領域',
+    'biz_industry': 'L2 賽道',
+    'biz_role': 'L3 角色',
+    'biz_framework': 'L4 模型',
+    'biz_context': '具體任務描述',
+    'generate_prompt_btn': '生成專業 Prompt',
+    'coding_input': '描述您的軟體需求',
+    'coding_platform': '目標平台',
+    'coding_complexity': '複雜度',
+    'generate_prd_btn': 'AI 轉譯為結構化 PRD',
+    'image_input': '描述您想生成的畫面',
+    'image_style': '藝術風格',
+    'image_ratio': '畫面比例',
+    'image_quality': '品質標籤',
+    'generate_image_prompt_btn': 'AI 生成繪圖指令',
+    'copy_prompt': '一鍵複製',
+    'export_word': '導出 Word'
   },
   
   'en': {
@@ -321,7 +347,33 @@ const translations = {
     'identified_pain_points': 'Identified User Pain Points',
     'usage_scenario_suggestions': 'Usage Scenario Suggestions',
     'target': 'Target',
-    'emotions': 'Emotions'
+    'emotions': 'Emotions',
+    
+    // Page 4: BizPrompt Architect Pro
+    'tab_prompt_architect': 'AI Prompt Architect',
+    'prompt_architect_title': 'BizPrompt Architect Pro',
+    'prompt_architect_subtitle': 'All-in-One AI Prompt Architect - Generate Expert-Level Prompts',
+    'generated_prompt': 'Generated Professional Prompt',
+    'mode_business': 'Business Consultant',
+    'mode_coding': 'Software Development',
+    'mode_image': 'Visual Image',
+    'biz_domain': 'L1 Domain',
+    'biz_industry': 'L2 Industry',
+    'biz_role': 'L3 Role',
+    'biz_framework': 'L4 Framework',
+    'biz_context': 'Task Description',
+    'generate_prompt_btn': 'Generate Professional Prompt',
+    'coding_input': 'Describe Your Software Requirements',
+    'coding_platform': 'Target Platform',
+    'coding_complexity': 'Complexity',
+    'generate_prd_btn': 'AI Translate to Structured PRD',
+    'image_input': 'Describe the Image You Want to Generate',
+    'image_style': 'Art Style',
+    'image_ratio': 'Aspect Ratio',
+    'image_quality': 'Quality Tags',
+    'generate_image_prompt_btn': 'AI Generate Image Prompt',
+    'copy_prompt': 'Copy to Clipboard',
+    'export_word': 'Export to Word'
   },
   
   'vi': {
@@ -483,7 +535,33 @@ const translations = {
     'identified_pain_points': 'Các vấn đề người dùng đã xác định',
     'usage_scenario_suggestions': 'Đề xuất kịch bản sử dụng',
     'target': 'Mục tiêu',
-    'emotions': 'Cảm xúc'
+    'emotions': 'Cảm xúc',
+    
+    // Page 4: BizPrompt Architect Pro
+    'tab_prompt_architect': 'AI Kiến Trúc Sư Prompt',
+    'prompt_architect_title': 'BizPrompt Architect Pro',
+    'prompt_architect_subtitle': 'Kiến trúc sư AI Prompt toàn diện - Tạo Prompt cấp chuyên gia',
+    'generated_prompt': 'Prompt chuyên nghiệp đã tạo',
+    'mode_business': 'Tư vấn kinh doanh',
+    'mode_coding': 'Phát triển phần mềm',
+    'mode_image': 'Hình ảnh trực quan',
+    'biz_domain': 'L1 Lĩnh vực',
+    'biz_industry': 'L2 Ngành',
+    'biz_role': 'L3 Vai trò',
+    'biz_framework': 'L4 Khung',
+    'biz_context': 'Mô tả nhiệm vụ',
+    'generate_prompt_btn': 'Tạo Prompt chuyên nghiệp',
+    'coding_input': 'Mô tả yêu cầu phần mềm của bạn',
+    'coding_platform': 'Nền tảng mục tiêu',
+    'coding_complexity': 'Độ phức tạp',
+    'generate_prd_btn': 'AI chuyển đổi thành PRD có cấu trúc',
+    'image_input': 'Mô tả hình ảnh bạn muốn tạo',
+    'image_style': 'Phong cách nghệ thuật',
+    'image_ratio': 'Tỷ lệ khung hình',
+    'image_quality': 'Thẻ chất lượng',
+    'generate_image_prompt_btn': 'AI tạo Prompt hình ảnh',
+    'copy_prompt': 'Sao chép vào clipboard',
+    'export_word': 'Xuất sang Word'
   }
 };
 
