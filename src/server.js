@@ -1049,6 +1049,168 @@ app.post('/api/chat-with-advisor', chatUpload.array('files', 5), async (req, res
   }
 });
 
+// ==================== Page 4: BizPrompt Architect Pro APIs ====================
+
+// API endpoint for refining prompts (coding and image modes)
+app.post('/api/refine-prompt', async (req, res) => {
+  try {
+    const { mode, input, platform, complexity, style, ratio, qualityTags } = req.body;
+    
+    console.log(`📝 Refining prompt in ${mode} mode...`);
+    
+    let refinedPrompt = '';
+    
+    if (mode === 'coding') {
+      // 軟體開發模式 - 生成結構化 PRD
+      const platformLabels = {
+        'web': 'Web 網頁應用',
+        'mobile': 'Mobile App',
+        'desktop': 'Desktop 桌面應用',
+        'api': 'API / Backend',
+        'fullstack': 'Full Stack 全端'
+      };
+      
+      const complexityLabels = {
+        'mvp': 'MVP 最小可行產品',
+        'standard': 'Standard 標準功能',
+        'enterprise': 'Enterprise 企業級'
+      };
+      
+      const prompt = `你是一位資深軟體架構師和產品經理。用戶用自然語言描述了一個軟體需求，請幫助將其轉化為專業的結構化 PRD (Product Requirements Document)。
+
+用戶需求描述：
+${input}
+
+目標平台：${platformLabels[platform] || platform}
+複雜度級別：${complexityLabels[complexity] || complexity}
+
+請生成一個專業的 Prompt，這個 Prompt 可以直接交給 AI（如 ChatGPT、Gemini、Claude）來生成完整的軟體開發方案。
+
+輸出格式要求：
+1. 首先定義清晰的角色設定（如：你是一位全端開發專家）
+2. 詳細描述功能需求和技術規格
+3. 包含推薦的技術棧
+4. 列出核心功能模塊
+5. 定義 API 端點結構（如適用）
+6. 描述資料模型
+7. 提供 MVP 功能優先級排序
+
+請直接輸出可以使用的 Prompt 內容，不需要額外說明。`;
+
+      refinedPrompt = await aiService.generateText(prompt);
+      
+    } else if (mode === 'image') {
+      // 視覺繪圖模式 - 生成 Midjourney/DALL-E 風格的指令
+      const styleLabels = {
+        'photorealistic': 'photorealistic, ultra-realistic, photograph',
+        'anime': 'anime style, manga art, Japanese animation',
+        'oil-painting': 'oil painting, classical art, brush strokes, canvas texture',
+        'watercolor': 'watercolor painting, soft colors, paint splatter',
+        '3d-render': '3D render, Octane render, Blender, Cinema 4D',
+        'cyberpunk': 'cyberpunk, neon lights, futuristic, sci-fi',
+        'minimalist': 'minimalist, simple, clean design, flat',
+        'fantasy': 'fantasy art, magical, ethereal, dreamlike',
+        'vintage': 'vintage, retro, film grain, nostalgic'
+      };
+      
+      const ratioLabels = {
+        '1:1': '--ar 1:1',
+        '16:9': '--ar 16:9',
+        '9:16': '--ar 9:16',
+        '4:3': '--ar 4:3',
+        '3:2': '--ar 3:2'
+      };
+      
+      const prompt = `你是一位專業的 AI 繪圖提示詞工程師，精通 Midjourney、DALL-E 和 Stable Diffusion 的提示詞優化。
+
+用戶想要生成的畫面描述：
+${input}
+
+選擇的藝術風格：${styleLabels[style] || style}
+畫面比例：${ratio}
+品質標籤：${(qualityTags || []).join(', ')}
+
+請生成一個專業的繪圖提示詞（Prompt），需要滿足以下要求：
+
+1. 使用英文輸出（Midjourney 標準格式）
+2. 包含主題描述、風格關鍵字、光影效果、構圖指示
+3. 添加適當的品質標籤（如 masterpiece, best quality, highly detailed）
+4. 包含相機/鏡頭參數（如適用）
+5. 添加否定提示詞（Negative Prompt）
+6. 在結尾添加比例參數 ${ratioLabels[ratio] || ''}
+
+輸出格式：
+【正向提示詞 Positive Prompt】
+(英文提示詞內容)
+
+【負向提示詞 Negative Prompt】  
+(避免出現的元素)
+
+【建議參數】
+(Midjourney 參數如 --q 2 --s 750 等)
+
+請直接輸出可複製使用的內容。`;
+
+      refinedPrompt = await aiService.generateText(prompt);
+    }
+    
+    console.log('✅ Prompt refined successfully');
+    
+    res.json({
+      success: true,
+      refinedPrompt: refinedPrompt,
+      mode: mode
+    });
+    
+  } catch (error) {
+    console.error('❌ Prompt refinement error:', error);
+    res.status(500).json({
+      error: 'Prompt 優化失敗',
+      message: error.message
+    });
+  }
+});
+
+// API endpoint for exporting prompt to Word document
+app.post('/api/export-prompt-word', async (req, res) => {
+  try {
+    const { prompt, mode, timestamp } = req.body;
+    
+    console.log(`📄 Exporting prompt to Word...`);
+    
+    // 生成 Word 文檔
+    const modeLabels = {
+      'business': '商業顧問模式',
+      'coding': '軟體開發模式',
+      'image': '視覺繪圖模式'
+    };
+    
+    const docContent = {
+      title: `BizPrompt Architect Pro - ${modeLabels[mode] || mode}`,
+      generatedAt: timestamp || new Date().toISOString(),
+      content: prompt
+    };
+    
+    // 使用 DocumentExportService 生成 Word
+    const result = await documentExporter.exportPromptToWord(docContent);
+    
+    console.log('✅ Word document generated:', result.filename);
+    
+    res.json({
+      success: true,
+      downloadUrl: result.downloadUrl,
+      filename: result.filename
+    });
+    
+  } catch (error) {
+    console.error('❌ Word export error:', error);
+    res.status(500).json({
+      error: 'Word 導出失敗',
+      message: error.message
+    });
+  }
+});
+
 // Start server - CRITICAL: Must bind to 0.0.0.0 for Replit
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`${BRAND_CONFIG.name} Facebook Auto Workflow server running on http://0.0.0.0:${PORT}`);
