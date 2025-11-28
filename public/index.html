@@ -773,6 +773,9 @@
                 <button class="tab-btn" onclick="switchPage('page3')">
                     <span data-i18n="tab_course_editor">📚 AI 課程編輯專家</span>
                 </button>
+                <button class="tab-btn" onclick="switchPage('page4')">
+                    <span data-i18n="tab_prompt_architect">📝 AI 指令架構師</span>
+                </button>
             </div>
         </div>
         
@@ -1256,6 +1259,218 @@
             </div>
         </div>
         <!-- End of Page 3 -->
+
+        <!-- Page 4: BizPrompt Architect Pro (AI 指令架構師) -->
+        <div id="page4" class="page-content">
+            <div class="workflow-container" style="grid-template-columns: 1fr 1fr;">
+                <!-- 左側：輸入區域 -->
+                <div class="input-panel">
+                    <h2 class="panel-title">📝 <span data-i18n="prompt_architect_title">BizPrompt Architect Pro</span></h2>
+                    <p style="color: #666; margin-bottom: 20px;" data-i18n="prompt_architect_subtitle">全方位 AI 指令架構師 - 讓您產出專家級 Prompt</p>
+                    
+                    <!-- 三態切換系統 -->
+                    <div class="mode-tabs" style="display: flex; gap: 10px; margin-bottom: 25px; flex-wrap: wrap;">
+                        <button type="button" class="mode-tab active" onclick="switchPromptMode('business')" id="modeTabBusiness" style="flex: 1; min-width: 100px; padding: 12px 15px; border: 2px solid #87CEEB; background: linear-gradient(135deg, #87CEEB 0%, #FFB6C1 100%); color: white; border-radius: 10px; cursor: pointer; font-weight: 600; transition: all 0.3s;">
+                            👨‍💼 商業顧問
+                        </button>
+                        <button type="button" class="mode-tab" onclick="switchPromptMode('coding')" id="modeTabCoding" style="flex: 1; min-width: 100px; padding: 12px 15px; border: 2px solid #87CEEB; background: white; color: #87CEEB; border-radius: 10px; cursor: pointer; font-weight: 600; transition: all 0.3s;">
+                            💻 軟體開發
+                        </button>
+                        <button type="button" class="mode-tab" onclick="switchPromptMode('image')" id="modeTabImage" style="flex: 1; min-width: 100px; padding: 12px 15px; border: 2px solid #87CEEB; background: white; color: #87CEEB; border-radius: 10px; cursor: pointer; font-weight: 600; transition: all 0.3s;">
+                            🎨 視覺繪圖
+                        </button>
+                    </div>
+
+                    <!-- ==================== 商業顧問模式 ==================== -->
+                    <div id="businessMode" class="prompt-mode active" style="display: block;">
+                        <form id="businessPromptForm">
+                            <!-- L1: 領域選擇 -->
+                            <div class="form-group">
+                                <label for="bizDomain">🏢 L1 領域 (Domain)</label>
+                                <select id="bizDomain" onchange="updateBizIndustry()" required style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 8px; font-size: 14px;">
+                                    <option value="">-- 請選擇領域 --</option>
+                                    <option value="marketing">市場行銷 Marketing</option>
+                                    <option value="strategy">企業戰略 Strategy</option>
+                                    <option value="sales">業務銷售 Sales</option>
+                                    <option value="product">產品管理 Product</option>
+                                    <option value="finance">財務分析 Finance</option>
+                                    <option value="hr">人力資源 HR</option>
+                                    <option value="custom">➕ 自定義 Custom</option>
+                                </select>
+                                <input type="text" id="bizDomainCustom" placeholder="輸入自定義領域..." style="display: none; margin-top: 10px; width: 100%; padding: 12px; border: 2px solid #87CEEB; border-radius: 8px;">
+                            </div>
+
+                            <!-- L2: 行業選擇 -->
+                            <div class="form-group">
+                                <label for="bizIndustry">🏭 L2 賽道 (Industry)</label>
+                                <select id="bizIndustry" onchange="updateBizRole()" required style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 8px; font-size: 14px;">
+                                    <option value="">-- 請先選擇領域 --</option>
+                                </select>
+                                <input type="text" id="bizIndustryCustom" placeholder="輸入自定義行業..." style="display: none; margin-top: 10px; width: 100%; padding: 12px; border: 2px solid #87CEEB; border-radius: 8px;">
+                            </div>
+
+                            <!-- L3: 角色選擇 -->
+                            <div class="form-group">
+                                <label for="bizRole">👤 L3 角色 (Role)</label>
+                                <select id="bizRole" onchange="updateBizFramework()" required style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 8px; font-size: 14px;">
+                                    <option value="">-- 請先選擇行業 --</option>
+                                </select>
+                                <input type="text" id="bizRoleCustom" placeholder="輸入自定義角色..." style="display: none; margin-top: 10px; width: 100%; padding: 12px; border: 2px solid #87CEEB; border-radius: 8px;">
+                            </div>
+
+                            <!-- L4: 模型/框架選擇 -->
+                            <div class="form-group">
+                                <label for="bizFramework">🧠 L4 模型 (Framework)</label>
+                                <select id="bizFramework" onchange="handleFrameworkChange()" required style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 8px; font-size: 14px;">
+                                    <option value="">-- 請先選擇角色 --</option>
+                                </select>
+                                <input type="text" id="bizFrameworkCustom" placeholder="輸入自定義模型/框架..." style="display: none; margin-top: 10px; width: 100%; padding: 12px; border: 2px solid #87CEEB; border-radius: 8px;">
+                            </div>
+
+                            <!-- 具體任務輸入 -->
+                            <div class="form-group">
+                                <label for="bizContext">📋 具體任務描述 (Context)</label>
+                                <textarea id="bizContext" rows="4" placeholder="描述您想解決的商業問題或任務目標..." style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 8px; font-size: 14px; resize: vertical;"></textarea>
+                            </div>
+
+                            <button type="button" class="btn" onclick="generateBusinessPrompt()" style="width: 100%; padding: 15px; background: linear-gradient(135deg, #4CAF50 0%, #8BC34A 100%); color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: 600; cursor: pointer;">
+                                🚀 生成專業 Prompt
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- ==================== 軟體開發模式 ==================== -->
+                    <div id="codingMode" class="prompt-mode" style="display: none;">
+                        <form id="codingPromptForm">
+                            <div class="form-group">
+                                <label for="codingInput">💻 描述您的軟體需求</label>
+                                <p style="color: #888; font-size: 13px; margin-bottom: 10px;">例如：「做一個像 Uber 的 App」、「我需要一個電商網站後台管理系統」</p>
+                                <textarea id="codingInput" rows="6" placeholder="用自然語言描述您想開發的軟體功能..." style="width: 100%; padding: 15px; border: 2px solid #ddd; border-radius: 8px; font-size: 14px; resize: vertical;"></textarea>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="codingPlatform">🎯 目標平台</label>
+                                <select id="codingPlatform" style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 8px; font-size: 14px;">
+                                    <option value="web">Web 網頁應用</option>
+                                    <option value="mobile">Mobile App</option>
+                                    <option value="desktop">Desktop 桌面應用</option>
+                                    <option value="api">API / Backend</option>
+                                    <option value="fullstack">Full Stack 全端</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="codingComplexity">📊 複雜度</label>
+                                <select id="codingComplexity" style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 8px; font-size: 14px;">
+                                    <option value="mvp">MVP 最小可行產品</option>
+                                    <option value="standard">Standard 標準功能</option>
+                                    <option value="enterprise">Enterprise 企業級</option>
+                                </select>
+                            </div>
+
+                            <button type="button" class="btn" onclick="generateCodingPrompt()" id="codingGenerateBtn" style="width: 100%; padding: 15px; background: linear-gradient(135deg, #2196F3 0%, #03A9F4 100%); color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: 600; cursor: pointer;">
+                                🤖 AI 轉譯為結構化 PRD
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- ==================== 視覺繪圖模式 ==================== -->
+                    <div id="imageMode" class="prompt-mode" style="display: none;">
+                        <form id="imagePromptForm">
+                            <div class="form-group">
+                                <label for="imageInput">🎨 描述您想生成的畫面</label>
+                                <p style="color: #888; font-size: 13px; margin-bottom: 10px;">例如：「太空中的貓」、「日落時分的海邊咖啡廳」、「未來城市的霓虹街景」</p>
+                                <textarea id="imageInput" rows="5" placeholder="用自然語言描述您想要的畫面..." style="width: 100%; padding: 15px; border: 2px solid #ddd; border-radius: 8px; font-size: 14px; resize: vertical;"></textarea>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="imageStyle">🖼️ 藝術風格</label>
+                                <select id="imageStyle" style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 8px; font-size: 14px;">
+                                    <option value="photorealistic">寫實攝影 Photorealistic</option>
+                                    <option value="anime">動漫風格 Anime</option>
+                                    <option value="oil-painting">油畫風格 Oil Painting</option>
+                                    <option value="watercolor">水彩風格 Watercolor</option>
+                                    <option value="3d-render">3D 渲染 3D Render</option>
+                                    <option value="cyberpunk">賽博龐克 Cyberpunk</option>
+                                    <option value="minimalist">極簡風格 Minimalist</option>
+                                    <option value="fantasy">奇幻風格 Fantasy</option>
+                                    <option value="vintage">復古風格 Vintage</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="imageRatio">📐 畫面比例</label>
+                                <select id="imageRatio" style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 8px; font-size: 14px;">
+                                    <option value="1:1">1:1 (正方形 - Instagram)</option>
+                                    <option value="16:9">16:9 (寬螢幕 - YouTube)</option>
+                                    <option value="9:16">9:16 (直式 - Stories/Reels)</option>
+                                    <option value="4:3">4:3 (傳統比例)</option>
+                                    <option value="3:2">3:2 (攝影標準)</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="imageQuality">✨ 品質標籤</label>
+                                <div style="display: flex; flex-wrap: wrap; gap: 10px; margin-top: 8px;">
+                                    <label style="display: flex; align-items: center; gap: 5px; cursor: pointer;">
+                                        <input type="checkbox" id="imgQualityHD" checked> HD 高畫質
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 5px; cursor: pointer;">
+                                        <input type="checkbox" id="imgQuality8K"> 8K 超高清
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 5px; cursor: pointer;">
+                                        <input type="checkbox" id="imgQualityDetail" checked> 高細節
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 5px; cursor: pointer;">
+                                        <input type="checkbox" id="imgQualityLighting"> 專業光影
+                                    </label>
+                                </div>
+                            </div>
+
+                            <button type="button" class="btn" onclick="generateImagePrompt()" id="imageGenerateBtn" style="width: 100%; padding: 15px; background: linear-gradient(135deg, #9C27B0 0%, #E91E63 100%); color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: 600; cursor: pointer;">
+                                🎨 AI 生成繪圖指令
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- 右側：結果輸出區 -->
+                <div class="output-panel">
+                    <h2 class="panel-title">🎯 <span data-i18n="generated_prompt">生成的專業 Prompt</span></h2>
+                    
+                    <div id="promptResult" style="max-height: 500px; overflow-y: auto; padding: 20px; background: #1e1e1e; border-radius: 10px; color: #d4d4d4; font-family: 'Consolas', 'Monaco', monospace; font-size: 14px; line-height: 1.6; white-space: pre-wrap;">
+                        <p style="text-align: center; color: #888; padding: 40px;">
+選擇模式並填寫參數後，點擊生成按鈕獲取專業 Prompt
+                        </p>
+                    </div>
+
+                    <!-- 工具按鈕區域 -->
+                    <div id="promptActions" style="display: none; margin-top: 20px; display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+                        <button class="btn" onclick="copyPromptToClipboard()" style="padding: 12px 25px; background: linear-gradient(135deg, #4CAF50 0%, #8BC34A 100%); color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px;">
+                            📋 一鍵複製
+                        </button>
+                        <button class="btn" onclick="exportPromptToWord()" style="padding: 12px 25px; background: linear-gradient(135deg, #2b579a 0%, #4a7cc9 100%); color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px;">
+                            📄 導出 Word
+                        </button>
+                    </div>
+
+                    <!-- 狀態提示 -->
+                    <div id="promptStatus" style="margin-top: 15px; padding: 10px; border-radius: 8px; display: none; text-align: center;"></div>
+
+                    <!-- 使用說明 -->
+                    <div style="margin-top: 25px; padding: 20px; background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); border-radius: 10px;">
+                        <h4 style="color: #333; margin-bottom: 15px;">💡 使用說明</h4>
+                        <ul style="color: #666; font-size: 13px; line-height: 1.8; padding-left: 20px;">
+                            <li><strong>商業顧問模式</strong>：透過 4 層級選單，將模糊問題轉化為帶有專業模型的指令</li>
+                            <li><strong>軟體開發模式</strong>：輸入需求，AI 自動生成結構化 PRD 與技術棧規格</li>
+                            <li><strong>視覺繪圖模式</strong>：描述畫面，AI 生成 Midjourney/DALL-E 專用參數化指令</li>
+                            <li>生成後可<strong>一鍵複製</strong>到 ChatGPT、Gemini 或繪圖工具使用</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- End of Page 4 -->
 
     </div>
 
@@ -2976,6 +3191,482 @@
                 console.error('PDF export error:', error);
                 status.className = 'error';
                 status.innerHTML = `❌ 錯誤: ${error.message}`;
+            }
+        }
+
+        // ==================== Page 4: BizPrompt Architect Pro ====================
+        
+        // 當前生成的 Prompt 內容
+        let currentGeneratedPrompt = '';
+        let currentPromptMode = 'business';
+
+        // 商業顧問模式的層級數據
+        const bizData = {
+            marketing: {
+                label: '市場行銷 Marketing',
+                industries: {
+                    'saas-b2b': { label: 'SaaS B2B', roles: ['growth-hacker', 'content-marketer', 'demand-gen', 'custom'] },
+                    'ecommerce': { label: '電商零售 E-commerce', roles: ['performance-marketer', 'brand-manager', 'social-media', 'custom'] },
+                    'fintech': { label: '金融科技 FinTech', roles: ['product-marketer', 'acquisition', 'retention', 'custom'] },
+                    'healthcare': { label: '醫療健康 Healthcare', roles: ['healthcare-marketer', 'patient-acquisition', 'custom'] },
+                    'custom': { label: '➕ 自定義', roles: ['custom'] }
+                }
+            },
+            strategy: {
+                label: '企業戰略 Strategy',
+                industries: {
+                    'consulting': { label: '顧問諮詢 Consulting', roles: ['strategy-consultant', 'management-consultant', 'custom'] },
+                    'startup': { label: '新創公司 Startup', roles: ['founder', 'coo', 'business-dev', 'custom'] },
+                    'enterprise': { label: '大型企業 Enterprise', roles: ['corporate-strategist', 'biz-analyst', 'custom'] },
+                    'custom': { label: '➕ 自定義', roles: ['custom'] }
+                }
+            },
+            sales: {
+                label: '業務銷售 Sales',
+                industries: {
+                    'b2b-sales': { label: 'B2B 銷售', roles: ['account-exec', 'sales-engineer', 'sales-manager', 'custom'] },
+                    'b2c-sales': { label: 'B2C 銷售', roles: ['retail-sales', 'inside-sales', 'custom'] },
+                    'custom': { label: '➕ 自定義', roles: ['custom'] }
+                }
+            },
+            product: {
+                label: '產品管理 Product',
+                industries: {
+                    'tech-product': { label: '科技產品 Tech', roles: ['pm', 'senior-pm', 'product-lead', 'custom'] },
+                    'consumer-product': { label: '消費品 Consumer', roles: ['consumer-pm', 'ux-researcher', 'custom'] },
+                    'custom': { label: '➕ 自定義', roles: ['custom'] }
+                }
+            },
+            finance: {
+                label: '財務分析 Finance',
+                industries: {
+                    'investment': { label: '投資分析 Investment', roles: ['analyst', 'portfolio-manager', 'custom'] },
+                    'corporate-finance': { label: '企業財務 Corporate', roles: ['cfo', 'fp-analyst', 'controller', 'custom'] },
+                    'custom': { label: '➕ 自定義', roles: ['custom'] }
+                }
+            },
+            hr: {
+                label: '人力資源 HR',
+                industries: {
+                    'talent-acquisition': { label: '人才招募 Talent', roles: ['recruiter', 'hr-manager', 'custom'] },
+                    'org-development': { label: '組織發展 OD', roles: ['od-specialist', 'hr-bp', 'custom'] },
+                    'custom': { label: '➕ 自定義', roles: ['custom'] }
+                }
+            }
+        };
+
+        // 角色對應的框架/模型
+        const roleFrameworks = {
+            'growth-hacker': ['AARRR', 'North Star Metric', 'Growth Loop', 'custom'],
+            'content-marketer': ['Content Pillar', 'Topic Cluster', 'Editorial Calendar', 'custom'],
+            'demand-gen': ['Lead Scoring', 'MQL/SQL', 'Funnel Optimization', 'custom'],
+            'performance-marketer': ['ROAS Optimization', 'Attribution Model', 'LTV:CAC', 'custom'],
+            'brand-manager': ['Brand Equity Model', 'Brand Architecture', 'Positioning Map', 'custom'],
+            'social-media': ['Content Calendar', 'Engagement Strategy', 'Influencer Matrix', 'custom'],
+            'product-marketer': ['GTM Strategy', 'Competitive Analysis', 'Messaging Framework', 'custom'],
+            'acquisition': ['CAC Analysis', 'Channel Mix', 'Conversion Funnel', 'custom'],
+            'retention': ['Cohort Analysis', 'Churn Prediction', 'Retention Hooks', 'custom'],
+            'strategy-consultant': ['SWOT', 'Porter Five Forces', 'BCG Matrix', 'McKinsey 7S', 'custom'],
+            'management-consultant': ['MECE', 'Hypothesis-driven', 'Issue Tree', 'custom'],
+            'founder': ['Lean Canvas', 'Business Model Canvas', 'OKR', 'custom'],
+            'coo': ['Operations Framework', 'Process Optimization', 'KPI Dashboard', 'custom'],
+            'business-dev': ['Partnership Framework', 'Deal Structure', 'Revenue Model', 'custom'],
+            'corporate-strategist': ['Ansoff Matrix', 'Value Chain', 'Scenario Planning', 'custom'],
+            'biz-analyst': ['Data Analysis', 'Business Case', 'ROI Model', 'custom'],
+            'account-exec': ['SPIN Selling', 'Challenger Sale', 'MEDDIC', 'custom'],
+            'sales-engineer': ['Solution Selling', 'Technical Demo', 'POC Framework', 'custom'],
+            'sales-manager': ['Pipeline Management', 'Forecast Model', 'Territory Planning', 'custom'],
+            'pm': ['PRD Template', 'User Story Mapping', 'Prioritization Matrix', 'custom'],
+            'senior-pm': ['Product Strategy', 'Roadmap Planning', 'Stakeholder Management', 'custom'],
+            'product-lead': ['Product Vision', 'Team Alignment', 'Metrics Framework', 'custom'],
+            'analyst': ['DCF Model', 'Comparable Analysis', 'Risk Assessment', 'custom'],
+            'portfolio-manager': ['Asset Allocation', 'Risk Management', 'Performance Attribution', 'custom'],
+            'cfo': ['Financial Planning', 'Capital Structure', 'Investor Relations', 'custom'],
+            'recruiter': ['Talent Pipeline', 'Employer Branding', 'Interview Framework', 'custom'],
+            'hr-manager': ['Performance Management', 'Compensation Strategy', 'HR Analytics', 'custom'],
+            'custom': ['custom']
+        };
+
+        // 角色標籤映射
+        const roleLabels = {
+            'growth-hacker': '成長駭客 Growth Hacker',
+            'content-marketer': '內容行銷 Content Marketer',
+            'demand-gen': '需求生成 Demand Gen',
+            'performance-marketer': '績效行銷 Performance',
+            'brand-manager': '品牌經理 Brand Manager',
+            'social-media': '社群經理 Social Media',
+            'product-marketer': '產品行銷 Product Marketer',
+            'acquisition': '用戶獲取 Acquisition',
+            'retention': '用戶留存 Retention',
+            'strategy-consultant': '策略顧問 Strategy',
+            'management-consultant': '管理顧問 Management',
+            'founder': '創辦人 Founder',
+            'coo': '營運長 COO',
+            'business-dev': '商務開發 BD',
+            'corporate-strategist': '企業策略師',
+            'biz-analyst': '商業分析師',
+            'account-exec': '客戶經理 AE',
+            'sales-engineer': '售前工程師',
+            'sales-manager': '銷售經理',
+            'pm': '產品經理 PM',
+            'senior-pm': '資深產品經理',
+            'product-lead': '產品負責人',
+            'analyst': '分析師 Analyst',
+            'portfolio-manager': '投資組合經理',
+            'cfo': '財務長 CFO',
+            'recruiter': '招募專員',
+            'hr-manager': 'HR 經理',
+            'custom': '➕ 自定義'
+        };
+
+        // 三態切換函數
+        function switchPromptMode(mode) {
+            currentPromptMode = mode;
+            
+            // 更新 Tab 按鈕樣式
+            document.querySelectorAll('.mode-tab').forEach(tab => {
+                tab.style.background = 'white';
+                tab.style.color = '#87CEEB';
+            });
+            
+            const activeTab = document.getElementById('modeTab' + mode.charAt(0).toUpperCase() + mode.slice(1));
+            if (activeTab) {
+                activeTab.style.background = 'linear-gradient(135deg, #87CEEB 0%, #FFB6C1 100%)';
+                activeTab.style.color = 'white';
+            }
+            
+            // 切換顯示的模式區塊
+            document.querySelectorAll('.prompt-mode').forEach(modeDiv => {
+                modeDiv.style.display = 'none';
+            });
+            
+            document.getElementById(mode + 'Mode').style.display = 'block';
+            
+            // 清空結果區
+            document.getElementById('promptResult').innerHTML = `<p style="text-align: center; color: #888; padding: 40px;">選擇模式並填寫參數後，點擊生成按鈕獲取專業 Prompt</p>`;
+            document.getElementById('promptActions').style.display = 'none';
+        }
+
+        // 更新行業選項
+        function updateBizIndustry() {
+            const domain = document.getElementById('bizDomain').value;
+            const industrySelect = document.getElementById('bizIndustry');
+            const customInput = document.getElementById('bizDomainCustom');
+            
+            // 處理自定義
+            if (domain === 'custom') {
+                customInput.style.display = 'block';
+            } else {
+                customInput.style.display = 'none';
+            }
+            
+            // 重置後續選項
+            industrySelect.innerHTML = '<option value="">-- 請選擇行業 --</option>';
+            document.getElementById('bizRole').innerHTML = '<option value="">-- 請先選擇行業 --</option>';
+            document.getElementById('bizFramework').innerHTML = '<option value="">-- 請先選擇角色 --</option>';
+            document.getElementById('bizIndustryCustom').style.display = 'none';
+            document.getElementById('bizRoleCustom').style.display = 'none';
+            document.getElementById('bizFrameworkCustom').style.display = 'none';
+            
+            if (domain && domain !== 'custom' && bizData[domain]) {
+                const industries = bizData[domain].industries;
+                for (const [key, value] of Object.entries(industries)) {
+                    const option = document.createElement('option');
+                    option.value = key;
+                    option.textContent = value.label;
+                    industrySelect.appendChild(option);
+                }
+            }
+        }
+
+        // 更新角色選項
+        function updateBizRole() {
+            const domain = document.getElementById('bizDomain').value;
+            const industry = document.getElementById('bizIndustry').value;
+            const roleSelect = document.getElementById('bizRole');
+            const customInput = document.getElementById('bizIndustryCustom');
+            
+            if (industry === 'custom') {
+                customInput.style.display = 'block';
+            } else {
+                customInput.style.display = 'none';
+            }
+            
+            roleSelect.innerHTML = '<option value="">-- 請選擇角色 --</option>';
+            document.getElementById('bizFramework').innerHTML = '<option value="">-- 請先選擇角色 --</option>';
+            document.getElementById('bizRoleCustom').style.display = 'none';
+            document.getElementById('bizFrameworkCustom').style.display = 'none';
+            
+            if (domain && industry && domain !== 'custom' && industry !== 'custom' && bizData[domain]?.industries[industry]) {
+                const roles = bizData[domain].industries[industry].roles;
+                roles.forEach(role => {
+                    const option = document.createElement('option');
+                    option.value = role;
+                    option.textContent = roleLabels[role] || role;
+                    roleSelect.appendChild(option);
+                });
+            }
+        }
+
+        // 更新框架選項
+        function updateBizFramework() {
+            const role = document.getElementById('bizRole').value;
+            const frameworkSelect = document.getElementById('bizFramework');
+            const customInput = document.getElementById('bizRoleCustom');
+            
+            if (role === 'custom') {
+                customInput.style.display = 'block';
+            } else {
+                customInput.style.display = 'none';
+            }
+            
+            frameworkSelect.innerHTML = '<option value="">-- 請選擇模型/框架 --</option>';
+            document.getElementById('bizFrameworkCustom').style.display = 'none';
+            
+            if (role && role !== 'custom' && roleFrameworks[role]) {
+                roleFrameworks[role].forEach(framework => {
+                    const option = document.createElement('option');
+                    option.value = framework;
+                    option.textContent = framework === 'custom' ? '➕ 自定義' : framework;
+                    frameworkSelect.appendChild(option);
+                });
+            }
+        }
+
+        // 處理框架選擇變化
+        function handleFrameworkChange() {
+            const framework = document.getElementById('bizFramework').value;
+            const customInput = document.getElementById('bizFrameworkCustom');
+            
+            if (framework === 'custom') {
+                customInput.style.display = 'block';
+            } else {
+                customInput.style.display = 'none';
+            }
+        }
+
+        // 生成商業 Prompt
+        function generateBusinessPrompt() {
+            const domain = document.getElementById('bizDomain').value === 'custom' 
+                ? document.getElementById('bizDomainCustom').value 
+                : (bizData[document.getElementById('bizDomain').value]?.label || document.getElementById('bizDomain').value);
+            
+            const industry = document.getElementById('bizIndustry').value === 'custom'
+                ? document.getElementById('bizIndustryCustom').value
+                : document.getElementById('bizIndustry').options[document.getElementById('bizIndustry').selectedIndex]?.text || '';
+            
+            const role = document.getElementById('bizRole').value === 'custom'
+                ? document.getElementById('bizRoleCustom').value
+                : (roleLabels[document.getElementById('bizRole').value] || document.getElementById('bizRole').value);
+            
+            const framework = document.getElementById('bizFramework').value === 'custom'
+                ? document.getElementById('bizFrameworkCustom').value
+                : document.getElementById('bizFramework').value;
+            
+            const context = document.getElementById('bizContext').value;
+
+            if (!domain || !industry || !role || !framework) {
+                showPromptStatus('請完整填寫所有必填欄位', 'error');
+                return;
+            }
+
+            // 組裝專業 Prompt
+            currentGeneratedPrompt = `【角色設定 Role】
+你是一位專精於「${domain}」領域的專家，擁有豐富的「${industry}」行業經驗。
+你的專業角色是：${role}
+
+【方法論框架 Framework】
+請運用「${framework}」模型/框架來分析和解決問題。
+
+【任務目標 Task】
+${context || '請根據上述角色和框架，提供專業的分析建議。'}
+
+【輸出要求 Output Requirements】
+1. 請以結構化的方式呈現分析結果
+2. 包含具體可執行的行動建議
+3. 如有需要，請提供相關數據支持或案例參考
+4. 使用專業但易懂的語言
+
+【回覆格式 Format】
+請使用 Markdown 格式，包含標題、條列式重點、以及必要的表格或圖表說明。`;
+
+            displayPromptResult(currentGeneratedPrompt);
+            showPromptStatus('✅ 商業 Prompt 已生成！', 'success');
+        }
+
+        // 生成軟體開發 Prompt (調用 AI)
+        async function generateCodingPrompt() {
+            const input = document.getElementById('codingInput').value;
+            const platform = document.getElementById('codingPlatform').value;
+            const complexity = document.getElementById('codingComplexity').value;
+
+            if (!input.trim()) {
+                showPromptStatus('請輸入您的軟體需求描述', 'error');
+                return;
+            }
+
+            const btn = document.getElementById('codingGenerateBtn');
+            btn.disabled = true;
+            btn.innerHTML = '🔄 AI 處理中...';
+
+            try {
+                const response = await fetch('/api/refine-prompt', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        mode: 'coding',
+                        input: input,
+                        platform: platform,
+                        complexity: complexity
+                    })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.message || 'AI 處理失敗');
+                }
+
+                currentGeneratedPrompt = data.refinedPrompt;
+                displayPromptResult(currentGeneratedPrompt);
+                showPromptStatus('✅ PRD 已生成！可複製使用於 Gemini / ChatGPT', 'success');
+
+            } catch (error) {
+                console.error('Coding prompt error:', error);
+                showPromptStatus(`❌ 錯誤: ${error.message}`, 'error');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '🤖 AI 轉譯為結構化 PRD';
+            }
+        }
+
+        // 生成視覺繪圖 Prompt (調用 AI)
+        async function generateImagePrompt() {
+            const input = document.getElementById('imageInput').value;
+            const style = document.getElementById('imageStyle').value;
+            const ratio = document.getElementById('imageRatio').value;
+            
+            // 收集品質標籤
+            const qualityTags = [];
+            if (document.getElementById('imgQualityHD')?.checked) qualityTags.push('HD');
+            if (document.getElementById('imgQuality8K')?.checked) qualityTags.push('8K');
+            if (document.getElementById('imgQualityDetail')?.checked) qualityTags.push('highly detailed');
+            if (document.getElementById('imgQualityLighting')?.checked) qualityTags.push('professional lighting');
+
+            if (!input.trim()) {
+                showPromptStatus('請輸入您想生成的畫面描述', 'error');
+                return;
+            }
+
+            const btn = document.getElementById('imageGenerateBtn');
+            btn.disabled = true;
+            btn.innerHTML = '🔄 AI 處理中...';
+
+            try {
+                const response = await fetch('/api/refine-prompt', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        mode: 'image',
+                        input: input,
+                        style: style,
+                        ratio: ratio,
+                        qualityTags: qualityTags
+                    })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.message || 'AI 處理失敗');
+                }
+
+                currentGeneratedPrompt = data.refinedPrompt;
+                displayPromptResult(currentGeneratedPrompt);
+                showPromptStatus('✅ 繪圖指令已生成！可複製使用於 Midjourney / DALL-E / Stable Diffusion', 'success');
+
+            } catch (error) {
+                console.error('Image prompt error:', error);
+                showPromptStatus(`❌ 錯誤: ${error.message}`, 'error');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '🎨 AI 生成繪圖指令';
+            }
+        }
+
+        // 顯示 Prompt 結果
+        function displayPromptResult(prompt) {
+            const resultDiv = document.getElementById('promptResult');
+            resultDiv.innerHTML = prompt.replace(/\n/g, '<br>');
+            document.getElementById('promptActions').style.display = 'flex';
+        }
+
+        // 顯示狀態提示
+        function showPromptStatus(message, type) {
+            const statusDiv = document.getElementById('promptStatus');
+            statusDiv.style.display = 'block';
+            statusDiv.style.background = type === 'success' ? '#d4edda' : '#f8d7da';
+            statusDiv.style.color = type === 'success' ? '#155724' : '#721c24';
+            statusDiv.innerHTML = message;
+            
+            setTimeout(() => {
+                statusDiv.style.display = 'none';
+            }, 5000);
+        }
+
+        // 一鍵複製
+        function copyPromptToClipboard() {
+            if (!currentGeneratedPrompt) {
+                showPromptStatus('沒有可複製的內容', 'error');
+                return;
+            }
+
+            navigator.clipboard.writeText(currentGeneratedPrompt).then(() => {
+                showPromptStatus('✅ 已複製到剪貼簿！', 'success');
+            }).catch(err => {
+                console.error('Copy failed:', err);
+                // Fallback for older browsers
+                const textarea = document.createElement('textarea');
+                textarea.value = currentGeneratedPrompt;
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+                showPromptStatus('✅ 已複製到剪貼簿！', 'success');
+            });
+        }
+
+        // 導出 Word
+        async function exportPromptToWord() {
+            if (!currentGeneratedPrompt) {
+                showPromptStatus('沒有可導出的內容', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/export-prompt-word', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        prompt: currentGeneratedPrompt,
+                        mode: currentPromptMode,
+                        timestamp: new Date().toISOString()
+                    })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.message || '導出失敗');
+                }
+
+                // 下載文件
+                window.location.href = data.downloadUrl;
+                showPromptStatus('✅ Word 文檔已生成，正在下載...', 'success');
+
+            } catch (error) {
+                console.error('Word export error:', error);
+                showPromptStatus(`❌ 導出錯誤: ${error.message}`, 'error');
             }
         }
     </script>
