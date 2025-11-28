@@ -1059,9 +1059,9 @@ app.post('/api/refine-prompt', async (req, res) => {
     console.log(`📝 Refining prompt in ${mode} mode...`);
     
     let refinedPrompt = '';
+    let systemPrompt = '';
     
     if (mode === 'coding') {
-      // 軟體開發模式 - 生成結構化 PRD
       const platformLabels = {
         'web': 'Web 網頁應用',
         'mobile': 'Mobile App',
@@ -1076,7 +1076,7 @@ app.post('/api/refine-prompt', async (req, res) => {
         'enterprise': 'Enterprise 企業級'
       };
       
-      const prompt = `你是一位資深軟體架構師和產品經理。用戶用自然語言描述了一個軟體需求，請幫助將其轉化為專業的結構化 PRD (Product Requirements Document)。
+      systemPrompt = `你是一位資深軟體架構師和產品經理。用戶用自然語言描述了一個軟體需求，請幫助將其轉化為專業的結構化 PRD (Product Requirements Document)。
 
 用戶需求描述：
 ${input}
@@ -1096,11 +1096,8 @@ ${input}
 7. 提供 MVP 功能優先級排序
 
 請直接輸出可以使用的 Prompt 內容，不需要額外說明。`;
-
-      refinedPrompt = await aiService.generateText(prompt);
       
     } else if (mode === 'image') {
-      // 視覺繪圖模式 - 生成 Midjourney/DALL-E 風格的指令
       const styleLabels = {
         'photorealistic': 'photorealistic, ultra-realistic, photograph',
         'anime': 'anime style, manga art, Japanese animation',
@@ -1121,7 +1118,7 @@ ${input}
         '3:2': '--ar 3:2'
       };
       
-      const prompt = `你是一位專業的 AI 繪圖提示詞工程師，精通 Midjourney、DALL-E 和 Stable Diffusion 的提示詞優化。
+      systemPrompt = `你是一位專業的 AI 繪圖提示詞工程師，精通 Midjourney、DALL-E 和 Stable Diffusion 的提示詞優化。
 
 用戶想要生成的畫面描述：
 ${input}
@@ -1150,8 +1147,24 @@ ${input}
 (Midjourney 參數如 --q 2 --s 750 等)
 
 請直接輸出可複製使用的內容。`;
-
-      refinedPrompt = await aiService.generateText(prompt);
+    }
+    
+    if (!systemPrompt) {
+      throw new Error('Invalid mode specified');
+    }
+    
+    const { GoogleGenAI } = require('@google/genai');
+    const genAI = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY_NEW || process.env.GEMINI_API_KEY });
+    
+    const response = await genAI.models.generateContent({
+      model: 'gemini-3-pro-preview',
+      contents: [{ role: 'user', parts: [{ text: systemPrompt }] }]
+    });
+    
+    if (response && response.candidates && response.candidates.length > 0) {
+      refinedPrompt = response.candidates[0].content.parts[0].text;
+    } else {
+      throw new Error('No response from AI model');
     }
     
     console.log('✅ Prompt refined successfully');
