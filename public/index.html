@@ -3200,124 +3200,731 @@
         let currentGeneratedPrompt = '';
         let currentPromptMode = 'business';
 
-        // 商業顧問模式的層級數據
+        // 商業顧問模式的層級數據 - 整合用戶特定行業需求
         const bizData = {
+            // ==================== 用戶核心行業 ====================
+            ecommerce: {
+                label: 'biz_domain_ecommerce',
+                industries: {
+                    'fashion-footwear': { label: 'biz_ind_fashion_footwear', roles: ['ecom-manager', 'fashion-buyer', 'visual-merchandiser', 'product-stylist', 'category-manager', 'custom'] },
+                    'mother-baby': { label: 'biz_ind_mother_baby', roles: ['baby-product-manager', 'parent-community', 'safety-specialist', 'content-creator', 'kol-manager', 'custom'] },
+                    'pet-industry': { label: 'biz_ind_pet', roles: ['pet-product-manager', 'pet-community', 'vet-consultant', 'pet-content', 'pet-influencer', 'custom'] },
+                    'art-toy': { label: 'biz_ind_art_toy', roles: ['toy-designer', 'ip-manager', 'collector-community', 'limited-edition', 'collab-manager', 'custom'] },
+                    'tiktok-shop': { label: 'biz_ind_tiktok_shop', roles: ['tiktok-operator', 'live-host', 'short-video', 'affiliate-tiktok', 'tiktok-ads', 'custom'] },
+                    'shopee': { label: 'biz_ind_shopee', roles: ['shopee-operator', 'shopee-ads', 'flash-sale', 'shopee-live', 'seller-support', 'custom'] },
+                    'fb-marketplace': { label: 'biz_ind_fb_marketplace', roles: ['fb-shop-manager', 'fb-ads-specialist', 'community-sales', 'messenger-sales', 'fb-live', 'custom'] },
+                    'custom': { label: 'biz_custom', roles: ['custom'] }
+                }
+            },
             marketing: {
-                label: '市場行銷 Marketing',
+                label: 'biz_domain_marketing',
                 industries: {
-                    'saas-b2b': { label: 'SaaS B2B', roles: ['growth-hacker', 'content-marketer', 'demand-gen', 'custom'] },
-                    'ecommerce': { label: '電商零售 E-commerce', roles: ['performance-marketer', 'brand-manager', 'social-media', 'custom'] },
-                    'fintech': { label: '金融科技 FinTech', roles: ['product-marketer', 'acquisition', 'retention', 'custom'] },
-                    'healthcare': { label: '醫療健康 Healthcare', roles: ['healthcare-marketer', 'patient-acquisition', 'custom'] },
-                    'custom': { label: '➕ 自定義', roles: ['custom'] }
-                }
-            },
-            strategy: {
-                label: '企業戰略 Strategy',
-                industries: {
-                    'consulting': { label: '顧問諮詢 Consulting', roles: ['strategy-consultant', 'management-consultant', 'custom'] },
-                    'startup': { label: '新創公司 Startup', roles: ['founder', 'coo', 'business-dev', 'custom'] },
-                    'enterprise': { label: '大型企業 Enterprise', roles: ['corporate-strategist', 'biz-analyst', 'custom'] },
-                    'custom': { label: '➕ 自定義', roles: ['custom'] }
-                }
-            },
-            sales: {
-                label: '業務銷售 Sales',
-                industries: {
-                    'b2b-sales': { label: 'B2B 銷售', roles: ['account-exec', 'sales-engineer', 'sales-manager', 'custom'] },
-                    'b2c-sales': { label: 'B2C 銷售', roles: ['retail-sales', 'inside-sales', 'custom'] },
-                    'custom': { label: '➕ 自定義', roles: ['custom'] }
+                    'seo-geo': { label: 'biz_ind_seo_geo', roles: ['seo-specialist', 'geo-specialist', 'local-seo', 'technical-seo', 'content-seo', 'custom'] },
+                    'social-marketing': { label: 'biz_ind_social_marketing', roles: ['social-media', 'influencer-manager', 'community-manager', 'content-marketer', 'viral-specialist', 'custom'] },
+                    'performance': { label: 'biz_ind_performance', roles: ['performance-marketer', 'paid-media', 'growth-hacker', 'conversion-optimizer', 'marketing-analyst', 'custom'] },
+                    'brand-marketing': { label: 'biz_ind_brand_marketing', roles: ['brand-manager', 'brand-strategist', 'creative-director', 'campaign-manager', 'pr-specialist', 'custom'] },
+                    'content-marketing': { label: 'biz_ind_content_marketing', roles: ['content-strategist', 'copywriter', 'video-producer', 'podcast-host', 'newsletter-manager', 'custom'] },
+                    'custom': { label: 'biz_custom', roles: ['custom'] }
                 }
             },
             product: {
-                label: '產品管理 Product',
+                label: 'biz_domain_product',
                 industries: {
-                    'tech-product': { label: '科技產品 Tech', roles: ['pm', 'senior-pm', 'product-lead', 'custom'] },
-                    'consumer-product': { label: '消費品 Consumer', roles: ['consumer-pm', 'ux-researcher', 'custom'] },
-                    'custom': { label: '➕ 自定義', roles: ['custom'] }
+                    'fashion-product': { label: 'biz_ind_fashion_product', roles: ['fashion-pm', 'trend-analyst', 'sourcing-manager', 'quality-controller', 'supply-chain', 'custom'] },
+                    'baby-product': { label: 'biz_ind_baby_product', roles: ['baby-pm', 'safety-pm', 'parent-researcher', 'packaging-designer', 'compliance-pm', 'custom'] },
+                    'pet-product': { label: 'biz_ind_pet_product', roles: ['pet-pm', 'pet-nutritionist', 'pet-safety', 'pet-ux', 'pet-innovation', 'custom'] },
+                    'toy-product': { label: 'biz_ind_toy_product', roles: ['toy-pm', 'play-researcher', 'ip-developer', 'manufacturing-pm', 'collector-pm', 'custom'] },
+                    'tech-product': { label: 'biz_ind_tech_product', roles: ['pm', 'senior-pm', 'product-lead', 'technical-pm', 'platform-pm', 'custom'] },
+                    'custom': { label: 'biz_custom', roles: ['custom'] }
+                }
+            },
+            design: {
+                label: 'biz_domain_design',
+                industries: {
+                    'product-design': { label: 'biz_ind_product_design', roles: ['industrial-designer', 'cad-engineer', '3d-modeler', 'prototype-specialist', 'material-designer', 'custom'] },
+                    'fashion-design': { label: 'biz_ind_fashion_design', roles: ['fashion-designer', 'pattern-maker', 'textile-designer', 'accessory-designer', 'footwear-designer', 'custom'] },
+                    'toy-design': { label: 'biz_ind_toy_design', roles: ['toy-sculptor', 'character-designer', 'packaging-designer', 'color-specialist', 'articulation-designer', 'custom'] },
+                    'ux-ui': { label: 'biz_ind_ux_ui', roles: ['ux-designer', 'ui-designer', 'interaction-designer', 'design-system', 'user-researcher', 'custom'] },
+                    'graphic-design': { label: 'biz_ind_graphic_design', roles: ['graphic-designer', 'brand-designer', 'motion-designer', 'illustration', 'print-designer', 'custom'] },
+                    'custom': { label: 'biz_custom', roles: ['custom'] }
+                }
+            },
+            development: {
+                label: 'biz_domain_development',
+                industries: {
+                    'vibe-coding': { label: 'biz_ind_vibe_coding', roles: ['vibe-developer', 'ai-pair-programmer', 'prompt-engineer', 'rapid-prototyper', 'no-code-builder', 'custom'] },
+                    'web-dev': { label: 'biz_ind_web_dev', roles: ['frontend-dev', 'backend-dev', 'fullstack-dev', 'web-architect', 'devops', 'custom'] },
+                    'mobile-dev': { label: 'biz_ind_mobile_dev', roles: ['ios-dev', 'android-dev', 'react-native', 'flutter-dev', 'mobile-architect', 'custom'] },
+                    'ai-ml': { label: 'biz_ind_ai_ml', roles: ['ml-engineer', 'data-scientist', 'ai-researcher', 'mlops-engineer', 'nlp-specialist', 'custom'] },
+                    'ecommerce-dev': { label: 'biz_ind_ecommerce_dev', roles: ['shopify-dev', 'woocommerce-dev', 'api-integrator', 'payment-specialist', 'erp-developer', 'custom'] },
+                    'custom': { label: 'biz_custom', roles: ['custom'] }
+                }
+            },
+            strategy: {
+                label: 'biz_domain_strategy',
+                industries: {
+                    'ecom-strategy': { label: 'biz_ind_ecom_strategy', roles: ['ecom-strategist', 'marketplace-analyst', 'pricing-strategist', 'expansion-manager', 'omnichannel-lead', 'custom'] },
+                    'brand-strategy': { label: 'biz_ind_brand_strategy', roles: ['brand-strategist', 'positioning-expert', 'competitive-analyst', 'market-researcher', 'trend-forecaster', 'custom'] },
+                    'growth-strategy': { label: 'biz_ind_growth_strategy', roles: ['growth-strategist', 'acquisition-lead', 'retention-lead', 'monetization-lead', 'partnerships-lead', 'custom'] },
+                    'consulting': { label: 'biz_ind_consulting', roles: ['strategy-consultant', 'management-consultant', 'digital-consultant', 'change-manager', 'process-consultant', 'custom'] },
+                    'startup': { label: 'biz_ind_startup', roles: ['founder', 'coo', 'business-dev', 'chief-strategy', 'venture-partner', 'custom'] },
+                    'custom': { label: 'biz_custom', roles: ['custom'] }
                 }
             },
             finance: {
-                label: '財務分析 Finance',
+                label: 'biz_domain_finance',
                 industries: {
-                    'investment': { label: '投資分析 Investment', roles: ['analyst', 'portfolio-manager', 'custom'] },
-                    'corporate-finance': { label: '企業財務 Corporate', roles: ['cfo', 'fp-analyst', 'controller', 'custom'] },
-                    'custom': { label: '➕ 自定義', roles: ['custom'] }
+                    'ecom-finance': { label: 'biz_ind_ecom_finance', roles: ['ecom-controller', 'marketplace-analyst', 'payment-ops', 'fraud-analyst', 'revenue-ops', 'custom'] },
+                    'corporate-finance': { label: 'biz_ind_corporate_finance', roles: ['cfo', 'fp-analyst', 'controller', 'treasury-manager', 'investor-relations', 'custom'] },
+                    'accounting': { label: 'biz_ind_accounting', roles: ['auditor', 'tax-advisor', 'bookkeeper', 'management-accountant', 'compliance-officer', 'custom'] },
+                    'investment': { label: 'biz_ind_investment', roles: ['analyst', 'portfolio-manager', 'research-analyst', 'quant-analyst', 'risk-manager', 'custom'] },
+                    'business-finance': { label: 'biz_ind_business_finance', roles: ['budget-analyst', 'cost-analyst', 'profitability-analyst', 'cash-flow-manager', 'financial-planner', 'custom'] },
+                    'custom': { label: 'biz_custom', roles: ['custom'] }
                 }
             },
             hr: {
-                label: '人力資源 HR',
+                label: 'biz_domain_hr',
                 industries: {
-                    'talent-acquisition': { label: '人才招募 Talent', roles: ['recruiter', 'hr-manager', 'custom'] },
-                    'org-development': { label: '組織發展 OD', roles: ['od-specialist', 'hr-bp', 'custom'] },
-                    'custom': { label: '➕ 自定義', roles: ['custom'] }
+                    'talent-acquisition': { label: 'biz_ind_talent_acquisition', roles: ['recruiter', 'hr-manager', 'sourcing-specialist', 'employer-branding', 'campus-recruiter', 'custom'] },
+                    'org-development': { label: 'biz_ind_org_development', roles: ['od-specialist', 'hr-bp', 'culture-manager', 'engagement-specialist', 'change-consultant', 'custom'] },
+                    'compensation': { label: 'biz_ind_compensation', roles: ['comp-analyst', 'benefits-specialist', 'total-rewards', 'payroll-manager', 'equity-admin', 'custom'] },
+                    'learning': { label: 'biz_ind_learning', roles: ['learning-designer', 'training-manager', 'leadership-coach', 'lms-admin', 'performance-consultant', 'custom'] },
+                    'hr-tech': { label: 'biz_ind_hr_tech', roles: ['hris-analyst', 'people-analytics', 'hr-systems', 'digital-hr', 'ai-hr-specialist', 'custom'] },
+                    'custom': { label: 'biz_custom', roles: ['custom'] }
                 }
             }
         };
 
-        // 角色對應的框架/模型
+        // 角色對應的框架/模型 - 擴展版（每個角色至少5個框架選項+自定義）
         const roleFrameworks = {
-            'growth-hacker': ['AARRR', 'North Star Metric', 'Growth Loop', 'custom'],
-            'content-marketer': ['Content Pillar', 'Topic Cluster', 'Editorial Calendar', 'custom'],
-            'demand-gen': ['Lead Scoring', 'MQL/SQL', 'Funnel Optimization', 'custom'],
-            'performance-marketer': ['ROAS Optimization', 'Attribution Model', 'LTV:CAC', 'custom'],
-            'brand-manager': ['Brand Equity Model', 'Brand Architecture', 'Positioning Map', 'custom'],
-            'social-media': ['Content Calendar', 'Engagement Strategy', 'Influencer Matrix', 'custom'],
-            'product-marketer': ['GTM Strategy', 'Competitive Analysis', 'Messaging Framework', 'custom'],
-            'acquisition': ['CAC Analysis', 'Channel Mix', 'Conversion Funnel', 'custom'],
-            'retention': ['Cohort Analysis', 'Churn Prediction', 'Retention Hooks', 'custom'],
-            'strategy-consultant': ['SWOT', 'Porter Five Forces', 'BCG Matrix', 'McKinsey 7S', 'custom'],
-            'management-consultant': ['MECE', 'Hypothesis-driven', 'Issue Tree', 'custom'],
-            'founder': ['Lean Canvas', 'Business Model Canvas', 'OKR', 'custom'],
-            'coo': ['Operations Framework', 'Process Optimization', 'KPI Dashboard', 'custom'],
-            'business-dev': ['Partnership Framework', 'Deal Structure', 'Revenue Model', 'custom'],
-            'corporate-strategist': ['Ansoff Matrix', 'Value Chain', 'Scenario Planning', 'custom'],
-            'biz-analyst': ['Data Analysis', 'Business Case', 'ROI Model', 'custom'],
-            'account-exec': ['SPIN Selling', 'Challenger Sale', 'MEDDIC', 'custom'],
-            'sales-engineer': ['Solution Selling', 'Technical Demo', 'POC Framework', 'custom'],
-            'sales-manager': ['Pipeline Management', 'Forecast Model', 'Territory Planning', 'custom'],
-            'pm': ['PRD Template', 'User Story Mapping', 'Prioritization Matrix', 'custom'],
-            'senior-pm': ['Product Strategy', 'Roadmap Planning', 'Stakeholder Management', 'custom'],
-            'product-lead': ['Product Vision', 'Team Alignment', 'Metrics Framework', 'custom'],
-            'analyst': ['DCF Model', 'Comparable Analysis', 'Risk Assessment', 'custom'],
-            'portfolio-manager': ['Asset Allocation', 'Risk Management', 'Performance Attribution', 'custom'],
-            'cfo': ['Financial Planning', 'Capital Structure', 'Investor Relations', 'custom'],
-            'recruiter': ['Talent Pipeline', 'Employer Branding', 'Interview Framework', 'custom'],
-            'hr-manager': ['Performance Management', 'Compensation Strategy', 'HR Analytics', 'custom'],
-            'custom': ['custom']
+            // Marketing roles
+            'growth-hacker': ['AARRR', 'North Star Metric', 'Growth Loop', 'Viral Coefficient', 'Activation Funnel', 'custom'],
+            'content-marketer': ['Content Pillar', 'Topic Cluster', 'Editorial Calendar', 'Content Matrix', 'SEO Strategy', 'custom'],
+            'demand-gen': ['Lead Scoring', 'MQL/SQL', 'Funnel Optimization', 'ABM Strategy', 'Nurture Workflow', 'custom'],
+            'seo-specialist': ['Keyword Research', 'Technical SEO Audit', 'Link Building', 'Content Gap Analysis', 'SERP Analysis', 'custom'],
+            'marketing-analyst': ['Marketing Mix Model', 'Attribution Analysis', 'Customer Segmentation', 'Campaign ROI', 'Cohort Analysis', 'custom'],
+            'performance-marketer': ['ROAS Optimization', 'Attribution Model', 'LTV:CAC', 'Budget Allocation', 'Creative Testing', 'custom'],
+            'brand-manager': ['Brand Equity Model', 'Brand Architecture', 'Positioning Map', 'Brand Pyramid', 'Competitive Mapping', 'custom'],
+            'social-media': ['Content Calendar', 'Engagement Strategy', 'Influencer Matrix', 'Community Playbook', 'Crisis Management', 'custom'],
+            'affiliate-manager': ['Commission Structure', 'Partner Recruitment', 'Performance Tracking', 'Affiliate Tier System', 'Payout Optimization', 'custom'],
+            'crm-specialist': ['Customer Journey Map', 'Lifecycle Marketing', 'Personalization Engine', 'Retention Strategy', 'Win-back Campaign', 'custom'],
+            'product-marketer': ['GTM Strategy', 'Competitive Analysis', 'Messaging Framework', 'Launch Playbook', 'Sales Enablement', 'custom'],
+            'acquisition': ['CAC Analysis', 'Channel Mix', 'Conversion Funnel', 'Paid Media Strategy', 'Growth Experiments', 'custom'],
+            'retention': ['Cohort Analysis', 'Churn Prediction', 'Retention Hooks', 'Customer Health Score', 'Engagement Loops', 'custom'],
+            'compliance-marketer': ['Regulatory Compliance', 'Risk Assessment', 'Approval Workflow', 'Audit Trail', 'Policy Framework', 'custom'],
+            'partnership-manager': ['Partner Ecosystem', 'Co-marketing Strategy', 'Revenue Share Model', 'Integration Roadmap', 'Partner Success', 'custom'],
+            'healthcare-marketer': ['Patient Journey', 'HCP Engagement', 'Compliance Framework', 'Outcomes Marketing', 'Digital Health Strategy', 'custom'],
+            'patient-acquisition': ['Referral Network', 'Community Outreach', 'Patient Funnel', 'Reputation Management', 'Appointment Optimization', 'custom'],
+            'medical-writer': ['Clinical Documentation', 'Regulatory Writing', 'Patient Education', 'Scientific Communication', 'Content Validation', 'custom'],
+            'pharma-marketer': ['KOL Engagement', 'Clinical Trial Marketing', 'Formulary Strategy', 'Multichannel Marketing', 'Compliance Protocol', 'custom'],
+            'health-educator': ['Health Literacy Framework', 'Behavior Change Model', 'Community Education', 'Digital Health Tools', 'Outcome Measurement', 'custom'],
+            'edu-marketer': ['Enrollment Funnel', 'Student Journey', 'Campus Marketing', 'Alumni Engagement', 'Program Promotion', 'custom'],
+            'enrollment-specialist': ['Admission Strategy', 'Yield Optimization', 'Scholarship Framework', 'Application Process', 'Student Retention', 'custom'],
+            'alumni-relations': ['Alumni Network', 'Giving Strategy', 'Event Planning', 'Mentorship Program', 'Career Services', 'custom'],
+            'content-developer': ['Curriculum Design', 'Learning Objectives', 'Assessment Framework', 'Content Mapping', 'Accessibility Standards', 'custom'],
+            'community-manager': ['Community Guidelines', 'Engagement Playbook', 'Moderation Framework', 'Growth Strategy', 'Member Journey', 'custom'],
+            // Strategy roles
+            'strategy-consultant': ['SWOT', 'Porter Five Forces', 'BCG Matrix', 'McKinsey 7S', 'Value Chain Analysis', 'custom'],
+            'management-consultant': ['MECE', 'Hypothesis-driven', 'Issue Tree', 'Pyramid Principle', 'Change Management', 'custom'],
+            'digital-consultant': ['Digital Maturity Model', 'Technology Roadmap', 'Digital Transformation', 'Agile Methodology', 'Innovation Framework', 'custom'],
+            'change-manager': ['ADKAR Model', 'Kotter 8-Step', 'Change Impact Assessment', 'Stakeholder Analysis', 'Resistance Management', 'custom'],
+            'process-consultant': ['Lean Six Sigma', 'Process Mapping', 'Value Stream Analysis', 'Kaizen', 'BPR Framework', 'custom'],
+            'founder': ['Lean Canvas', 'Business Model Canvas', 'OKR', 'MVP Strategy', 'Pitch Deck Framework', 'custom'],
+            'coo': ['Operations Framework', 'Process Optimization', 'KPI Dashboard', 'Resource Planning', 'Operational Excellence', 'custom'],
+            'business-dev': ['Partnership Framework', 'Deal Structure', 'Revenue Model', 'Market Entry Strategy', 'Channel Strategy', 'custom'],
+            'chief-strategy': ['Corporate Strategy', 'M&A Framework', 'Portfolio Management', 'Strategic Planning', 'Competitive Intelligence', 'custom'],
+            'venture-partner': ['Due Diligence', 'Portfolio Strategy', 'Value Creation', 'Exit Planning', 'Syndication Strategy', 'custom'],
+            'corporate-strategist': ['Ansoff Matrix', 'Value Chain', 'Scenario Planning', 'Blue Ocean Strategy', 'Core Competency Analysis', 'custom'],
+            'biz-analyst': ['Data Analysis', 'Business Case', 'ROI Model', 'Requirements Gathering', 'Gap Analysis', 'custom'],
+            'transformation-lead': ['Transformation Roadmap', 'Change Readiness', 'Digital Strategy', 'Operating Model', 'Culture Transformation', 'custom'],
+            'innovation-manager': ['Design Thinking', 'Innovation Funnel', 'Open Innovation', 'Technology Scouting', 'Intrapreneurship', 'custom'],
+            'market-intelligence': ['Competitive Analysis', 'Market Sizing', 'Trend Analysis', 'Customer Intelligence', 'Strategic Foresight', 'custom'],
+            'pe-analyst': ['LBO Model', 'Deal Screening', 'Industry Analysis', 'Investment Thesis', 'Financial Modeling', 'custom'],
+            'due-diligence': ['Commercial DD', 'Financial DD', 'Operational DD', 'Legal DD', 'Technology DD', 'custom'],
+            'portfolio-ops': ['Value Creation Plan', 'Performance Monitoring', 'Best Practice Sharing', 'Exit Readiness', 'Management Assessment', 'custom'],
+            'deal-sourcing': ['Deal Flow Management', 'Relationship Building', 'Market Mapping', 'Proprietary Sourcing', 'Intermediary Network', 'custom'],
+            'value-creation': ['100-Day Plan', 'Revenue Enhancement', 'Cost Optimization', 'Digital Enablement', 'Organizational Design', 'custom'],
+            'policy-analyst': ['Policy Analysis Framework', 'Impact Assessment', 'Stakeholder Mapping', 'Regulatory Analysis', 'Policy Recommendation', 'custom'],
+            'program-manager': ['Program Governance', 'Benefits Realization', 'Risk Management', 'Resource Allocation', 'Performance Metrics', 'custom'],
+            'public-affairs': ['Government Relations', 'Advocacy Strategy', 'Public Communication', 'Coalition Building', 'Issue Management', 'custom'],
+            'regulatory-advisor': ['Compliance Framework', 'Regulatory Strategy', 'Risk Assessment', 'Policy Interpretation', 'Regulatory Filing', 'custom'],
+            'strategic-planner': ['Long-term Planning', 'Scenario Analysis', 'Resource Allocation', 'Performance Framework', 'Strategic Alignment', 'custom'],
+            // Sales roles
+            'account-exec': ['SPIN Selling', 'Challenger Sale', 'MEDDIC', 'Solution Selling', 'Value Selling', 'custom'],
+            'sales-engineer': ['Solution Selling', 'Technical Demo', 'POC Framework', 'Technical Discovery', 'Integration Planning', 'custom'],
+            'sales-manager': ['Pipeline Management', 'Forecast Model', 'Territory Planning', 'Team Coaching', 'Sales Enablement', 'custom'],
+            'enterprise-sales': ['Strategic Account Planning', 'Executive Alignment', 'Complex Deal Strategy', 'Procurement Navigation', 'Multi-threading', 'custom'],
+            'channel-manager': ['Partner Program', 'Channel Strategy', 'Partner Enablement', 'Deal Registration', 'Channel Conflict Resolution', 'custom'],
+            'retail-sales': ['Customer Engagement', 'Upselling Strategy', 'Visual Merchandising', 'Customer Loyalty', 'In-store Experience', 'custom'],
+            'inside-sales': ['Call Scripts', 'Lead Qualification', 'CRM Management', 'Email Sequences', 'Virtual Selling', 'custom'],
+            'telesales': ['Objection Handling', 'Script Optimization', 'Call Metrics', 'Appointment Setting', 'Follow-up Strategy', 'custom'],
+            'showroom-manager': ['Floor Planning', 'Staff Scheduling', 'Customer Flow', 'Display Strategy', 'Sales Training', 'custom'],
+            'customer-success': ['Onboarding Framework', 'Health Score', 'Expansion Strategy', 'Churn Prevention', 'QBR Process', 'custom'],
+            'sdr': ['Outbound Prospecting', 'Cold Calling', 'Email Cadence', 'Social Selling', 'Lead Qualification', 'custom'],
+            'bdr': ['Inbound Qualification', 'Lead Routing', 'Discovery Calls', 'Meeting Booking', 'Handoff Process', 'custom'],
+            'account-manager': ['Account Planning', 'Relationship Building', 'Renewal Strategy', 'Cross-sell Framework', 'Customer Advocacy', 'custom'],
+            'renewal-specialist': ['Renewal Playbook', 'At-risk Identification', 'Negotiation Strategy', 'Contract Management', 'Pricing Strategy', 'custom'],
+            'solution-architect': ['Technical Design', 'Solution Mapping', 'Architecture Review', 'Integration Strategy', 'Scalability Planning', 'custom'],
+            'real-estate-agent': ['Property Valuation', 'Market Analysis', 'Client Matching', 'Negotiation Strategy', 'Closing Process', 'custom'],
+            'property-consultant': ['Investment Analysis', 'Portfolio Strategy', 'Market Trends', 'Due Diligence', 'Asset Management', 'custom'],
+            'leasing-specialist': ['Lease Negotiation', 'Tenant Screening', 'Rent Optimization', 'Lease Renewal', 'Property Marketing', 'custom'],
+            'investment-advisor': ['Investment Strategy', 'Risk Assessment', 'Portfolio Diversification', 'Market Timing', 'Exit Strategy', 'custom'],
+            'development-sales': ['Pre-sale Strategy', 'Project Marketing', 'Buyer Qualification', 'Contract Negotiation', 'Settlement Process', 'custom'],
+            'wholesale-rep': ['Territory Management', 'Dealer Relations', 'Volume Pricing', 'Inventory Management', 'Trade Shows', 'custom'],
+            'key-account': ['Strategic Account Management', 'JBP Planning', 'Category Management', 'Trade Terms', 'Promotional Planning', 'custom'],
+            'distributor-manager': ['Distribution Network', 'Partner Performance', 'Inventory Optimization', 'Market Coverage', 'Distributor Development', 'custom'],
+            'trade-marketing': ['Trade Promotions', 'Retail Execution', 'POS Materials', 'Category Strategy', 'Shopper Marketing', 'custom'],
+            'territory-manager': ['Territory Planning', 'Route Optimization', 'Coverage Strategy', 'Performance Tracking', 'Market Penetration', 'custom'],
+            // Product roles
+            'pm': ['PRD Template', 'User Story Mapping', 'Prioritization Matrix', 'Sprint Planning', 'Feature Specification', 'custom'],
+            'senior-pm': ['Product Strategy', 'Roadmap Planning', 'Stakeholder Management', 'Go-to-Market', 'Competitive Positioning', 'custom'],
+            'product-lead': ['Product Vision', 'Team Alignment', 'Metrics Framework', 'Portfolio Management', 'Innovation Pipeline', 'custom'],
+            'technical-pm': ['Technical Requirements', 'API Strategy', 'System Architecture', 'Performance Optimization', 'Security Requirements', 'custom'],
+            'platform-pm': ['Platform Strategy', 'Developer Experience', 'API Design', 'Ecosystem Development', 'Integration Framework', 'custom'],
+            'consumer-pm': ['User Research', 'A/B Testing', 'Feature Prioritization', 'User Journey', 'Engagement Metrics', 'custom'],
+            'ux-researcher': ['User Interview', 'Usability Testing', 'Survey Design', 'Persona Development', 'Journey Mapping', 'custom'],
+            'growth-pm': ['Growth Experiments', 'Funnel Analysis', 'Activation Metrics', 'Retention Strategy', 'Viral Loops', 'custom'],
+            'mobile-pm': ['Mobile UX', 'App Store Optimization', 'Push Strategy', 'Mobile Analytics', 'Cross-platform Strategy', 'custom'],
+            'product-analyst': ['Product Analytics', 'Feature Adoption', 'User Segmentation', 'Funnel Analysis', 'Cohort Analysis', 'custom'],
+            'enterprise-pm': ['Enterprise Requirements', 'Security Compliance', 'Integration Strategy', 'SLA Management', 'Customer Success', 'custom'],
+            'api-pm': ['API Design', 'Developer Portal', 'Rate Limiting', 'Versioning Strategy', 'Documentation', 'custom'],
+            'integration-pm': ['Integration Architecture', 'Partner API', 'Webhook Strategy', 'Data Mapping', 'Error Handling', 'custom'],
+            'partner-pm': ['Partner Requirements', 'White-label Strategy', 'Co-development', 'Partner Success', 'Revenue Sharing', 'custom'],
+            'product-ops': ['Product Operations', 'Process Optimization', 'Tool Management', 'Data Governance', 'Cross-functional Alignment', 'custom'],
+            'hardware-pm': ['Hardware Requirements', 'Manufacturing Process', 'Supply Chain', 'Quality Assurance', 'Product Lifecycle', 'custom'],
+            'iot-pm': ['IoT Architecture', 'Device Management', 'Connectivity Strategy', 'Edge Computing', 'Security Framework', 'custom'],
+            'embedded-pm': ['Embedded Systems', 'Firmware Strategy', 'Hardware-Software Integration', 'Real-time Requirements', 'Power Management', 'custom'],
+            'manufacturing-liaison': ['Manufacturing Process', 'Quality Control', 'Cost Optimization', 'Supplier Management', 'Production Planning', 'custom'],
+            'quality-pm': ['Quality Framework', 'Testing Strategy', 'Defect Management', 'Quality Metrics', 'Continuous Improvement', 'custom'],
+            'data-pm': ['Data Strategy', 'Data Pipeline', 'Data Quality', 'Data Governance', 'Analytics Platform', 'custom'],
+            'ml-pm': ['ML Pipeline', 'Model Development', 'MLOps', 'Feature Engineering', 'Model Monitoring', 'custom'],
+            'analytics-pm': ['Analytics Strategy', 'BI Tools', 'Dashboard Design', 'Self-service Analytics', 'Data Democratization', 'custom'],
+            'bi-product-manager': ['BI Architecture', 'Reporting Framework', 'KPI Definition', 'Data Visualization', 'Insight Generation', 'custom'],
+            'data-strategy': ['Data Architecture', 'Data Monetization', 'Data Partnerships', 'Privacy Framework', 'Data Ethics', 'custom'],
+            // Finance roles
+            'analyst': ['DCF Model', 'Comparable Analysis', 'Risk Assessment', 'Financial Modeling', 'Valuation Methods', 'custom'],
+            'portfolio-manager': ['Asset Allocation', 'Risk Management', 'Performance Attribution', 'Rebalancing Strategy', 'Factor Investing', 'custom'],
+            'research-analyst': ['Equity Research', 'Industry Analysis', 'Company Valuation', 'Investment Thesis', 'Earnings Model', 'custom'],
+            'quant-analyst': ['Quantitative Models', 'Statistical Analysis', 'Algorithmic Trading', 'Risk Models', 'Backtesting', 'custom'],
+            'risk-manager': ['Risk Framework', 'VaR Analysis', 'Stress Testing', 'Risk Reporting', 'Hedging Strategy', 'custom'],
+            'cfo': ['Financial Planning', 'Capital Structure', 'Investor Relations', 'Treasury Management', 'Strategic Finance', 'custom'],
+            'fp-analyst': ['Budget Planning', 'Variance Analysis', 'Forecasting', 'Financial Reporting', 'Business Partnering', 'custom'],
+            'controller': ['Financial Controls', 'Close Process', 'Compliance', 'Audit Management', 'Policy Development', 'custom'],
+            'treasury-manager': ['Cash Management', 'Liquidity Planning', 'FX Management', 'Banking Relations', 'Working Capital', 'custom'],
+            'investor-relations': ['Investor Communication', 'Earnings Guidance', 'Shareholder Analysis', 'IR Strategy', 'ESG Reporting', 'custom'],
+            'relationship-manager': ['Client Relationship', 'Needs Assessment', 'Product Recommendation', 'Portfolio Review', 'Client Retention', 'custom'],
+            'credit-analyst': ['Credit Assessment', 'Risk Rating', 'Financial Analysis', 'Covenant Monitoring', 'Credit Policy', 'custom'],
+            'trade-finance': ['Trade Products', 'LC Documentation', 'Risk Mitigation', 'Working Capital', 'Supply Chain Finance', 'custom'],
+            'private-banker': ['Wealth Planning', 'Investment Advisory', 'Tax Planning', 'Estate Planning', 'Family Governance', 'custom'],
+            'loan-officer': ['Loan Origination', 'Underwriting', 'Documentation', 'Compliance', 'Collection Strategy', 'custom'],
+            'actuary': ['Actuarial Modeling', 'Pricing Strategy', 'Reserve Calculation', 'Risk Assessment', 'Regulatory Reporting', 'custom'],
+            'underwriter': ['Risk Selection', 'Policy Pricing', 'Capacity Management', 'Treaty Negotiation', 'Claims Analysis', 'custom'],
+            'claims-analyst': ['Claims Assessment', 'Fraud Detection', 'Settlement Strategy', 'Subrogation', 'Claims Reserve', 'custom'],
+            'product-actuary': ['Product Development', 'Pricing Model', 'Profit Testing', 'Regulatory Filing', 'Market Analysis', 'custom'],
+            'risk-assessor': ['Risk Evaluation', 'Site Inspection', 'Risk Recommendation', 'Loss Prevention', 'Risk Reporting', 'custom'],
+            'auditor': ['Audit Planning', 'Internal Controls', 'Risk-based Audit', 'Audit Reporting', 'Remediation Tracking', 'custom'],
+            'tax-advisor': ['Tax Planning', 'Compliance Strategy', 'Tax Optimization', 'Transfer Pricing', 'Tax Controversy', 'custom'],
+            'forensic-accountant': ['Fraud Investigation', 'Litigation Support', 'Asset Tracing', 'Expert Testimony', 'Compliance Investigation', 'custom'],
+            'management-accountant': ['Cost Accounting', 'Performance Analysis', 'Decision Support', 'Process Improvement', 'Management Reporting', 'custom'],
+            'compliance-officer': ['Compliance Program', 'Regulatory Monitoring', 'Policy Development', 'Training Program', 'Incident Management', 'custom'],
+            // HR roles
+            'recruiter': ['Talent Pipeline', 'Employer Branding', 'Interview Framework', 'Sourcing Strategy', 'Candidate Experience', 'custom'],
+            'hr-manager': ['Performance Management', 'Compensation Strategy', 'HR Analytics', 'Employee Relations', 'Policy Development', 'custom'],
+            'sourcing-specialist': ['Talent Sourcing', 'Boolean Search', 'Talent Mapping', 'Pipeline Development', 'Market Intelligence', 'custom'],
+            'employer-branding': ['EVP Development', 'Brand Strategy', 'Content Marketing', 'Social Media', 'Candidate Engagement', 'custom'],
+            'campus-recruiter': ['Campus Strategy', 'University Relations', 'Internship Program', 'Event Planning', 'Early Talent', 'custom'],
+            'od-specialist': ['Organization Design', 'Culture Assessment', 'Change Readiness', 'Team Effectiveness', 'Leadership Development', 'custom'],
+            'hr-bp': ['Business Partnering', 'Workforce Planning', 'Talent Review', 'Succession Planning', 'Employee Engagement', 'custom'],
+            'culture-manager': ['Culture Strategy', 'Values Activation', 'Employee Experience', 'Culture Measurement', 'Behavior Change', 'custom'],
+            'engagement-specialist': ['Engagement Survey', 'Action Planning', 'Recognition Program', 'Communication Strategy', 'Wellbeing Initiative', 'custom'],
+            'change-consultant': ['Change Strategy', 'Stakeholder Engagement', 'Communication Plan', 'Training Design', 'Adoption Measurement', 'custom'],
+            'comp-analyst': ['Compensation Analysis', 'Market Benchmarking', 'Pay Equity', 'Salary Structure', 'Incentive Design', 'custom'],
+            'benefits-specialist': ['Benefits Design', 'Vendor Management', 'Open Enrollment', 'Compliance', 'Employee Communication', 'custom'],
+            'total-rewards': ['Total Rewards Strategy', 'Executive Compensation', 'Global Mobility', 'Recognition Framework', 'Rewards Philosophy', 'custom'],
+            'payroll-manager': ['Payroll Processing', 'Compliance', 'Tax Reporting', 'System Management', 'Process Improvement', 'custom'],
+            'equity-admin': ['Equity Programs', 'Stock Administration', 'Compliance Reporting', 'Participant Communication', 'System Management', 'custom'],
+            'learning-designer': ['Instructional Design', 'Learning Experience', 'Content Development', 'Assessment Design', 'Learning Technology', 'custom'],
+            'training-manager': ['Training Strategy', 'Needs Analysis', 'Program Delivery', 'Vendor Management', 'ROI Measurement', 'custom'],
+            'leadership-coach': ['Executive Coaching', 'Leadership Assessment', 'Development Planning', 'Team Coaching', 'Succession Coaching', 'custom'],
+            'lms-admin': ['LMS Management', 'Content Curation', 'Reporting Analytics', 'User Experience', 'Integration Management', 'custom'],
+            'performance-consultant': ['Performance Analysis', 'Intervention Design', 'Process Improvement', 'Change Management', 'Measurement Strategy', 'custom'],
+            'hris-analyst': ['System Administration', 'Data Management', 'Reporting', 'Process Automation', 'Integration', 'custom'],
+            'people-analytics': ['Workforce Analytics', 'Predictive Modeling', 'Dashboard Development', 'Insight Generation', 'Data Storytelling', 'custom'],
+            'hr-systems': ['System Implementation', 'Vendor Selection', 'Change Management', 'Data Migration', 'User Training', 'custom'],
+            'digital-hr': ['Digital Transformation', 'Employee Experience', 'Process Automation', 'Self-service Portal', 'Chatbot Development', 'custom'],
+            'ai-hr-specialist': ['AI Applications', 'ML in HR', 'Predictive Analytics', 'Automation Strategy', 'Ethical AI', 'custom'],
+            // ==================== 用戶行業角色 - E-commerce ====================
+            'ecom-manager': ['Marketplace Strategy', 'Inventory Management', 'Pricing Optimization', 'Seller Performance', 'Platform Analytics', 'custom'],
+            'fashion-buyer': ['Trend Forecasting', 'Vendor Negotiation', 'Seasonal Planning', 'Assortment Strategy', 'Margin Management', 'custom'],
+            'visual-merchandiser': ['Display Strategy', 'Product Styling', 'Store Layout', 'Brand Presentation', 'Customer Flow', 'custom'],
+            'product-stylist': ['Product Photography', 'Lifestyle Styling', 'Brand Aesthetics', 'Content Direction', 'Trend Interpretation', 'custom'],
+            'category-manager': ['Category Strategy', 'Assortment Planning', 'Pricing Strategy', 'Vendor Management', 'Performance Analysis', 'custom'],
+            'baby-product-manager': ['Safety Compliance', 'Age-appropriate Design', 'Parent Education', 'Product Testing', 'Regulatory Standards', 'custom'],
+            'parent-community': ['Community Building', 'Parent Engagement', 'Content Strategy', 'Expert Partnerships', 'Support Groups', 'custom'],
+            'safety-specialist': ['Safety Standards', 'Testing Protocols', 'Certification Process', 'Risk Assessment', 'Compliance Audit', 'custom'],
+            'content-creator': ['Content Strategy', 'Video Production', 'Social Media', 'Influencer Collaboration', 'Brand Storytelling', 'custom'],
+            'kol-manager': ['KOL Identification', 'Partnership Negotiation', 'Campaign Management', 'ROI Measurement', 'Relationship Building', 'custom'],
+            'pet-product-manager': ['Pet Health Focus', 'Species-specific Design', 'Quality Standards', 'Vet Consultation', 'Product Testing', 'custom'],
+            'pet-community': ['Pet Parent Engagement', 'Educational Content', 'Community Events', 'Expert Network', 'User Stories', 'custom'],
+            'vet-consultant': ['Health Advisory', 'Product Validation', 'Nutrition Guidance', 'Safety Review', 'Expert Content', 'custom'],
+            'pet-content': ['Pet Photography', 'Educational Videos', 'Care Guides', 'Product Reviews', 'Social Content', 'custom'],
+            'pet-influencer': ['Influencer Partnerships', 'Brand Ambassadors', 'Campaign Strategy', 'Content Collaboration', 'Engagement Analytics', 'custom'],
+            'toy-designer': ['Character Design', 'Articulation Design', 'Material Selection', 'Manufacturing Specs', 'Collectibility Features', 'custom'],
+            'ip-manager': ['IP Development', 'Licensing Strategy', 'Brand Protection', 'Collaboration Management', 'Revenue Optimization', 'custom'],
+            'collector-community': ['Collector Engagement', 'Limited Edition Strategy', 'Community Events', 'Resale Market', 'Authenticity Programs', 'custom'],
+            'limited-edition': ['Drop Strategy', 'Scarcity Marketing', 'Pre-order Management', 'Launch Events', 'Exclusivity Programs', 'custom'],
+            'collab-manager': ['Artist Partnerships', 'Brand Collaborations', 'Co-creation Process', 'Contract Negotiation', 'Launch Coordination', 'custom'],
+            'tiktok-operator': ['TikTok Shop Management', 'Algorithm Optimization', 'Content Strategy', 'Affiliate Program', 'Performance Analytics', 'custom'],
+            'live-host': ['Live Streaming', 'Audience Engagement', 'Product Demonstration', 'Sales Conversion', 'Follower Growth', 'custom'],
+            'short-video': ['Video Production', 'Trend Riding', 'Hook Creation', 'Editing Techniques', 'Viral Strategy', 'custom'],
+            'affiliate-tiktok': ['Affiliate Recruitment', 'Commission Structure', 'Performance Tracking', 'Relationship Management', 'Campaign Optimization', 'custom'],
+            'tiktok-ads': ['TikTok Ads Manager', 'Creative Testing', 'Audience Targeting', 'Budget Optimization', 'Conversion Tracking', 'custom'],
+            'shopee-operator': ['Shopee Seller Center', 'Listing Optimization', 'Promotional Tools', 'Order Management', 'Customer Service', 'custom'],
+            'shopee-ads': ['Shopee Ads', 'Keyword Bidding', 'Product Boost', 'Discovery Ads', 'ROI Optimization', 'custom'],
+            'flash-sale': ['Flash Deal Strategy', 'Inventory Planning', 'Pricing Strategy', 'Promotional Calendar', 'Performance Analysis', 'custom'],
+            'shopee-live': ['Shopee Live', 'Streaming Schedule', 'Product Showcase', 'Viewer Engagement', 'Sales Conversion', 'custom'],
+            'seller-support': ['Seller Performance', 'Policy Compliance', 'Issue Resolution', 'Rating Management', 'Account Health', 'custom'],
+            'fb-shop-manager': ['Facebook Shop', 'Catalog Management', 'Checkout Optimization', 'Customer Engagement', 'Performance Tracking', 'custom'],
+            'fb-ads-specialist': ['Facebook Ads Manager', 'Audience Building', 'Creative Testing', 'Conversion Campaigns', 'Pixel Optimization', 'custom'],
+            'community-sales': ['Facebook Groups', 'Community Engagement', 'Social Selling', 'Trust Building', 'Group Management', 'custom'],
+            'messenger-sales': ['Messenger Commerce', 'Chatbot Strategy', 'Quick Replies', 'Order Management', 'Customer Follow-up', 'custom'],
+            'fb-live': ['Facebook Live', 'Live Shopping', 'Audience Interaction', 'Product Demos', 'Engagement Strategy', 'custom'],
+            // ==================== Marketing - SEO/GEO ====================
+            'geo-specialist': ['Local SEO', 'Google Business Profile', 'Location Strategy', 'Review Management', 'Citation Building', 'custom'],
+            'local-seo': ['Local Keywords', 'Map Pack Optimization', 'Local Landing Pages', 'NAP Consistency', 'Local Link Building', 'custom'],
+            'technical-seo': ['Site Architecture', 'Core Web Vitals', 'Schema Markup', 'Crawl Optimization', 'Site Speed', 'custom'],
+            'content-seo': ['Keyword Research', 'Content Optimization', 'Topic Clusters', 'Search Intent', 'Featured Snippets', 'custom'],
+            'influencer-manager': ['Influencer Identification', 'Campaign Planning', 'Contract Negotiation', 'Performance Tracking', 'Relationship Management', 'custom'],
+            'viral-specialist': ['Viral Content Strategy', 'Trend Surfing', 'Shareable Content', 'Engagement Hooks', 'Platform Optimization', 'custom'],
+            'paid-media': ['Paid Media Strategy', 'Channel Mix', 'Budget Allocation', 'Bid Strategy', 'Creative Testing', 'custom'],
+            'conversion-optimizer': ['CRO Strategy', 'A/B Testing', 'Landing Page Optimization', 'User Flow Analysis', 'Conversion Funnel', 'custom'],
+            'brand-strategist': ['Brand Positioning', 'Brand Architecture', 'Messaging Framework', 'Visual Identity', 'Brand Guidelines', 'custom'],
+            'creative-director': ['Creative Strategy', 'Campaign Concepts', 'Art Direction', 'Brand Expression', 'Creative Brief', 'custom'],
+            'campaign-manager': ['Campaign Planning', 'Execution Management', 'Timeline Coordination', 'Budget Management', 'Results Reporting', 'custom'],
+            'pr-specialist': ['Media Relations', 'Press Release', 'Crisis Communication', 'Reputation Management', 'Influencer PR', 'custom'],
+            'content-strategist': ['Content Strategy', 'Content Audit', 'Content Calendar', 'Channel Strategy', 'Performance Metrics', 'custom'],
+            'copywriter': ['Copywriting', 'Brand Voice', 'Ad Copy', 'Product Description', 'Email Copy', 'custom'],
+            'video-producer': ['Video Strategy', 'Production Planning', 'Post-production', 'Distribution Strategy', 'Video Analytics', 'custom'],
+            'podcast-host': ['Podcast Strategy', 'Guest Booking', 'Episode Planning', 'Audience Growth', 'Monetization', 'custom'],
+            'newsletter-manager': ['Newsletter Strategy', 'List Building', 'Content Curation', 'Engagement Optimization', 'Deliverability', 'custom'],
+            // ==================== Product - Industry Specific ====================
+            'fashion-pm': ['Fashion Product Lifecycle', 'Trend Integration', 'Size/Fit Optimization', 'Color Strategy', 'Material Innovation', 'custom'],
+            'trend-analyst': ['Trend Research', 'Forecast Reports', 'Consumer Insights', 'Market Analysis', 'Competitive Tracking', 'custom'],
+            'sourcing-manager': ['Supplier Management', 'Cost Negotiation', 'Quality Control', 'Lead Time Optimization', 'Sustainability Sourcing', 'custom'],
+            'quality-controller': ['Quality Standards', 'Inspection Process', 'Defect Analysis', 'Supplier Audit', 'Continuous Improvement', 'custom'],
+            'supply-chain': ['Supply Chain Strategy', 'Logistics Optimization', 'Inventory Management', 'Demand Planning', 'Risk Management', 'custom'],
+            'baby-pm': ['Baby Product Safety', 'Age Segmentation', 'Parent Research', 'Development Milestones', 'Regulatory Compliance', 'custom'],
+            'safety-pm': ['Safety Testing', 'Certification Process', 'Risk Assessment', 'Recall Prevention', 'Safety Standards', 'custom'],
+            'parent-researcher': ['Parent Insights', 'User Testing', 'Focus Groups', 'Journey Mapping', 'Pain Point Analysis', 'custom'],
+            'packaging-designer': ['Package Design', 'Shelf Impact', 'Sustainability', 'Unboxing Experience', 'Cost Optimization', 'custom'],
+            'compliance-pm': ['Regulatory Compliance', 'Certification Management', 'Documentation', 'Audit Preparation', 'Policy Updates', 'custom'],
+            'pet-pm': ['Pet Product Development', 'Species Research', 'Safety Testing', 'Vet Collaboration', 'Customer Feedback', 'custom'],
+            'pet-nutritionist': ['Nutrition Formulation', 'Ingredient Sourcing', 'Health Claims', 'Regulatory Compliance', 'Quality Testing', 'custom'],
+            'pet-safety': ['Pet Safety Standards', 'Material Testing', 'Choking Hazard Assessment', 'Durability Testing', 'Toxicity Screening', 'custom'],
+            'pet-ux': ['Pet User Experience', 'Behavioral Testing', 'Owner Feedback', 'Usage Patterns', 'Design Iteration', 'custom'],
+            'pet-innovation': ['Pet Tech Innovation', 'Smart Products', 'Connected Devices', 'Health Monitoring', 'App Integration', 'custom'],
+            'toy-pm': ['Toy Development', 'Play Testing', 'Safety Compliance', 'Manufacturing Specs', 'Cost Management', 'custom'],
+            'play-researcher': ['Play Patterns', 'Child Development', 'Educational Value', 'Engagement Testing', 'Age Appropriateness', 'custom'],
+            'ip-developer': ['IP Creation', 'Character Development', 'Story Building', 'Brand Extension', 'Licensing Prep', 'custom'],
+            'manufacturing-pm': ['Manufacturing Process', 'Vendor Management', 'Production Planning', 'Cost Control', 'Quality Assurance', 'custom'],
+            'collector-pm': ['Collector Market', 'Limited Edition Strategy', 'Authenticity Features', 'Resale Value', 'Community Engagement', 'custom'],
+            // ==================== Design ====================
+            'industrial-designer': ['Product Design', 'CAD Modeling', 'Prototyping', 'Material Selection', 'Manufacturing Design', 'custom'],
+            'cad-engineer': ['CAD Software', 'Technical Drawing', '3D Modeling', 'Design Validation', 'Manufacturing Specs', 'custom'],
+            '3d-modeler': ['3D Modeling', 'Rendering', 'Animation', 'Texture Mapping', 'Model Optimization', 'custom'],
+            'prototype-specialist': ['Rapid Prototyping', '3D Printing', 'Mock-up Creation', 'Testing Coordination', 'Iteration Management', 'custom'],
+            'material-designer': ['Material Selection', 'Sustainable Materials', 'Cost Analysis', 'Supplier Sourcing', 'Quality Testing', 'custom'],
+            'fashion-designer': ['Fashion Design', 'Collection Development', 'Trend Interpretation', 'Technical Sketching', 'Fabric Selection', 'custom'],
+            'pattern-maker': ['Pattern Development', 'Grading', 'Fit Analysis', 'Technical Specs', 'Production Patterns', 'custom'],
+            'textile-designer': ['Textile Design', 'Print Development', 'Fabric Innovation', 'Color Stories', 'Surface Design', 'custom'],
+            'accessory-designer': ['Accessory Design', 'Hardware Selection', 'Material Innovation', 'Trend Research', 'Production Specs', 'custom'],
+            'footwear-designer': ['Footwear Design', 'Last Development', 'Material Selection', 'Comfort Engineering', 'Production Specs', 'custom'],
+            'toy-sculptor': ['Sculpture Design', 'Character Modeling', 'Articulation Design', 'Material Consideration', 'Production Ready', 'custom'],
+            'character-designer': ['Character Creation', 'Visual Development', 'Style Guide', 'Personality Design', 'Brand Consistency', 'custom'],
+            'color-specialist': ['Color Theory', 'Color Matching', 'Trend Colors', 'Production Colors', 'Color Management', 'custom'],
+            'articulation-designer': ['Joint Design', 'Movement Range', 'Play Pattern', 'Durability Testing', 'Assembly Design', 'custom'],
+            'ux-designer': ['User Experience', 'Wireframing', 'Prototyping', 'User Testing', 'Design Systems', 'custom'],
+            'ui-designer': ['Interface Design', 'Visual Design', 'Component Library', 'Responsive Design', 'Design Specs', 'custom'],
+            'interaction-designer': ['Interaction Patterns', 'Animation Design', 'Micro-interactions', 'User Flows', 'Gesture Design', 'custom'],
+            'design-system': ['Design System', 'Component Library', 'Documentation', 'Governance', 'Adoption Strategy', 'custom'],
+            'user-researcher': ['User Research', 'Usability Testing', 'Interview Techniques', 'Survey Design', 'Insight Synthesis', 'custom'],
+            'graphic-designer': ['Graphic Design', 'Layout Design', 'Typography', 'Color Theory', 'Visual Hierarchy', 'custom'],
+            'brand-designer': ['Brand Identity', 'Logo Design', 'Brand Guidelines', 'Visual System', 'Brand Applications', 'custom'],
+            'motion-designer': ['Motion Graphics', 'Animation', 'Video Effects', 'Storytelling', 'After Effects', 'custom'],
+            'illustration': ['Illustration', 'Character Art', 'Digital Painting', 'Vector Art', 'Style Development', 'custom'],
+            'print-designer': ['Print Design', 'Packaging', 'Editorial Design', 'Production Files', 'Print Specs', 'custom'],
+            // ==================== Development - Vibe Coding ====================
+            'vibe-developer': ['AI-assisted Coding', 'Rapid Development', 'Prompt Engineering', 'Code Generation', 'Iterative Building', 'custom'],
+            'ai-pair-programmer': ['AI Pair Programming', 'Code Review', 'Bug Fixing', 'Feature Implementation', 'Learning Loop', 'custom'],
+            'prompt-engineer': ['Prompt Design', 'Context Optimization', 'Output Control', 'Chain of Thought', 'Few-shot Learning', 'custom'],
+            'rapid-prototyper': ['Quick Prototyping', 'MVP Development', 'Iteration Speed', 'User Feedback Loop', 'Feature Prioritization', 'custom'],
+            'no-code-builder': ['No-code Tools', 'Workflow Automation', 'App Building', 'Integration Setup', 'Rapid Deployment', 'custom'],
+            'frontend-dev': ['Frontend Development', 'React/Vue/Angular', 'CSS/Styling', 'Performance', 'Accessibility', 'custom'],
+            'backend-dev': ['Backend Development', 'API Design', 'Database Design', 'Security', 'Scalability', 'custom'],
+            'fullstack-dev': ['Full Stack', 'End-to-end Development', 'Architecture', 'Deployment', 'DevOps', 'custom'],
+            'web-architect': ['System Architecture', 'Scalability', 'Security Architecture', 'Tech Stack Selection', 'Performance Design', 'custom'],
+            'devops': ['CI/CD', 'Infrastructure as Code', 'Containerization', 'Monitoring', 'Cloud Services', 'custom'],
+            'ios-dev': ['iOS Development', 'Swift', 'SwiftUI', 'App Store', 'Performance', 'custom'],
+            'android-dev': ['Android Development', 'Kotlin', 'Jetpack Compose', 'Play Store', 'Performance', 'custom'],
+            'react-native': ['React Native', 'Cross-platform', 'Native Modules', 'Performance', 'App Store', 'custom'],
+            'flutter-dev': ['Flutter', 'Dart', 'Cross-platform', 'Widget Design', 'Performance', 'custom'],
+            'mobile-architect': ['Mobile Architecture', 'Cross-platform Strategy', 'Performance', 'Security', 'Scalability', 'custom'],
+            'ml-engineer': ['Machine Learning', 'Model Training', 'Feature Engineering', 'MLOps', 'Model Deployment', 'custom'],
+            'data-scientist': ['Data Analysis', 'Statistical Modeling', 'Python/R', 'Visualization', 'Business Insights', 'custom'],
+            'ai-researcher': ['AI Research', 'Paper Implementation', 'Model Innovation', 'Experiment Design', 'Benchmarking', 'custom'],
+            'mlops-engineer': ['MLOps', 'Model Pipeline', 'Monitoring', 'A/B Testing', 'Model Versioning', 'custom'],
+            'nlp-specialist': ['NLP', 'Text Processing', 'Language Models', 'Sentiment Analysis', 'Chatbots', 'custom'],
+            'shopify-dev': ['Shopify Development', 'Theme Customization', 'App Development', 'Liquid', 'Checkout Extension', 'custom'],
+            'woocommerce-dev': ['WooCommerce', 'WordPress', 'Plugin Development', 'Theme Customization', 'Payment Gateway', 'custom'],
+            'api-integrator': ['API Integration', 'Third-party Services', 'Webhook Management', 'Data Sync', 'Error Handling', 'custom'],
+            'payment-specialist': ['Payment Gateway', 'Checkout Flow', 'Security Compliance', 'Multi-currency', 'Fraud Prevention', 'custom'],
+            'erp-developer': ['ERP Integration', 'Inventory Sync', 'Order Management', 'Data Migration', 'System Automation', 'custom'],
+            // ==================== Strategy ====================
+            'ecom-strategist': ['E-commerce Strategy', 'Marketplace Analysis', 'Growth Planning', 'Channel Strategy', 'P&L Optimization', 'custom'],
+            'marketplace-analyst': ['Marketplace Analysis', 'Competitive Intelligence', 'Pricing Analysis', 'Category Trends', 'Performance Metrics', 'custom'],
+            'pricing-strategist': ['Pricing Strategy', 'Dynamic Pricing', 'Competitor Analysis', 'Margin Optimization', 'Promotional Pricing', 'custom'],
+            'expansion-manager': ['Market Expansion', 'New Channel Entry', 'Localization Strategy', 'Partnership Development', 'Launch Planning', 'custom'],
+            'omnichannel-lead': ['Omnichannel Strategy', 'Channel Integration', 'Customer Journey', 'Unified Commerce', 'Inventory Visibility', 'custom'],
+            'positioning-expert': ['Brand Positioning', 'Competitive Differentiation', 'Value Proposition', 'Target Segmentation', 'Messaging Strategy', 'custom'],
+            'competitive-analyst': ['Competitive Analysis', 'Market Mapping', 'SWOT Analysis', 'Strategy Monitoring', 'Opportunity Identification', 'custom'],
+            'market-researcher': ['Market Research', 'Consumer Insights', 'Survey Design', 'Data Analysis', 'Trend Identification', 'custom'],
+            'trend-forecaster': ['Trend Forecasting', 'Future Planning', 'Scenario Analysis', 'Innovation Spotting', 'Consumer Behavior', 'custom'],
+            'growth-strategist': ['Growth Strategy', 'Acquisition Planning', 'Retention Strategy', 'Expansion Planning', 'Metrics Framework', 'custom'],
+            'acquisition-lead': ['Customer Acquisition', 'Channel Strategy', 'CAC Optimization', 'Conversion Funnel', 'Growth Experiments', 'custom'],
+            'retention-lead': ['Customer Retention', 'Loyalty Programs', 'Churn Prevention', 'Engagement Strategy', 'LTV Optimization', 'custom'],
+            'monetization-lead': ['Monetization Strategy', 'Revenue Model', 'Pricing Optimization', 'Product Bundling', 'Value Capture', 'custom'],
+            'partnerships-lead': ['Partnership Strategy', 'Business Development', 'Alliance Management', 'Revenue Sharing', 'Integration Planning', 'custom'],
+            // ==================== Finance - E-commerce ====================
+            'ecom-controller': ['E-commerce Finance', 'Marketplace Accounting', 'Revenue Recognition', 'Fee Analysis', 'Profitability Tracking', 'custom'],
+            'payment-ops': ['Payment Operations', 'Settlement Management', 'Chargeback Handling', 'Payment Method Analysis', 'Fee Optimization', 'custom'],
+            'fraud-analyst': ['Fraud Detection', 'Risk Assessment', 'Chargeback Analysis', 'Prevention Strategy', 'Pattern Recognition', 'custom'],
+            'revenue-ops': ['Revenue Operations', 'Billing Management', 'Subscription Analytics', 'Revenue Forecasting', 'Process Optimization', 'custom'],
+            'bookkeeper': ['Bookkeeping', 'Transaction Recording', 'Account Reconciliation', 'Financial Statements', 'Tax Preparation', 'custom'],
+            'budget-analyst': ['Budget Analysis', 'Variance Reporting', 'Cost Control', 'Forecast Modeling', 'Resource Allocation', 'custom'],
+            'cost-analyst': ['Cost Analysis', 'Cost Allocation', 'Profitability Analysis', 'Cost Reduction', 'Activity-based Costing', 'custom'],
+            'profitability-analyst': ['Profitability Analysis', 'Product Margin', 'Channel Profitability', 'Customer Profitability', 'Pricing Analysis', 'custom'],
+            'cash-flow-manager': ['Cash Flow Management', 'Working Capital', 'Liquidity Planning', 'Cash Forecasting', 'Collection Optimization', 'custom'],
+            'financial-planner': ['Financial Planning', 'Business Planning', 'Scenario Analysis', 'Long-term Forecasting', 'Strategic Finance', 'custom'],
+            'custom': ['SWOT Analysis', 'Business Model Canvas', 'OKR Framework', 'Design Thinking', 'Lean Methodology', 'custom']
         };
 
-        // 角色標籤映射
+        // 角色標籤映射 - 使用翻譯鍵值
         const roleLabels = {
-            'growth-hacker': '成長駭客 Growth Hacker',
-            'content-marketer': '內容行銷 Content Marketer',
-            'demand-gen': '需求生成 Demand Gen',
-            'performance-marketer': '績效行銷 Performance',
-            'brand-manager': '品牌經理 Brand Manager',
-            'social-media': '社群經理 Social Media',
-            'product-marketer': '產品行銷 Product Marketer',
-            'acquisition': '用戶獲取 Acquisition',
-            'retention': '用戶留存 Retention',
-            'strategy-consultant': '策略顧問 Strategy',
-            'management-consultant': '管理顧問 Management',
-            'founder': '創辦人 Founder',
-            'coo': '營運長 COO',
-            'business-dev': '商務開發 BD',
-            'corporate-strategist': '企業策略師',
-            'biz-analyst': '商業分析師',
-            'account-exec': '客戶經理 AE',
-            'sales-engineer': '售前工程師',
-            'sales-manager': '銷售經理',
-            'pm': '產品經理 PM',
-            'senior-pm': '資深產品經理',
-            'product-lead': '產品負責人',
-            'analyst': '分析師 Analyst',
-            'portfolio-manager': '投資組合經理',
-            'cfo': '財務長 CFO',
-            'recruiter': '招募專員',
-            'hr-manager': 'HR 經理',
-            'custom': '➕ 自定義'
+            // Marketing roles
+            'growth-hacker': 'biz_role_growth_hacker',
+            'content-marketer': 'biz_role_content_marketer',
+            'demand-gen': 'biz_role_demand_gen',
+            'seo-specialist': 'biz_role_seo_specialist',
+            'marketing-analyst': 'biz_role_marketing_analyst',
+            'performance-marketer': 'biz_role_performance_marketer',
+            'brand-manager': 'biz_role_brand_manager',
+            'social-media': 'biz_role_social_media',
+            'affiliate-manager': 'biz_role_affiliate_manager',
+            'crm-specialist': 'biz_role_crm_specialist',
+            'product-marketer': 'biz_role_product_marketer',
+            'acquisition': 'biz_role_acquisition',
+            'retention': 'biz_role_retention',
+            'compliance-marketer': 'biz_role_compliance_marketer',
+            'partnership-manager': 'biz_role_partnership_manager',
+            'healthcare-marketer': 'biz_role_healthcare_marketer',
+            'patient-acquisition': 'biz_role_patient_acquisition',
+            'medical-writer': 'biz_role_medical_writer',
+            'pharma-marketer': 'biz_role_pharma_marketer',
+            'health-educator': 'biz_role_health_educator',
+            'edu-marketer': 'biz_role_edu_marketer',
+            'enrollment-specialist': 'biz_role_enrollment_specialist',
+            'alumni-relations': 'biz_role_alumni_relations',
+            'content-developer': 'biz_role_content_developer',
+            'community-manager': 'biz_role_community_manager',
+            // Strategy roles
+            'strategy-consultant': 'biz_role_strategy_consultant',
+            'management-consultant': 'biz_role_management_consultant',
+            'digital-consultant': 'biz_role_digital_consultant',
+            'change-manager': 'biz_role_change_manager',
+            'process-consultant': 'biz_role_process_consultant',
+            'founder': 'biz_role_founder',
+            'coo': 'biz_role_coo',
+            'business-dev': 'biz_role_business_dev',
+            'chief-strategy': 'biz_role_chief_strategy',
+            'venture-partner': 'biz_role_venture_partner',
+            'corporate-strategist': 'biz_role_corporate_strategist',
+            'biz-analyst': 'biz_role_biz_analyst',
+            'transformation-lead': 'biz_role_transformation_lead',
+            'innovation-manager': 'biz_role_innovation_manager',
+            'market-intelligence': 'biz_role_market_intelligence',
+            'pe-analyst': 'biz_role_pe_analyst',
+            'due-diligence': 'biz_role_due_diligence',
+            'portfolio-ops': 'biz_role_portfolio_ops',
+            'deal-sourcing': 'biz_role_deal_sourcing',
+            'value-creation': 'biz_role_value_creation',
+            'policy-analyst': 'biz_role_policy_analyst',
+            'program-manager': 'biz_role_program_manager',
+            'public-affairs': 'biz_role_public_affairs',
+            'regulatory-advisor': 'biz_role_regulatory_advisor',
+            'strategic-planner': 'biz_role_strategic_planner',
+            // Sales roles
+            'account-exec': 'biz_role_account_exec',
+            'sales-engineer': 'biz_role_sales_engineer',
+            'sales-manager': 'biz_role_sales_manager',
+            'enterprise-sales': 'biz_role_enterprise_sales',
+            'channel-manager': 'biz_role_channel_manager',
+            'retail-sales': 'biz_role_retail_sales',
+            'inside-sales': 'biz_role_inside_sales',
+            'telesales': 'biz_role_telesales',
+            'showroom-manager': 'biz_role_showroom_manager',
+            'customer-success': 'biz_role_customer_success',
+            'sdr': 'biz_role_sdr',
+            'bdr': 'biz_role_bdr',
+            'account-manager': 'biz_role_account_manager',
+            'renewal-specialist': 'biz_role_renewal_specialist',
+            'solution-architect': 'biz_role_solution_architect',
+            'real-estate-agent': 'biz_role_real_estate_agent',
+            'property-consultant': 'biz_role_property_consultant',
+            'leasing-specialist': 'biz_role_leasing_specialist',
+            'investment-advisor': 'biz_role_investment_advisor',
+            'development-sales': 'biz_role_development_sales',
+            'wholesale-rep': 'biz_role_wholesale_rep',
+            'key-account': 'biz_role_key_account',
+            'distributor-manager': 'biz_role_distributor_manager',
+            'trade-marketing': 'biz_role_trade_marketing',
+            'territory-manager': 'biz_role_territory_manager',
+            // Product roles
+            'pm': 'biz_role_pm',
+            'senior-pm': 'biz_role_senior_pm',
+            'product-lead': 'biz_role_product_lead',
+            'technical-pm': 'biz_role_technical_pm',
+            'platform-pm': 'biz_role_platform_pm',
+            'consumer-pm': 'biz_role_consumer_pm',
+            'ux-researcher': 'biz_role_ux_researcher',
+            'growth-pm': 'biz_role_growth_pm',
+            'mobile-pm': 'biz_role_mobile_pm',
+            'product-analyst': 'biz_role_product_analyst',
+            'enterprise-pm': 'biz_role_enterprise_pm',
+            'api-pm': 'biz_role_api_pm',
+            'integration-pm': 'biz_role_integration_pm',
+            'partner-pm': 'biz_role_partner_pm',
+            'product-ops': 'biz_role_product_ops',
+            'hardware-pm': 'biz_role_hardware_pm',
+            'iot-pm': 'biz_role_iot_pm',
+            'embedded-pm': 'biz_role_embedded_pm',
+            'manufacturing-liaison': 'biz_role_manufacturing_liaison',
+            'quality-pm': 'biz_role_quality_pm',
+            'data-pm': 'biz_role_data_pm',
+            'ml-pm': 'biz_role_ml_pm',
+            'analytics-pm': 'biz_role_analytics_pm',
+            'bi-product-manager': 'biz_role_bi_product_manager',
+            'data-strategy': 'biz_role_data_strategy',
+            // Finance roles
+            'analyst': 'biz_role_analyst',
+            'portfolio-manager': 'biz_role_portfolio_manager',
+            'research-analyst': 'biz_role_research_analyst',
+            'quant-analyst': 'biz_role_quant_analyst',
+            'risk-manager': 'biz_role_risk_manager',
+            'cfo': 'biz_role_cfo',
+            'fp-analyst': 'biz_role_fp_analyst',
+            'controller': 'biz_role_controller',
+            'treasury-manager': 'biz_role_treasury_manager',
+            'investor-relations': 'biz_role_investor_relations',
+            'relationship-manager': 'biz_role_relationship_manager',
+            'credit-analyst': 'biz_role_credit_analyst',
+            'trade-finance': 'biz_role_trade_finance',
+            'private-banker': 'biz_role_private_banker',
+            'loan-officer': 'biz_role_loan_officer',
+            'actuary': 'biz_role_actuary',
+            'underwriter': 'biz_role_underwriter',
+            'claims-analyst': 'biz_role_claims_analyst',
+            'product-actuary': 'biz_role_product_actuary',
+            'risk-assessor': 'biz_role_risk_assessor',
+            'auditor': 'biz_role_auditor',
+            'tax-advisor': 'biz_role_tax_advisor',
+            'forensic-accountant': 'biz_role_forensic_accountant',
+            'management-accountant': 'biz_role_management_accountant',
+            'compliance-officer': 'biz_role_compliance_officer',
+            // HR roles
+            'recruiter': 'biz_role_recruiter',
+            'hr-manager': 'biz_role_hr_manager',
+            'sourcing-specialist': 'biz_role_sourcing_specialist',
+            'employer-branding': 'biz_role_employer_branding',
+            'campus-recruiter': 'biz_role_campus_recruiter',
+            'od-specialist': 'biz_role_od_specialist',
+            'hr-bp': 'biz_role_hr_bp',
+            'culture-manager': 'biz_role_culture_manager',
+            'engagement-specialist': 'biz_role_engagement_specialist',
+            'change-consultant': 'biz_role_change_consultant',
+            'comp-analyst': 'biz_role_comp_analyst',
+            'benefits-specialist': 'biz_role_benefits_specialist',
+            'total-rewards': 'biz_role_total_rewards',
+            'payroll-manager': 'biz_role_payroll_manager',
+            'equity-admin': 'biz_role_equity_admin',
+            'learning-designer': 'biz_role_learning_designer',
+            'training-manager': 'biz_role_training_manager',
+            'leadership-coach': 'biz_role_leadership_coach',
+            'lms-admin': 'biz_role_lms_admin',
+            'performance-consultant': 'biz_role_performance_consultant',
+            'hris-analyst': 'biz_role_hris_analyst',
+            'people-analytics': 'biz_role_people_analytics',
+            'hr-systems': 'biz_role_hr_systems',
+            'digital-hr': 'biz_role_digital_hr',
+            'ai-hr-specialist': 'biz_role_ai_hr_specialist',
+            // ==================== 用戶行業角色 - E-commerce ====================
+            'ecom-manager': 'biz_role_ecom_manager',
+            'fashion-buyer': 'biz_role_fashion_buyer',
+            'visual-merchandiser': 'biz_role_visual_merchandiser',
+            'product-stylist': 'biz_role_product_stylist',
+            'category-manager': 'biz_role_category_manager',
+            'baby-product-manager': 'biz_role_baby_product_manager',
+            'parent-community': 'biz_role_parent_community',
+            'safety-specialist': 'biz_role_safety_specialist',
+            'content-creator': 'biz_role_content_creator',
+            'kol-manager': 'biz_role_kol_manager',
+            'pet-product-manager': 'biz_role_pet_product_manager',
+            'pet-community': 'biz_role_pet_community',
+            'vet-consultant': 'biz_role_vet_consultant',
+            'pet-content': 'biz_role_pet_content',
+            'pet-influencer': 'biz_role_pet_influencer',
+            'toy-designer': 'biz_role_toy_designer',
+            'ip-manager': 'biz_role_ip_manager',
+            'collector-community': 'biz_role_collector_community',
+            'limited-edition': 'biz_role_limited_edition',
+            'collab-manager': 'biz_role_collab_manager',
+            'tiktok-operator': 'biz_role_tiktok_operator',
+            'live-host': 'biz_role_live_host',
+            'short-video': 'biz_role_short_video',
+            'affiliate-tiktok': 'biz_role_affiliate_tiktok',
+            'tiktok-ads': 'biz_role_tiktok_ads',
+            'shopee-operator': 'biz_role_shopee_operator',
+            'shopee-ads': 'biz_role_shopee_ads',
+            'flash-sale': 'biz_role_flash_sale',
+            'shopee-live': 'biz_role_shopee_live',
+            'seller-support': 'biz_role_seller_support',
+            'fb-shop-manager': 'biz_role_fb_shop_manager',
+            'fb-ads-specialist': 'biz_role_fb_ads_specialist',
+            'community-sales': 'biz_role_community_sales',
+            'messenger-sales': 'biz_role_messenger_sales',
+            'fb-live': 'biz_role_fb_live',
+            // ==================== Marketing - SEO/GEO ====================
+            'geo-specialist': 'biz_role_geo_specialist',
+            'local-seo': 'biz_role_local_seo',
+            'technical-seo': 'biz_role_technical_seo',
+            'content-seo': 'biz_role_content_seo',
+            'influencer-manager': 'biz_role_influencer_manager',
+            'viral-specialist': 'biz_role_viral_specialist',
+            'paid-media': 'biz_role_paid_media',
+            'conversion-optimizer': 'biz_role_conversion_optimizer',
+            'brand-strategist': 'biz_role_brand_strategist',
+            'creative-director': 'biz_role_creative_director',
+            'campaign-manager': 'biz_role_campaign_manager',
+            'pr-specialist': 'biz_role_pr_specialist',
+            'content-strategist': 'biz_role_content_strategist',
+            'copywriter': 'biz_role_copywriter',
+            'video-producer': 'biz_role_video_producer',
+            'podcast-host': 'biz_role_podcast_host',
+            'newsletter-manager': 'biz_role_newsletter_manager',
+            // ==================== Product - Industry Specific ====================
+            'fashion-pm': 'biz_role_fashion_pm',
+            'trend-analyst': 'biz_role_trend_analyst',
+            'sourcing-manager': 'biz_role_sourcing_manager',
+            'quality-controller': 'biz_role_quality_controller',
+            'supply-chain': 'biz_role_supply_chain',
+            'baby-pm': 'biz_role_baby_pm',
+            'safety-pm': 'biz_role_safety_pm',
+            'parent-researcher': 'biz_role_parent_researcher',
+            'packaging-designer': 'biz_role_packaging_designer',
+            'compliance-pm': 'biz_role_compliance_pm',
+            'pet-pm': 'biz_role_pet_pm',
+            'pet-nutritionist': 'biz_role_pet_nutritionist',
+            'pet-safety': 'biz_role_pet_safety',
+            'pet-ux': 'biz_role_pet_ux',
+            'pet-innovation': 'biz_role_pet_innovation',
+            'toy-pm': 'biz_role_toy_pm',
+            'play-researcher': 'biz_role_play_researcher',
+            'ip-developer': 'biz_role_ip_developer',
+            'manufacturing-pm': 'biz_role_manufacturing_pm',
+            'collector-pm': 'biz_role_collector_pm',
+            // ==================== Design ====================
+            'industrial-designer': 'biz_role_industrial_designer',
+            'cad-engineer': 'biz_role_cad_engineer',
+            '3d-modeler': 'biz_role_3d_modeler',
+            'prototype-specialist': 'biz_role_prototype_specialist',
+            'material-designer': 'biz_role_material_designer',
+            'fashion-designer': 'biz_role_fashion_designer',
+            'pattern-maker': 'biz_role_pattern_maker',
+            'textile-designer': 'biz_role_textile_designer',
+            'accessory-designer': 'biz_role_accessory_designer',
+            'footwear-designer': 'biz_role_footwear_designer',
+            'toy-sculptor': 'biz_role_toy_sculptor',
+            'character-designer': 'biz_role_character_designer',
+            'color-specialist': 'biz_role_color_specialist',
+            'articulation-designer': 'biz_role_articulation_designer',
+            'ux-designer': 'biz_role_ux_designer',
+            'ui-designer': 'biz_role_ui_designer',
+            'interaction-designer': 'biz_role_interaction_designer',
+            'design-system': 'biz_role_design_system',
+            'user-researcher': 'biz_role_user_researcher',
+            'graphic-designer': 'biz_role_graphic_designer',
+            'brand-designer': 'biz_role_brand_designer',
+            'motion-designer': 'biz_role_motion_designer',
+            'illustration': 'biz_role_illustration',
+            'print-designer': 'biz_role_print_designer',
+            // ==================== Development ====================
+            'vibe-developer': 'biz_role_vibe_developer',
+            'ai-pair-programmer': 'biz_role_ai_pair_programmer',
+            'prompt-engineer': 'biz_role_prompt_engineer',
+            'rapid-prototyper': 'biz_role_rapid_prototyper',
+            'no-code-builder': 'biz_role_no_code_builder',
+            'frontend-dev': 'biz_role_frontend_dev',
+            'backend-dev': 'biz_role_backend_dev',
+            'fullstack-dev': 'biz_role_fullstack_dev',
+            'web-architect': 'biz_role_web_architect',
+            'devops': 'biz_role_devops',
+            'ios-dev': 'biz_role_ios_dev',
+            'android-dev': 'biz_role_android_dev',
+            'react-native': 'biz_role_react_native',
+            'flutter-dev': 'biz_role_flutter_dev',
+            'mobile-architect': 'biz_role_mobile_architect',
+            'ml-engineer': 'biz_role_ml_engineer',
+            'data-scientist': 'biz_role_data_scientist',
+            'ai-researcher': 'biz_role_ai_researcher',
+            'mlops-engineer': 'biz_role_mlops_engineer',
+            'nlp-specialist': 'biz_role_nlp_specialist',
+            'shopify-dev': 'biz_role_shopify_dev',
+            'woocommerce-dev': 'biz_role_woocommerce_dev',
+            'api-integrator': 'biz_role_api_integrator',
+            'payment-specialist': 'biz_role_payment_specialist',
+            'erp-developer': 'biz_role_erp_developer',
+            // ==================== Strategy ====================
+            'ecom-strategist': 'biz_role_ecom_strategist',
+            'marketplace-analyst': 'biz_role_marketplace_analyst',
+            'pricing-strategist': 'biz_role_pricing_strategist',
+            'expansion-manager': 'biz_role_expansion_manager',
+            'omnichannel-lead': 'biz_role_omnichannel_lead',
+            'positioning-expert': 'biz_role_positioning_expert',
+            'competitive-analyst': 'biz_role_competitive_analyst',
+            'market-researcher': 'biz_role_market_researcher',
+            'trend-forecaster': 'biz_role_trend_forecaster',
+            'growth-strategist': 'biz_role_growth_strategist',
+            'acquisition-lead': 'biz_role_acquisition_lead',
+            'retention-lead': 'biz_role_retention_lead',
+            'monetization-lead': 'biz_role_monetization_lead',
+            'partnerships-lead': 'biz_role_partnerships_lead',
+            // ==================== Finance - E-commerce ====================
+            'ecom-controller': 'biz_role_ecom_controller',
+            'payment-ops': 'biz_role_payment_ops',
+            'fraud-analyst': 'biz_role_fraud_analyst',
+            'revenue-ops': 'biz_role_revenue_ops',
+            'bookkeeper': 'biz_role_bookkeeper',
+            'budget-analyst': 'biz_role_budget_analyst',
+            'cost-analyst': 'biz_role_cost_analyst',
+            'profitability-analyst': 'biz_role_profitability_analyst',
+            'cash-flow-manager': 'biz_role_cash_flow_manager',
+            'financial-planner': 'biz_role_financial_planner',
+            'custom': 'biz_custom'
         };
+        
+        // 獲取翻譯文本的輔助函數
+        function getTranslatedLabel(key) {
+            return typeof t === 'function' ? t(key) : key;
+        }
 
         // 三態切換函數
         function switchPromptMode(mode) {
@@ -3353,27 +3960,40 @@
             const industrySelect = document.getElementById('bizIndustry');
             const customInput = document.getElementById('bizDomainCustom');
             
-            // 處理自定義
+            // 處理自定義 - L1 選擇自定義時，L2-L4 全部切換為自定義模式
             if (domain === 'custom') {
                 customInput.style.display = 'block';
+                // 隱藏 L2 下拉選單，顯示 L2 自定義輸入
+                industrySelect.style.display = 'none';
+                document.getElementById('bizIndustryCustom').style.display = 'block';
+                // 隱藏 L3 下拉選單，顯示 L3 自定義輸入
+                document.getElementById('bizRole').style.display = 'none';
+                document.getElementById('bizRoleCustom').style.display = 'block';
+                // 隱藏 L4 下拉選單，顯示 L4 自定義輸入
+                document.getElementById('bizFramework').style.display = 'none';
+                document.getElementById('bizFrameworkCustom').style.display = 'block';
             } else {
                 customInput.style.display = 'none';
+                // 恢復 L2-L4 下拉選單
+                industrySelect.style.display = 'block';
+                document.getElementById('bizIndustryCustom').style.display = 'none';
+                document.getElementById('bizRole').style.display = 'block';
+                document.getElementById('bizRoleCustom').style.display = 'none';
+                document.getElementById('bizFramework').style.display = 'block';
+                document.getElementById('bizFrameworkCustom').style.display = 'none';
             }
             
             // 重置後續選項
-            industrySelect.innerHTML = '<option value="">-- 請選擇行業 --</option>';
-            document.getElementById('bizRole').innerHTML = '<option value="">-- 請先選擇行業 --</option>';
-            document.getElementById('bizFramework').innerHTML = '<option value="">-- 請先選擇角色 --</option>';
-            document.getElementById('bizIndustryCustom').style.display = 'none';
-            document.getElementById('bizRoleCustom').style.display = 'none';
-            document.getElementById('bizFrameworkCustom').style.display = 'none';
+            industrySelect.innerHTML = '<option value="">-- ' + getTranslatedLabel('biz_select_industry') + ' --</option>';
+            document.getElementById('bizRole').innerHTML = '<option value="">-- ' + getTranslatedLabel('biz_select_industry_first') + ' --</option>';
+            document.getElementById('bizFramework').innerHTML = '<option value="">-- ' + getTranslatedLabel('biz_select_role_first') + ' --</option>';
             
             if (domain && domain !== 'custom' && bizData[domain]) {
                 const industries = bizData[domain].industries;
                 for (const [key, value] of Object.entries(industries)) {
                     const option = document.createElement('option');
                     option.value = key;
-                    option.textContent = value.label;
+                    option.textContent = getTranslatedLabel(value.label);
                     industrySelect.appendChild(option);
                 }
             }
@@ -3386,23 +4006,33 @@
             const roleSelect = document.getElementById('bizRole');
             const customInput = document.getElementById('bizIndustryCustom');
             
+            // L2 選擇自定義時，L3-L4 也切換為自定義模式
             if (industry === 'custom') {
                 customInput.style.display = 'block';
+                // 隱藏 L3 下拉選單，顯示 L3 自定義輸入
+                roleSelect.style.display = 'none';
+                document.getElementById('bizRoleCustom').style.display = 'block';
+                // 隱藏 L4 下拉選單，顯示 L4 自定義輸入
+                document.getElementById('bizFramework').style.display = 'none';
+                document.getElementById('bizFrameworkCustom').style.display = 'block';
             } else {
                 customInput.style.display = 'none';
+                // 恢復 L3-L4 下拉選單
+                roleSelect.style.display = 'block';
+                document.getElementById('bizRoleCustom').style.display = 'none';
+                document.getElementById('bizFramework').style.display = 'block';
+                document.getElementById('bizFrameworkCustom').style.display = 'none';
             }
             
-            roleSelect.innerHTML = '<option value="">-- 請選擇角色 --</option>';
-            document.getElementById('bizFramework').innerHTML = '<option value="">-- 請先選擇角色 --</option>';
-            document.getElementById('bizRoleCustom').style.display = 'none';
-            document.getElementById('bizFrameworkCustom').style.display = 'none';
+            roleSelect.innerHTML = '<option value="">-- ' + getTranslatedLabel('biz_select_role') + ' --</option>';
+            document.getElementById('bizFramework').innerHTML = '<option value="">-- ' + getTranslatedLabel('biz_select_role_first') + ' --</option>';
             
             if (domain && industry && domain !== 'custom' && industry !== 'custom' && bizData[domain]?.industries[industry]) {
                 const roles = bizData[domain].industries[industry].roles;
                 roles.forEach(role => {
                     const option = document.createElement('option');
                     option.value = role;
-                    option.textContent = roleLabels[role] || role;
+                    option.textContent = getTranslatedLabel(roleLabels[role]) || role;
                     roleSelect.appendChild(option);
                 });
             }
@@ -3410,24 +4040,32 @@
 
         // 更新框架選項
         function updateBizFramework() {
+            const domain = document.getElementById('bizDomain').value;
+            const industry = document.getElementById('bizIndustry').value;
             const role = document.getElementById('bizRole').value;
             const frameworkSelect = document.getElementById('bizFramework');
             const customInput = document.getElementById('bizRoleCustom');
             
+            // L3 選擇自定義時，L4 也切換為自定義模式
             if (role === 'custom') {
                 customInput.style.display = 'block';
+                // 隱藏 L4 下拉選單，顯示 L4 自定義輸入
+                frameworkSelect.style.display = 'none';
+                document.getElementById('bizFrameworkCustom').style.display = 'block';
             } else {
                 customInput.style.display = 'none';
+                // 恢復 L4 下拉選單
+                frameworkSelect.style.display = 'block';
+                document.getElementById('bizFrameworkCustom').style.display = 'none';
             }
             
-            frameworkSelect.innerHTML = '<option value="">-- 請選擇模型/框架 --</option>';
-            document.getElementById('bizFrameworkCustom').style.display = 'none';
+            frameworkSelect.innerHTML = '<option value="">-- ' + getTranslatedLabel('biz_select_framework') + ' --</option>';
             
             if (role && role !== 'custom' && roleFrameworks[role]) {
                 roleFrameworks[role].forEach(framework => {
                     const option = document.createElement('option');
                     option.value = framework;
-                    option.textContent = framework === 'custom' ? '➕ 自定義' : framework;
+                    option.textContent = framework === 'custom' ? getTranslatedLabel('biz_custom') : framework;
                     frameworkSelect.appendChild(option);
                 });
             }
@@ -3447,26 +4085,53 @@
 
         // 生成商業 Prompt
         function generateBusinessPrompt() {
-            const domain = document.getElementById('bizDomain').value === 'custom' 
-                ? document.getElementById('bizDomainCustom').value 
-                : (bizData[document.getElementById('bizDomain').value]?.label || document.getElementById('bizDomain').value);
+            const domainValue = document.getElementById('bizDomain').value;
+            const industryValue = document.getElementById('bizIndustry').value;
+            const roleValue = document.getElementById('bizRole').value;
+            const frameworkValue = document.getElementById('bizFramework').value;
             
-            const industry = document.getElementById('bizIndustry').value === 'custom'
-                ? document.getElementById('bizIndustryCustom').value
-                : document.getElementById('bizIndustry').options[document.getElementById('bizIndustry').selectedIndex]?.text || '';
+            // 判斷是否處於自定義模式（L1 選擇 custom 時，L2-L4 都是自定義輸入）
+            const isL1Custom = domainValue === 'custom';
+            const isL2Custom = industryValue === 'custom' || isL1Custom;
+            const isL3Custom = roleValue === 'custom' || isL2Custom;
             
-            const role = document.getElementById('bizRole').value === 'custom'
-                ? document.getElementById('bizRoleCustom').value
-                : (roleLabels[document.getElementById('bizRole').value] || document.getElementById('bizRole').value);
+            // 獲取各層級的值
+            let domain, industry, role, framework;
             
-            const framework = document.getElementById('bizFramework').value === 'custom'
-                ? document.getElementById('bizFrameworkCustom').value
-                : document.getElementById('bizFramework').value;
+            if (isL1Custom) {
+                domain = document.getElementById('bizDomainCustom').value;
+                industry = document.getElementById('bizIndustryCustom').value;
+                role = document.getElementById('bizRoleCustom').value;
+                framework = document.getElementById('bizFrameworkCustom').value;
+            } else {
+                domain = getTranslatedLabel(bizData[domainValue]?.label) || domainValue;
+                
+                if (isL2Custom) {
+                    industry = document.getElementById('bizIndustryCustom').value;
+                    role = document.getElementById('bizRoleCustom').value;
+                    framework = document.getElementById('bizFrameworkCustom').value;
+                } else {
+                    industry = document.getElementById('bizIndustry').options[document.getElementById('bizIndustry').selectedIndex]?.text || '';
+                    
+                    if (isL3Custom) {
+                        role = document.getElementById('bizRoleCustom').value;
+                        framework = document.getElementById('bizFrameworkCustom').value;
+                    } else {
+                        role = getTranslatedLabel(roleLabels[roleValue]) || roleValue;
+                        
+                        if (frameworkValue === 'custom') {
+                            framework = document.getElementById('bizFrameworkCustom').value;
+                        } else {
+                            framework = frameworkValue;
+                        }
+                    }
+                }
+            }
             
             const context = document.getElementById('bizContext').value;
 
             if (!domain || !industry || !role || !framework) {
-                showPromptStatus('請完整填寫所有必填欄位', 'error');
+                showPromptStatus(getTranslatedLabel('biz_fill_all_fields'), 'error');
                 return;
             }
 
