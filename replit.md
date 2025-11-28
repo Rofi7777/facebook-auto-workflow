@@ -51,6 +51,19 @@ The project follows a client-server architecture:
 
 ## Recent Changes
 
+### Visual Image Mode - Advanced Options Enhancement (November 28, 2025)
+- **New Feature**: Added optional advanced settings section in Visual Image mode
+- **Steps Selection**: Choose image generation steps (20/30/50/75/100/150) for quality control
+  - FLUX/Stable Diffusion: Direct steps parameter
+  - Midjourney: Uses --q quality parameter instead
+- **Output Format Selection**: Choose output image format (PNG/JPG/WebP/TIFF/BMP)
+  - PNG: Lossless, supports transparency
+  - JPG: Compressed, smaller file size
+  - WebP: Web-optimized, balanced quality and size
+  - TIFF: Print quality, high resolution
+- **UI Design**: Two-column grid layout in a styled advanced options box
+- **Multi-Language Support**: Full i18n for zh-TW, en, vi translations
+
 ### Visual Image Mode - Multi-Platform Image Model Support (November 28, 2025)
 - **New Feature**: Added target image model dropdown in Visual Image mode
 - **Platform Support**: 

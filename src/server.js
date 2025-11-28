@@ -1159,7 +1159,7 @@ ${context || '無額外描述'}
 請直接輸出完整的 System Prompt，不需要額外的說明或前言。`;
       
     } else if (mode === 'image') {
-      const { imageModel, customModelName } = req.body;
+      const { imageModel, customModelName, imageSteps, imageFormat } = req.body;
       
       const styleLabels = {
         'photorealistic': 'photorealistic, ultra-realistic, photograph',
@@ -1268,6 +1268,25 @@ unwanted elements
 (可能適用的參數)`
       };
 
+      const stepsLabel = imageSteps ? `${imageSteps} 步` : '預設';
+      const formatLabel = imageFormat ? imageFormat.toUpperCase() : '預設';
+      
+      const advancedOptionsInfo = (imageSteps || imageFormat) ? `
+【進階選項】
+${imageSteps ? `- 生成步數 (Steps): ${imageSteps}` : ''}
+${imageFormat ? `- 輸出格式: ${imageFormat.toUpperCase()}` : ''}` : '';
+
+      const advancedParamsGuide = (imageSteps || imageFormat) ? `
+
+【進階參數輸出】
+${imageSteps ? `在提示詞末尾添加步數參數：
+- Midjourney: 不適用（使用 --q 控制品質）
+- Stable Diffusion / ComfyUI / FLUX: Steps: ${imageSteps}
+- 其他平台: 依據平台語法添加 steps 或 iterations 參數` : ''}
+${imageFormat ? `在輸出建議中包含：
+- 建議輸出格式: ${imageFormat.toUpperCase()}
+- 格式特點: ${imageFormat === 'png' ? '無損壓縮，支援透明背景' : imageFormat === 'jpg' ? '有損壓縮，檔案較小' : imageFormat === 'webp' ? '網頁優化，平衡品質與大小' : imageFormat === 'tiff' ? '印刷品質，無損高解析度' : '標準格式'}` : ''}` : '';
+
       systemPrompt = `你是一位專業的 AI 繪圖提示詞工程師，精通各種 AI 繪圖平台的提示詞優化技術。
 
 【目標平台】${modelName === 'nanobanana' ? 'Nano Banana (FLUX)' : modelName === 'gpt' ? 'GPT (DALL-E 3)' : modelName === 'midjourney' ? 'Midjourney' : modelName}
@@ -1278,14 +1297,18 @@ ${input}
 【選擇的藝術風格】${styleLabels[style] || style}
 【畫面比例】${ratio}
 【品質標籤】${(qualityTags || []).join(', ')}
+${advancedOptionsInfo}
 
 ${platformPromptGuides[targetModel] || platformPromptGuides['custom']}
+${advancedParamsGuide}
 
 ===== 重要指示 =====
 1. 嚴格按照目標平台的格式要求輸出
 2. 確保提示詞能在該平台上獲得最佳效果
 3. 包含專業的光影、構圖、細節描述
-4. 直接輸出可複製使用的內容，無需額外說明`;
+${imageSteps ? `4. 在適當位置包含步數參數 (${imageSteps} steps)` : ''}
+${imageFormat ? `5. 在輸出末尾添加格式建議區塊：【輸出格式建議】${imageFormat.toUpperCase()}` : ''}
+6. 直接輸出可複製使用的內容，無需額外說明`;
     }
     
     if (!systemPrompt) {

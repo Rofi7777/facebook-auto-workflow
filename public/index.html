@@ -1439,6 +1439,40 @@
                                 </div>
                             </div>
 
+                            <!-- 進階選項區塊 -->
+                            <div class="form-group" style="background: linear-gradient(135deg, rgba(156, 39, 176, 0.05) 0%, rgba(233, 30, 99, 0.05) 100%); padding: 15px; border-radius: 10px; border: 1px dashed #ccc;">
+                                <label style="color: #666; font-size: 14px; margin-bottom: 12px; display: block;" data-i18n="img_advanced_options">⚙️ 進階選項 (選填)</label>
+                                
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                                    <!-- 畫數/迭代步數 -->
+                                    <div>
+                                        <label for="imageSteps" style="font-size: 13px; color: #555; margin-bottom: 5px; display: block;" data-i18n="img_steps_label">🔄 畫數 Steps</label>
+                                        <select id="imageSteps" style="width: 100%; padding: 10px; border: 2px solid #ddd; border-radius: 8px; font-size: 13px;">
+                                            <option value="" data-i18n="img_steps_default">預設 (不指定)</option>
+                                            <option value="20">20 步 (快速)</option>
+                                            <option value="30">30 步 (標準)</option>
+                                            <option value="50">50 步 (精細)</option>
+                                            <option value="75">75 步 (高品質)</option>
+                                            <option value="100">100 步 (極致)</option>
+                                            <option value="150">150 步 (專業)</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <!-- 輸出圖片格式 -->
+                                    <div>
+                                        <label for="imageFormat" style="font-size: 13px; color: #555; margin-bottom: 5px; display: block;" data-i18n="img_format_label">📁 輸出格式</label>
+                                        <select id="imageFormat" style="width: 100%; padding: 10px; border: 2px solid #ddd; border-radius: 8px; font-size: 13px;">
+                                            <option value="" data-i18n="img_format_default">預設 (不指定)</option>
+                                            <option value="png">PNG (無損、透明)</option>
+                                            <option value="jpg">JPG/JPEG (壓縮)</option>
+                                            <option value="webp">WebP (網頁優化)</option>
+                                            <option value="tiff">TIFF (印刷品質)</option>
+                                            <option value="bmp">BMP (無壓縮)</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
                             <button type="button" class="btn" onclick="generateImagePrompt()" id="imageGenerateBtn" style="width: 100%; padding: 15px; background: linear-gradient(135deg, #9C27B0 0%, #E91E63 100%); color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: 600; cursor: pointer;">
                                 🎨 AI 生成繪圖指令
                             </button>
@@ -4257,6 +4291,8 @@
             const ratio = document.getElementById('imageRatio').value;
             const imageModel = document.getElementById('imageModel').value;
             const customModelName = document.getElementById('customModelName')?.value || '';
+            const imageSteps = document.getElementById('imageSteps')?.value || '';
+            const imageFormat = document.getElementById('imageFormat')?.value || '';
             
             const qualityTags = [];
             if (document.getElementById('imgQualityHD')?.checked) qualityTags.push('HD');
@@ -4296,7 +4332,9 @@
                         ratio: ratio,
                         qualityTags: qualityTags,
                         imageModel: imageModel,
-                        customModelName: customModelName
+                        customModelName: customModelName,
+                        imageSteps: imageSteps,
+                        imageFormat: imageFormat
                     })
                 });
 
