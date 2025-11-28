@@ -4065,7 +4065,12 @@
                 roleFrameworks[role].forEach(framework => {
                     const option = document.createElement('option');
                     option.value = framework;
-                    option.textContent = framework === 'custom' ? getTranslatedLabel('biz_custom') : framework;
+                    if (framework === 'custom') {
+                        option.textContent = getTranslatedLabel('biz_custom');
+                    } else {
+                        const fwKey = 'biz_fw_' + framework.toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/_+/g, '_').replace(/^_|_$/g, '');
+                        option.textContent = getTranslatedLabel(fwKey) || framework;
+                    }
                     frameworkSelect.appendChild(option);
                 });
             }
