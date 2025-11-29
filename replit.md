@@ -37,7 +37,28 @@ The project follows a client-server architecture:
         - **Visual Image Mode**: AI-powered Midjourney/DALL-E prompt optimization with style, ratio, and quality tag customization, and support for various image models (Nano Banana (FLUX), GPT (DALL-E 3), Midjourney (MJ), Custom). Includes advanced options for steps and output format selection. This mode also supports reference material upload (images, documents, URLs) for AI analysis.
 
 ## External Dependencies
-- **AI Services**: Google Gemini 3 Pro Preview (text reasoning), Google Gemini 2.5 Flash Image Preview (image generation), Google Gemini 2.5 Flash (fallback), Google Gemini 2.0 Flash Experimental (legacy)
+- **AI Services**: Google Gemini 3 Pro Preview (text reasoning), Google Gemini 2.5 Flash Image Preview (image generation), Google Gemini 2.0 Flash (multimodal vision for reference image analysis), Google Gemini 2.5 Flash (fallback), Google Gemini 2.0 Flash Experimental (legacy)
+
+## Recent Changes (November 29, 2025)
+
+### Gemini Multimodal Vision Integration
+- **New Feature**: Implemented Gemini's native multimodal vision capabilities for reference material analysis in BizPrompt Architect Pro
+- **How it works**:
+  - When users upload reference images in Software Development or Visual Image mode, the system now uses `gemini-2.0-flash` multimodal model to actually "see" and analyze the images
+  - AI provides detailed visual analysis including: color palette, composition, lighting, style characteristics, visual elements, and emotional atmosphere
+  - Analysis results are integrated into the prompt generation context for more accurate and style-consistent outputs
+- **Technical Implementation**:
+  - `analyzeReferenceImagesWithVision()` function in server.js
+  - Uses Gemini inlineData format for base64-encoded images
+  - Supports JPEG, PNG, GIF, WebP, BMP formats
+  - Mode-specific analysis prompts (image mode vs coding mode)
+  - Graceful fallback to text-only description if multimodal fails
+- **Benefits**:
+  - AI can now truly understand uploaded reference images
+  - Generated prompts accurately reflect reference material styles
+  - Better reverse-engineering of design patterns and visual elements
+
+## Other Dependencies
 - **Web Framework**: Express.js
 - **Middleware**: CORS, Multer (file uploads), Dotenv (environment variables)
 - **HTTP Client**: Axios

@@ -1052,7 +1052,165 @@ app.post('/api/chat-with-advisor', chatUpload.array('files', 5), async (req, res
 
 // ==================== Page 4: BizPrompt Architect Pro APIs ====================
 
-// Helper function to build reference context from uploaded materials
+// Helper function to analyze reference images using Gemini multimodal vision
+async function analyzeReferenceImagesWithVision(references, mode = 'image') {
+  if (!references || references.length === 0) {
+    return { textContext: '', imageAnalysis: null };
+  }
+  
+  const imageRefs = references.filter(ref => ref.type === 'image' && ref.data);
+  const urlRefs = references.filter(ref => ref.type === 'url');
+  const docRefs = references.filter(ref => ref.type === 'document');
+  
+  let textContext = '\n\n【參考資料分析】\n用戶提供了以下參考資料，請深度分析並整合到生成的提示詞中：\n\n';
+  let imageAnalysis = null;
+  
+  // If there are images, use Gemini multimodal to analyze them
+  if (imageRefs.length > 0) {
+    try {
+      console.log(`🖼️ Analyzing ${imageRefs.length} image(s) with Gemini multimodal vision...`);
+      
+      // Prepare image parts for Gemini multimodal API
+      const imageParts = [];
+      for (const ref of imageRefs) {
+        try {
+          // Handle base64 data (remove data URL prefix if present)
+          let base64Data = ref.data;
+          if (base64Data && base64Data.includes(',')) {
+            base64Data = base64Data.split(',')[1];
+          }
+          
+          if (!base64Data) {
+            console.log(`⚠️ Skipping image ${ref.name} - no valid base64 data`);
+            continue;
+          }
+          
+          // Detect MIME type
+          let mimeType = 'image/jpeg';
+          if (ref.name) {
+            const ext = ref.name.toLowerCase().split('.').pop();
+            if (ext === 'png') mimeType = 'image/png';
+            else if (ext === 'gif') mimeType = 'image/gif';
+            else if (ext === 'webp') mimeType = 'image/webp';
+            else if (ext === 'bmp') mimeType = 'image/bmp';
+          }
+          
+          imageParts.push({
+            inlineData: {
+              data: base64Data,
+              mimeType: mimeType
+            }
+          });
+        } catch (imgError) {
+          console.log(`⚠️ Error processing image ${ref.name}:`, imgError.message);
+        }
+      }
+      
+      if (imageParts.length > 0) {
+        // Create analysis prompt based on mode
+        const analysisPrompt = mode === 'image' 
+          ? `請詳細分析這${imageParts.length > 1 ? '些' : '張'}參考圖片，作為 AI 繪圖提示詞生成的參考。請提供以下分析：
+
+1. 🎨 **色彩分析**：主色調、輔助色、色彩搭配風格（如：暖色調、冷色調、高飽和、低飽和、復古、現代等）
+2. 📐 **構圖分析**：構圖方式、視覺焦點、空間布局、前中後景安排
+3. 💡 **光影效果**：光線方向、陰影處理、明暗對比、整體亮度
+4. 🌟 **風格特徵**：藝術風格（如：寫實、插畫、3D渲染、水彩、油畫等）、視覺特效
+5. 🔍 **細節元素**：重要的視覺元素、紋理、材質、特殊效果
+6. 💭 **氛圍情緒**：整體情緒、氛圍營造、給人的感受
+
+請用繁體中文回答，提供具體且可用於 AI 繪圖提示詞的描述。`
+          : `請詳細分析這${imageParts.length > 1 ? '些' : '張'}參考圖片/截圖，作為軟體開發需求的參考。請提供以下分析：
+
+1. 🖥️ **界面分析**：UI 佈局、設計風格、導航結構
+2. 🎨 **視覺設計**：配色方案、字體風格、圖標設計
+3. ⚙️ **功能識別**：可見的功能模塊、交互元素、資料展示方式
+4. 📱 **用戶體驗**：操作流程、信息架構、關鍵交互點
+5. 💡 **技術推測**：可能使用的技術棧、框架建議
+6. 🔍 **需求提取**：從圖片中可推斷的業務需求和功能需求
+
+請用繁體中文回答，提供具體且可用於 PRD 編寫的描述。`;
+        
+        // Build parts array with images first, then text prompt
+        const allParts = [...imageParts, { text: analysisPrompt }];
+        
+        // Use Gemini multimodal model with correct API format
+        const { GoogleGenAI } = require('@google/genai');
+        const geminiApiKey = process.env.GEMINI_API_KEY_NEW || process.env.GEMINI_API_KEY;
+        const ai = new GoogleGenAI({ apiKey: geminiApiKey });
+        
+        // Use gemini-2.0-flash for multimodal (supports vision) with correct contents format
+        const response = await ai.models.generateContent({
+          model: 'gemini-2.0-flash',
+          contents: [{ 
+            role: 'user', 
+            parts: allParts 
+          }]
+        });
+        
+        // Safely extract response text
+        if (response && response.candidates && response.candidates.length > 0) {
+          const candidate = response.candidates[0];
+          if (candidate.content && candidate.content.parts && candidate.content.parts.length > 0) {
+            imageAnalysis = candidate.content.parts[0].text || '';
+            console.log(`✅ Image analysis completed successfully (${imageAnalysis.length} chars)`);
+          }
+        }
+      }
+      
+    } catch (error) {
+      console.error(`❌ Multimodal image analysis failed:`, error.message);
+      // Fallback to text description if multimodal fails
+      imageAnalysis = null;
+    }
+  }
+  
+  // Add AI-analyzed image content if available
+  if (imageAnalysis) {
+    textContext += `\n===== AI 視覺分析結果 (Gemini Multimodal) =====\n`;
+    textContext += `以下是 AI 對上傳參考圖片的深度分析：\n\n`;
+    textContext += `${imageAnalysis}\n\n`;
+  } else if (imageRefs.length > 0) {
+    // Fallback text description for images if multimodal failed
+    imageRefs.forEach((ref, index) => {
+      textContext += `🖼️ 參考圖片 ${index + 1}：${ref.name}\n`;
+      textContext += `   [圖片已上傳，請分析其視覺特點]\n\n`;
+    });
+  }
+  
+  // Add URL references
+  urlRefs.forEach((ref, index) => {
+    textContext += `📎 參考連結 ${index + 1}：${ref.url}\n`;
+    textContext += `   請參考該網站/頁面的設計、功能或內容特點\n\n`;
+  });
+  
+  // Add document references
+  docRefs.forEach((ref, index) => {
+    textContext += `📄 參考文件 ${index + 1}：${ref.name} (${ref.fileType})\n`;
+    if (ref.content && !ref.content.startsWith('[')) {
+      textContext += `   文件內容：\n${ref.content.substring(0, 2000)}${ref.content.length > 2000 ? '...(內容已截斷)' : ''}\n\n`;
+    } else {
+      textContext += `   [${ref.fileType.toUpperCase()} 文件已上傳]\n\n`;
+    }
+  });
+  
+  // Only add integration requirements if there's any context
+  if (imageRefs.length > 0 || urlRefs.length > 0 || docRefs.length > 0) {
+    textContext += `\n===== 參考資料整合要求 =====
+請根據上述參考資料${imageAnalysis ? '和 AI 視覺分析結果' : ''}：
+1. 深度理解參考資料的設計理念和風格特點
+2. 提取關鍵視覺元素和設計語言
+3. 將分析結果精準融入生成的提示詞
+4. 確保生成的提示詞能還原參考資料的核心風格
+
+`;
+  } else {
+    textContext = '';
+  }
+  
+  return { textContext, imageAnalysis };
+}
+
+// Legacy helper function (kept for backward compatibility)
 function buildReferenceContext(references) {
   if (!references || references.length === 0) {
     return '';
@@ -1102,12 +1260,26 @@ app.post('/api/refine-prompt', async (req, res) => {
     console.log(`📝 Refining prompt in ${mode} mode...`);
     if (references && references.length > 0) {
       console.log(`📎 Processing ${references.length} reference(s)...`);
+      const hasImages = references.some(ref => ref.type === 'image' && ref.data);
+      if (hasImages) {
+        console.log(`🖼️ Found images in references - will use multimodal analysis`);
+      }
     }
     
     let refinedPrompt = '';
     let systemPrompt = '';
     
-    const referenceContext = buildReferenceContext(references);
+    // Use multimodal analysis for modes with references (coding, image)
+    let referenceContext = '';
+    if (references && references.length > 0 && (mode === 'coding' || mode === 'image')) {
+      const analysisResult = await analyzeReferenceImagesWithVision(references, mode);
+      referenceContext = analysisResult.textContext;
+      if (analysisResult.imageAnalysis) {
+        console.log(`✅ Multimodal image analysis integrated into prompt context`);
+      }
+    } else {
+      referenceContext = buildReferenceContext(references);
+    }
     
     if (mode === 'coding') {
       const platformLabels = {
@@ -1142,7 +1314,7 @@ ${referenceContext}
 5. 定義 API 端點結構（如適用）
 6. 描述資料模型
 7. 提供 MVP 功能優先級排序
-${references && references.length > 0 ? '8. 整合參考資料中的設計理念和功能特點' : ''}
+${references && references.length > 0 ? '8. 根據 AI 視覺分析結果，整合參考資料中的設計理念、UI 佈局和功能特點' : ''}
 
 請直接輸出可以使用的 Prompt 內容，不需要額外說明。`;
       
