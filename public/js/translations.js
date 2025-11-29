@@ -202,6 +202,15 @@ const translations = {
     'img_format_default': '預設 (不指定)',
     'copy_prompt': '一鍵複製',
     'export_word': '導出 Word',
+    // 參考資料上傳
+    'ref_upload_label': '📎 參考資料 (選填)',
+    'ref_upload_hint': '上傳參考圖片、文件或貼上網址，AI 將分析後生成更精準的提示詞',
+    'ref_upload_hint_image': '上傳參考圖片或貼上網址，AI 將分析風格/構圖後生成更精準的提示詞',
+    'ref_drop_hint': '拖放檔案到此處，或點擊上傳',
+    'ref_url_placeholder': '貼上參考網址 (例如: https://example.com)...',
+    'ref_url_placeholder_image': '貼上參考圖片網址 (例如: https://example.com/image.jpg)...',
+    'ref_add_url': '加入',
+    'ref_uploaded_items': '📋 已加入的參考資料：',
     // BizPrompt - 選項提示文字
     'biz_select_industry': '請選擇行業',
     'biz_select_industry_first': '請先選擇行業',
@@ -2055,6 +2064,15 @@ const translations = {
     'img_format_default': 'Default (Not specified)',
     'copy_prompt': 'Copy to Clipboard',
     'export_word': 'Export to Word',
+    // Reference Upload
+    'ref_upload_label': '📎 Reference Materials (Optional)',
+    'ref_upload_hint': 'Upload reference images, documents or paste URLs. AI will analyze and generate more precise prompts',
+    'ref_upload_hint_image': 'Upload reference images or paste URLs. AI will analyze style/composition to generate more precise prompts',
+    'ref_drop_hint': 'Drop files here, or click to upload',
+    'ref_url_placeholder': 'Paste reference URL (e.g., https://example.com)...',
+    'ref_url_placeholder_image': 'Paste reference image URL (e.g., https://example.com/image.jpg)...',
+    'ref_add_url': 'Add',
+    'ref_uploaded_items': '📋 Added reference materials:',
     // BizPrompt - Selection Hints
     'biz_select_industry': 'Select Industry',
     'biz_select_industry_first': 'Select Industry First',
@@ -3786,6 +3804,15 @@ const translations = {
     'img_format_default': 'Mặc định (Không chỉ định)',
     'copy_prompt': 'Sao chép vào clipboard',
     'export_word': 'Xuất sang Word',
+    // Tải lên tài liệu tham khảo
+    'ref_upload_label': '📎 Tài liệu tham khảo (Tùy chọn)',
+    'ref_upload_hint': 'Tải lên hình ảnh, tài liệu hoặc dán URL. AI sẽ phân tích để tạo prompt chính xác hơn',
+    'ref_upload_hint_image': 'Tải lên hình ảnh hoặc dán URL. AI sẽ phân tích phong cách/bố cục để tạo prompt chính xác hơn',
+    'ref_drop_hint': 'Thả tệp vào đây hoặc nhấp để tải lên',
+    'ref_url_placeholder': 'Dán URL tham khảo (ví dụ: https://example.com)...',
+    'ref_url_placeholder_image': 'Dán URL hình ảnh (ví dụ: https://example.com/image.jpg)...',
+    'ref_add_url': 'Thêm',
+    'ref_uploaded_items': '📋 Tài liệu đã thêm:',
     // BizPrompt - Selection Hints
     'biz_select_industry': 'Chọn ngành',
     'biz_select_industry_first': 'Chọn ngành trước',

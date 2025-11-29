@@ -1051,15 +1051,62 @@ app.post('/api/chat-with-advisor', chatUpload.array('files', 5), async (req, res
 
 // ==================== Page 4: BizPrompt Architect Pro APIs ====================
 
+// Helper function to build reference context from uploaded materials
+function buildReferenceContext(references) {
+  if (!references || references.length === 0) {
+    return '';
+  }
+  
+  let context = '\n\n【參考資料分析】\n用戶提供了以下參考資料，請深度分析並整合到生成的提示詞中：\n\n';
+  
+  references.forEach((ref, index) => {
+    if (ref.type === 'url') {
+      context += `📎 參考連結 ${index + 1}：${ref.url}\n`;
+      context += `   請分析該網站/頁面的設計、功能或內容特點，並融入提示詞中\n\n`;
+    } else if (ref.type === 'image') {
+      context += `🖼️ 參考圖片 ${index + 1}：${ref.name}\n`;
+      context += `   [圖片內容已上傳]\n`;
+      context += `   請分析圖片的：\n`;
+      context += `   - 色彩搭配與調色風格\n`;
+      context += `   - 構圖方式與視覺層次\n`;
+      context += `   - 光影效果與氛圍\n`;
+      context += `   - 主題元素與細節\n\n`;
+    } else if (ref.type === 'document') {
+      context += `📄 參考文件 ${index + 1}：${ref.name} (${ref.fileType})\n`;
+      if (ref.content && !ref.content.startsWith('[')) {
+        context += `   文件內容：\n${ref.content.substring(0, 2000)}${ref.content.length > 2000 ? '...(內容已截斷)' : ''}\n\n`;
+      } else {
+        context += `   [${ref.fileType.toUpperCase()} 文件已上傳，請根據檔案名稱和類型推測內容相關性]\n\n`;
+      }
+    }
+  });
+  
+  context += `\n===== 參考資料整合要求 =====
+請根據上述參考資料：
+1. 逆向工程分析其設計理念和風格特點
+2. 提取關鍵元素並融入生成的提示詞
+3. 保持與參考資料一致的風格調性
+4. 如有多個參考資料，進行智能融合
+
+`;
+  
+  return context;
+}
+
 // API endpoint for refining prompts (coding and image modes)
 app.post('/api/refine-prompt', async (req, res) => {
   try {
-    const { mode, input, platform, complexity, style, ratio, qualityTags } = req.body;
+    const { mode, input, platform, complexity, style, ratio, qualityTags, references } = req.body;
     
     console.log(`📝 Refining prompt in ${mode} mode...`);
+    if (references && references.length > 0) {
+      console.log(`📎 Processing ${references.length} reference(s)...`);
+    }
     
     let refinedPrompt = '';
     let systemPrompt = '';
+    
+    const referenceContext = buildReferenceContext(references);
     
     if (mode === 'coding') {
       const platformLabels = {
@@ -1083,7 +1130,7 @@ ${input}
 
 目標平台：${platformLabels[platform] || platform}
 複雜度級別：${complexityLabels[complexity] || complexity}
-
+${referenceContext}
 請生成一個專業的 Prompt，這個 Prompt 可以直接交給 AI（如 ChatGPT、Gemini、Claude）來生成完整的軟體開發方案。
 
 輸出格式要求：
@@ -1094,6 +1141,7 @@ ${input}
 5. 定義 API 端點結構（如適用）
 6. 描述資料模型
 7. 提供 MVP 功能優先級排序
+${references && references.length > 0 ? '8. 整合參考資料中的設計理念和功能特點' : ''}
 
 請直接輸出可以使用的 Prompt 內容，不需要額外說明。`;
       
@@ -1298,7 +1346,7 @@ ${input}
 【畫面比例】${ratio}
 【品質標籤】${(qualityTags || []).join(', ')}
 ${advancedOptionsInfo}
-
+${referenceContext}
 ${platformPromptGuides[targetModel] || platformPromptGuides['custom']}
 ${advancedParamsGuide}
 
@@ -1308,7 +1356,8 @@ ${advancedParamsGuide}
 3. 包含專業的光影、構圖、細節描述
 ${imageSteps ? `4. 在適當位置包含步數參數 (${imageSteps} steps)` : ''}
 ${imageFormat ? `5. 在輸出末尾添加格式建議區塊：【輸出格式建議】${imageFormat.toUpperCase()}` : ''}
-6. 直接輸出可複製使用的內容，無需額外說明`;
+${references && references.length > 0 ? '6. 深度分析參考資料的視覺風格並融入提示詞，包括色調、構圖、氛圍等元素' : ''}
+7. 直接輸出可複製使用的內容，無需額外說明`;
     }
     
     if (!systemPrompt) {
