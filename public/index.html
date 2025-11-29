@@ -1348,6 +1348,48 @@
                                 <textarea id="codingInput" rows="6" placeholder="用自然語言描述您想開發的軟體功能..." style="width: 100%; padding: 15px; border: 2px solid #ddd; border-radius: 8px; font-size: 14px; resize: vertical;"></textarea>
                             </div>
 
+                            <!-- 參考資料上傳區 -->
+                            <div class="form-group" style="background: linear-gradient(135deg, rgba(33, 150, 243, 0.05) 0%, rgba(3, 169, 244, 0.05) 100%); padding: 15px; border-radius: 10px; border: 1px dashed #2196F3;">
+                                <label style="color: #1976D2; font-size: 14px; margin-bottom: 10px; display: block;" data-i18n="ref_upload_label">📎 參考資料 (選填)</label>
+                                <p style="color: #888; font-size: 12px; margin-bottom: 12px;" data-i18n="ref_upload_hint">上傳參考圖片、文件或貼上網址，AI 將分析後生成更精準的提示詞</p>
+                                
+                                <!-- 上傳區域 -->
+                                <div id="codingUploadZone" class="upload-drop-zone" 
+                                     ondragover="handleDragOver(event, 'coding')" 
+                                     ondragleave="handleDragLeave(event, 'coding')" 
+                                     ondrop="handleDrop(event, 'coding')"
+                                     style="border: 2px dashed #90CAF9; border-radius: 10px; padding: 20px; text-align: center; background: #fff; transition: all 0.3s; cursor: pointer;"
+                                     onclick="document.getElementById('codingFileInput').click()">
+                                    <div style="display: flex; flex-direction: column; align-items: center; gap: 10px;">
+                                        <span style="font-size: 32px;">📁</span>
+                                        <span style="color: #666; font-size: 13px;" data-i18n="ref_drop_hint">拖放檔案到此處，或點擊上傳</span>
+                                        <div style="display: flex; gap: 8px; flex-wrap: wrap; justify-content: center;">
+                                            <span style="background: #E3F2FD; color: #1976D2; padding: 3px 8px; border-radius: 12px; font-size: 11px;">🖼️ 圖片</span>
+                                            <span style="background: #E8F5E9; color: #388E3C; padding: 3px 8px; border-radius: 12px; font-size: 11px;">📄 PDF</span>
+                                            <span style="background: #FFF3E0; color: #F57C00; padding: 3px 8px; border-radius: 12px; font-size: 11px;">📊 Excel</span>
+                                            <span style="background: #E3F2FD; color: #1565C0; padding: 3px 8px; border-radius: 12px; font-size: 11px;">📝 Word</span>
+                                            <span style="background: #FCE4EC; color: #C2185B; padding: 3px 8px; border-radius: 12px; font-size: 11px;">📽️ PPT</span>
+                                            <span style="background: #F3E5F5; color: #7B1FA2; padding: 3px 8px; border-radius: 12px; font-size: 11px;">📋 MD</span>
+                                        </div>
+                                    </div>
+                                    <input type="file" id="codingFileInput" multiple accept="image/*,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.md,.txt" style="display: none;" onchange="handleFileSelect(event, 'coding')">
+                                </div>
+                                
+                                <!-- 網址輸入 -->
+                                <div style="margin-top: 12px; display: flex; gap: 8px;">
+                                    <input type="text" id="codingUrlInput" placeholder="貼上參考網址 (例如: https://example.com)..." style="flex: 1; padding: 10px 12px; border: 2px solid #ddd; border-radius: 8px; font-size: 13px;" data-i18n-placeholder="ref_url_placeholder">
+                                    <button type="button" onclick="addUrlReference('coding')" style="padding: 10px 15px; background: #2196F3; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 13px;">
+                                        🔗 <span data-i18n="ref_add_url">加入</span>
+                                    </button>
+                                </div>
+                                
+                                <!-- 已上傳項目預覽 -->
+                                <div id="codingUploadedItems" style="margin-top: 12px; display: none;">
+                                    <div style="font-size: 12px; color: #666; margin-bottom: 8px;" data-i18n="ref_uploaded_items">📋 已加入的參考資料：</div>
+                                    <div id="codingUploadedList" style="display: flex; flex-wrap: wrap; gap: 8px;"></div>
+                                </div>
+                            </div>
+
                             <div class="form-group">
                                 <label for="codingPlatform">🎯 目標平台</label>
                                 <select id="codingPlatform" style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 8px; font-size: 14px;">
@@ -1381,6 +1423,46 @@
                                 <label for="imageInput" data-i18n="img_desc_label">🎨 描述您想生成的畫面</label>
                                 <p style="color: #888; font-size: 13px; margin-bottom: 10px;" data-i18n="img_desc_hint">例如：「太空中的貓」、「日落時分的海邊咖啡廳」、「未來城市的霓虹街景」</p>
                                 <textarea id="imageInput" rows="5" data-i18n-placeholder="img_desc_placeholder" placeholder="用自然語言描述您想要的畫面..." style="width: 100%; padding: 15px; border: 2px solid #ddd; border-radius: 8px; font-size: 14px; resize: vertical;"></textarea>
+                            </div>
+
+                            <!-- 參考資料上傳區 -->
+                            <div class="form-group" style="background: linear-gradient(135deg, rgba(156, 39, 176, 0.05) 0%, rgba(233, 30, 99, 0.05) 100%); padding: 15px; border-radius: 10px; border: 1px dashed #9C27B0;">
+                                <label style="color: #7B1FA2; font-size: 14px; margin-bottom: 10px; display: block;" data-i18n="ref_upload_label">📎 參考資料 (選填)</label>
+                                <p style="color: #888; font-size: 12px; margin-bottom: 12px;" data-i18n="ref_upload_hint_image">上傳參考圖片或貼上網址，AI 將分析風格/構圖後生成更精準的提示詞</p>
+                                
+                                <!-- 上傳區域 -->
+                                <div id="imageUploadZone" class="upload-drop-zone" 
+                                     ondragover="handleDragOver(event, 'image')" 
+                                     ondragleave="handleDragLeave(event, 'image')" 
+                                     ondrop="handleDrop(event, 'image')"
+                                     style="border: 2px dashed #CE93D8; border-radius: 10px; padding: 20px; text-align: center; background: #fff; transition: all 0.3s; cursor: pointer;"
+                                     onclick="document.getElementById('imageFileInput').click()">
+                                    <div style="display: flex; flex-direction: column; align-items: center; gap: 10px;">
+                                        <span style="font-size: 32px;">🖼️</span>
+                                        <span style="color: #666; font-size: 13px;" data-i18n="ref_drop_hint">拖放檔案到此處，或點擊上傳</span>
+                                        <div style="display: flex; gap: 8px; flex-wrap: wrap; justify-content: center;">
+                                            <span style="background: #F3E5F5; color: #7B1FA2; padding: 3px 8px; border-radius: 12px; font-size: 11px;">🖼️ JPG/PNG</span>
+                                            <span style="background: #FCE4EC; color: #C2185B; padding: 3px 8px; border-radius: 12px; font-size: 11px;">🎨 WEBP/GIF</span>
+                                            <span style="background: #E8F5E9; color: #388E3C; padding: 3px 8px; border-radius: 12px; font-size: 11px;">📄 PDF</span>
+                                            <span style="background: #E3F2FD; color: #1976D2; padding: 3px 8px; border-radius: 12px; font-size: 11px;">📝 文件</span>
+                                        </div>
+                                    </div>
+                                    <input type="file" id="imageFileInput" multiple accept="image/*,.pdf,.doc,.docx,.md,.txt" style="display: none;" onchange="handleFileSelect(event, 'image')">
+                                </div>
+                                
+                                <!-- 網址輸入 -->
+                                <div style="margin-top: 12px; display: flex; gap: 8px;">
+                                    <input type="text" id="imageUrlInput" placeholder="貼上參考圖片網址 (例如: https://example.com/image.jpg)..." style="flex: 1; padding: 10px 12px; border: 2px solid #ddd; border-radius: 8px; font-size: 13px;" data-i18n-placeholder="ref_url_placeholder_image">
+                                    <button type="button" onclick="addUrlReference('image')" style="padding: 10px 15px; background: #9C27B0; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 13px;">
+                                        🔗 <span data-i18n="ref_add_url">加入</span>
+                                    </button>
+                                </div>
+                                
+                                <!-- 已上傳項目預覽 -->
+                                <div id="imageUploadedItems" style="margin-top: 12px; display: none;">
+                                    <div style="font-size: 12px; color: #666; margin-bottom: 8px;" data-i18n="ref_uploaded_items">📋 已加入的參考資料：</div>
+                                    <div id="imageUploadedList" style="display: flex; flex-wrap: wrap; gap: 8px;"></div>
+                                </div>
                             </div>
 
                             <div class="form-group">
@@ -4243,6 +4325,8 @@
             btn.innerHTML = '🔄 AI 處理中...';
 
             try {
+                const references = await prepareReferencesForAPI('coding');
+                
                 const response = await fetch('/api/refine-prompt', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -4250,7 +4334,8 @@
                         mode: 'coding',
                         input: input,
                         platform: platform,
-                        complexity: complexity
+                        complexity: complexity,
+                        references: references
                     })
                 });
 
@@ -4283,6 +4368,227 @@
                 customInput.style.display = 'none';
                 customInput.value = '';
             }
+        }
+
+        // ==================== 參考資料上傳功能 ====================
+        const uploadedReferences = {
+            coding: [],
+            image: []
+        };
+
+        function handleDragOver(event, mode) {
+            event.preventDefault();
+            event.stopPropagation();
+            const zone = document.getElementById(mode + 'UploadZone');
+            zone.style.borderColor = mode === 'coding' ? '#2196F3' : '#9C27B0';
+            zone.style.background = mode === 'coding' ? '#E3F2FD' : '#F3E5F5';
+        }
+
+        function handleDragLeave(event, mode) {
+            event.preventDefault();
+            event.stopPropagation();
+            const zone = document.getElementById(mode + 'UploadZone');
+            zone.style.borderColor = mode === 'coding' ? '#90CAF9' : '#CE93D8';
+            zone.style.background = '#fff';
+        }
+
+        function handleDrop(event, mode) {
+            event.preventDefault();
+            event.stopPropagation();
+            handleDragLeave(event, mode);
+            
+            const files = event.dataTransfer.files;
+            if (files.length > 0) {
+                processFiles(files, mode);
+            }
+        }
+
+        function handleFileSelect(event, mode) {
+            const files = event.target.files;
+            if (files.length > 0) {
+                processFiles(files, mode);
+            }
+        }
+
+        async function processFiles(files, mode) {
+            for (let file of files) {
+                const fileType = getFileType(file);
+                const fileData = {
+                    type: 'file',
+                    fileType: fileType,
+                    name: file.name,
+                    size: file.size,
+                    file: file
+                };
+
+                if (fileType === 'image') {
+                    fileData.preview = await readFileAsDataURL(file);
+                }
+
+                uploadedReferences[mode].push(fileData);
+            }
+            updateUploadedList(mode);
+        }
+
+        function readFileAsDataURL(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = (e) => resolve(e.target.result);
+                reader.onerror = (e) => reject(e);
+                reader.readAsDataURL(file);
+            });
+        }
+
+        function getFileType(file) {
+            const ext = file.name.split('.').pop().toLowerCase();
+            const mimeType = file.type;
+
+            if (mimeType.startsWith('image/') || ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp', 'svg'].includes(ext)) {
+                return 'image';
+            } else if (ext === 'pdf' || mimeType === 'application/pdf') {
+                return 'pdf';
+            } else if (['doc', 'docx'].includes(ext) || mimeType.includes('word')) {
+                return 'word';
+            } else if (['xls', 'xlsx'].includes(ext) || mimeType.includes('excel') || mimeType.includes('spreadsheet')) {
+                return 'excel';
+            } else if (['ppt', 'pptx'].includes(ext) || mimeType.includes('presentation')) {
+                return 'ppt';
+            } else if (ext === 'md') {
+                return 'markdown';
+            } else {
+                return 'text';
+            }
+        }
+
+        function addUrlReference(mode) {
+            const inputId = mode + 'UrlInput';
+            const urlInput = document.getElementById(inputId);
+            const url = urlInput.value.trim();
+
+            if (!url) {
+                alert('請輸入有效的網址');
+                return;
+            }
+
+            if (!url.startsWith('http://') && !url.startsWith('https://')) {
+                alert('請輸入完整的網址 (http:// 或 https://)');
+                return;
+            }
+
+            const urlData = {
+                type: 'url',
+                url: url,
+                name: url.length > 40 ? url.substring(0, 40) + '...' : url
+            };
+
+            uploadedReferences[mode].push(urlData);
+            urlInput.value = '';
+            updateUploadedList(mode);
+        }
+
+        function updateUploadedList(mode) {
+            const container = document.getElementById(mode + 'UploadedItems');
+            const list = document.getElementById(mode + 'UploadedList');
+            const refs = uploadedReferences[mode];
+
+            if (refs.length === 0) {
+                container.style.display = 'none';
+                return;
+            }
+
+            container.style.display = 'block';
+            list.innerHTML = '';
+
+            refs.forEach((ref, index) => {
+                const item = document.createElement('div');
+                item.style.cssText = 'display: flex; align-items: center; gap: 6px; background: #f5f5f5; padding: 6px 10px; border-radius: 8px; font-size: 12px;';
+
+                const icon = getFileIcon(ref);
+                const name = ref.type === 'url' ? ref.name : ref.name;
+
+                let preview = '';
+                if (ref.type === 'file' && ref.fileType === 'image' && ref.preview) {
+                    preview = `<img src="${ref.preview}" style="width: 24px; height: 24px; object-fit: cover; border-radius: 4px; margin-right: 4px;">`;
+                }
+
+                item.innerHTML = `
+                    ${preview}
+                    <span>${icon}</span>
+                    <span style="max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${name}</span>
+                    <button type="button" onclick="removeReference('${mode}', ${index})" style="background: none; border: none; cursor: pointer; padding: 2px; color: #999; font-size: 14px;">✕</button>
+                `;
+                list.appendChild(item);
+            });
+        }
+
+        function getFileIcon(ref) {
+            if (ref.type === 'url') return '🔗';
+            switch (ref.fileType) {
+                case 'image': return '🖼️';
+                case 'pdf': return '📄';
+                case 'word': return '📝';
+                case 'excel': return '📊';
+                case 'ppt': return '📽️';
+                case 'markdown': return '📋';
+                default: return '📄';
+            }
+        }
+
+        function removeReference(mode, index) {
+            uploadedReferences[mode].splice(index, 1);
+            updateUploadedList(mode);
+        }
+
+        async function prepareReferencesForAPI(mode) {
+            const refs = uploadedReferences[mode];
+            const preparedRefs = [];
+
+            for (let ref of refs) {
+                if (ref.type === 'url') {
+                    preparedRefs.push({
+                        type: 'url',
+                        url: ref.url
+                    });
+                } else if (ref.type === 'file') {
+                    if (ref.fileType === 'image') {
+                        preparedRefs.push({
+                            type: 'image',
+                            name: ref.name,
+                            data: ref.preview
+                        });
+                    } else {
+                        const textContent = await readFileAsText(ref.file);
+                        preparedRefs.push({
+                            type: 'document',
+                            fileType: ref.fileType,
+                            name: ref.name,
+                            content: textContent
+                        });
+                    }
+                }
+            }
+
+            return preparedRefs;
+        }
+
+        function readFileAsText(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = (e) => resolve(e.target.result);
+                reader.onerror = (e) => reject(e);
+                
+                if (file.type === 'application/pdf') {
+                    resolve('[PDF 檔案 - 需要後端解析]');
+                } else if (file.name.endsWith('.docx') || file.name.endsWith('.doc')) {
+                    resolve('[Word 檔案 - 需要後端解析]');
+                } else if (file.name.endsWith('.xlsx') || file.name.endsWith('.xls')) {
+                    resolve('[Excel 檔案 - 需要後端解析]');
+                } else if (file.name.endsWith('.pptx') || file.name.endsWith('.ppt')) {
+                    resolve('[PPT 檔案 - 需要後端解析]');
+                } else {
+                    reader.readAsText(file);
+                }
+            });
         }
 
         async function generateImagePrompt() {
@@ -4322,6 +4628,8 @@
             };
 
             try {
+                const references = await prepareReferencesForAPI('image');
+                
                 const response = await fetch('/api/refine-prompt', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -4334,7 +4642,8 @@
                         imageModel: imageModel,
                         customModelName: customModelName,
                         imageSteps: imageSteps,
-                        imageFormat: imageFormat
+                        imageFormat: imageFormat,
+                        references: references
                     })
                 });
 
