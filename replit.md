@@ -1,7 +1,7 @@
 # Googoogaga Multi-Platform Content Generator
 
 ## Overview
-The Googoogaga platform is an AI-powered content generation system designed for various industries including Fashion, Mother&Kids, and Art Toy. It leverages Google Gemini AI for intelligent product analysis and automated content creation tailored for multiple social media and e-commerce platforms (Shopee, TikTok, Instagram, Facebook). **NEW**: Now includes AI Course Editor Expert for educational content generation and **BizPrompt Architect Pro** for professional AI prompt generation. The project aims to streamline marketing content creation by offering multi-language support, interactive AI consultation, and customizable image generation, ultimately enhancing brand targeting and marketing efficiency across diverse consumer bases.
+The Googoogaga platform is an AI-powered content generation system for various industries including Fashion, Mother&Kids, and Art Toy. It leverages Google Gemini AI for intelligent product analysis and automated content creation tailored for multiple social media and e-commerce platforms (Shopee, TikTok, Instagram, Facebook). Key features include an AI Course Editor Expert for educational content and BizPrompt Architect Pro for professional AI prompt generation. The project aims to streamline marketing content creation through multi-language support, interactive AI consultation, and customizable image generation, enhancing brand targeting and marketing efficiency.
 
 ## User Preferences
 - Language: Bilingual Vietnamese and Traditional Chinese
@@ -12,17 +12,16 @@ The Googoogaga platform is an AI-powered content generation system designed for 
 
 ## System Architecture
 The project follows a client-server architecture:
-- **Frontend**: Responsive web interface built with HTML, CSS, and JavaScript, served from the `/public` directory. It features a baby-friendly design, multi-language switching, and an interactive chat window.
-- **Backend**: An Express.js server (`/src/server.js`) handling API requests, file uploads, and integrating with AI services. It supports bilingual content generation and intelligent ad analysis.
-- **AI Integration**: Utilizes Google Gemini 3 Pro Preview for advanced text reasoning and prompt optimization, with Gemini 2.5 Flash Image Preview for stable image generation. Fallback models include Gemini 2.5 Flash and 2.0 Flash Experimental. Used for product analysis, pain point identification, scenario suggestions, ad analysis, and educational content generation. AI responses are language-aware.
-- **Image Processing**: Incorporates Sharp library for high-quality image manipulation, including automatic Googoogaga logo overlay with transparent backgrounds and customizable image generation based on user input for model nationality, combination, and scene location.
+- **Frontend**: Responsive web interface with HTML, CSS, and JavaScript, served from `/public`, featuring a baby-friendly design, multi-language switching, and an interactive chat window. UI includes a four-page tab navigation system, grid preview for multi-image uploads, and professional report output with PDF export.
+- **Backend**: An Express.js server (`/src/server.js`) handling API requests, file uploads, and AI service integration, supporting bilingual content generation and intelligent ad analysis.
+- **AI Integration**: Utilizes Google Gemini 3 Pro Preview for advanced text reasoning and prompt optimization, and Gemini 2.5 Flash Image Preview for stable image generation. Fallback models include Gemini 2.5 Flash and 2.0 Flash Experimental. Used for product analysis, pain point identification, scenario suggestions, ad analysis, and educational content generation, with language-aware responses.
+- **Image Processing**: Incorporates Sharp library for high-quality image manipulation, including automatic Googoogaga logo overlay and customizable image generation based on user input.
 - **Data Structures**: TypeScript schemas and interfaces in `/src/schemas/` define data contracts.
-- **Routing**: API endpoints are managed in `/src/routes/` with specific routes for content generation, ad analysis, and chat interactions.
+- **Routing**: API endpoints are managed in `/src/routes/` for content generation, ad analysis, and chat interactions.
 - **Prompts**: AI prompt templates for various industries and marketing scenarios are stored in `/src/prompts/`.
 - **File Storage**: Uploaded product images are stored in `/assets/uploads/`.
-- **UI/UX**: Features a four-page tab navigation system ("AI 圖片生成", "AI 廣告顧問", "AI 課程編輯專家", and "AI 指令架構師"), grid preview for multi-image uploads, and professional report output with PDF export functionality. All UI elements support dynamic language switching.
 - **Core Features**:
-    - **Multi-Language Support**: Traditional Chinese, English, Vietnamese with dynamic switching for all pages.
+    - **Multi-Language Support**: Traditional Chinese, English, Vietnamese with dynamic switching.
     - **Interactive AI Chat Advisor**: Continuous consultation with conversation history and file upload.
     - **Multi-Industry Support**: Fashion, Mother&Kids, Art Toy, Others with industry-specific AI prompts.
     - **Scenario Switching**: Quick platform switching without re-entering product information.
@@ -31,126 +30,19 @@ The project follows a client-server architecture:
     - **Smart Analysis**: AI-powered product recognition, pain point identification, and scenario suggestions.
     - **Automated Image Generation**: Customizable marketing scenario images with real product integration and automatic brand logo.
     - **Ad Analysis**: AI-powered analysis for ad campaigns across TikTok, Shopee, Meta, and Zalo, generating professional reports.
-    - **AI Course Editor Expert**: Automated educational course content generation for ages 3-14 across multiple subjects (Social, Science, Math, Language, Art) with customizable teaching styles, multi-language support, and professional Word/PDF export capabilities.
-    - **BizPrompt Architect Pro (NEW)**: Professional AI prompt generation system featuring three modes:
-        - **Business Consultant Mode**: 4-level cascading dropdown (Domain → Industry → Role → Framework) for generating expert-level business prompts with professional models like SWOT, Porter Five Forces, Lean Canvas, etc.
-        - **Software Development Mode**: Natural language to structured PRD conversion using Gemini AI, with platform and complexity selection.
-        - **Visual Image Mode**: AI-powered Midjourney/DALL-E prompt optimization with style, ratio, and quality tag customization.
+    - **AI Course Editor Expert**: Automated educational course content generation for ages 3-14 across multiple subjects, with customizable teaching styles, multi-language support, and professional Word/PDF export capabilities.
+    - **BizPrompt Architect Pro**: Professional AI prompt generation system with three modes:
+        - **Business Consultant Mode**: 4-level cascading dropdown (Domain → Industry → Role → Framework) for expert-level business prompts.
+        - **Software Development Mode**: Natural language to structured PRD conversion using Gemini AI.
+        - **Visual Image Mode**: AI-powered Midjourney/DALL-E prompt optimization with style, ratio, and quality tag customization, and support for various image models (Nano Banana (FLUX), GPT (DALL-E 3), Midjourney (MJ), Custom). Includes advanced options for steps and output format selection. This mode also supports reference material upload (images, documents, URLs) for AI analysis.
 
 ## External Dependencies
 - **AI Services**: Google Gemini 3 Pro Preview (text reasoning), Google Gemini 2.5 Flash Image Preview (image generation), Google Gemini 2.5 Flash (fallback), Google Gemini 2.0 Flash Experimental (legacy)
 - **Web Framework**: Express.js
-- **Middleware**: CORS, Multer (for file uploads), Dotenv (for environment variables)
+- **Middleware**: CORS, Multer (file uploads), Dotenv (environment variables)
 - **HTTP Client**: Axios
 - **Image Processing**: Sharp
-- **Document Generation**: docx (Word), pdfkit (PDF), html-docx-js (HTML to Word conversion)
-- **Font Support**: Source Han Sans OTF (16MB bundled) for proper CJK character rendering in PDF exports
+- **Document Generation**: docx (Word), pdfkit (PDF), html-docx-js (HTML to Word)
+- **Font Support**: Source Han Sans OTF (for CJK character rendering in PDF exports)
 - **System Packages**: noto-fonts-cjk-sans, unzip
 - **Scheduling**: Node-cron
-- **Deployment Environment**: Replit (requires specific port and host configurations)
-
-## Recent Changes
-
-### Visual Image Mode - Advanced Options Enhancement (November 28, 2025)
-- **New Feature**: Added optional advanced settings section in Visual Image mode
-- **Steps Selection**: Choose image generation steps (20/30/50/75/100/150) for quality control
-  - FLUX/Stable Diffusion: Direct steps parameter
-  - Midjourney: Uses --q quality parameter instead
-- **Output Format Selection**: Choose output image format (PNG/JPG/WebP/TIFF/BMP)
-  - PNG: Lossless, supports transparency
-  - JPG: Compressed, smaller file size
-  - WebP: Web-optimized, balanced quality and size
-  - TIFF: Print quality, high resolution
-- **UI Design**: Two-column grid layout in a styled advanced options box
-- **Multi-Language Support**: Full i18n for zh-TW, en, vi translations
-
-### Visual Image Mode - Multi-Platform Image Model Support (November 28, 2025)
-- **New Feature**: Added target image model dropdown in Visual Image mode
-- **Platform Support**: 
-  - **Nano Banana (FLUX)**: Natural language prompts, supports Chinese/English mix, emphasis on lighting and material descriptions
-  - **GPT (DALL-E 3)**: Complete English sentence descriptions, supports emotional and narrative elements
-  - **Midjourney (MJ)**: Keyword-based prompts with --ar, --q, --s, --v parameters and negative prompts
-  - **Custom**: User-defined platform with AI-generated optimized format
-- **Platform-Specific Output**: Each platform generates unique prompt format optimized for that AI model
-- **UI Enhancement**: Toggle for custom model input when "Custom" is selected
-- **Multi-Language Support**: Full i18n for zh-TW, en, vi translations
-
-### BizPrompt Architect Pro - AI-Powered Deep Prompt Generation (November 28, 2025)
-- **Major Enhancement**: Business Consultant Mode now uses Gemini 3 Pro for deep AI-powered prompt generation instead of simple string templates
-- **Professional Meta-Prompt System**: 
-  - 🎯 System Role: Generates 10+ years experience professional profiles with 5-8 required skills
-  - 📌 Expected Outputs: 5-7 specific work items with sub-tasks and deliverables
-  - 🧠 Analysis Framework: 4-6 structured analysis dimensions tailored to selected framework
-  - 🗣️ Tone & Style: Professional communication guidelines
-  - 📥 Required User Inputs: 5-7 key questions for AI to gather context
-- **Reference Quality**: Outputs match professional-level prompts like the "越南母嬰市場商業顧問 × Nuby 品牌 MD" example
-- **Async UI Flow**: Added loading states, error handling, and proper button state management
-- **API Enhancement**: `/api/refine-prompt` now handles 'business' mode with sophisticated meta-prompt
-
-### BizPrompt Architect Pro - Complete Framework Translation (November 28, 2025)
-- **Framework Translation System**: Added comprehensive multi-language translation for all L4 frameworks
-- **Translation Coverage**: 1254 unique frameworks × 3 languages = 3762+ translations
-- **Dynamic Translation Lookup**: Framework names automatically converted to translation keys (e.g., "SWOT Analysis" → "biz_fw_swot_analysis")
-- **Languages Supported**: Traditional Chinese (繁體中文), English, Vietnamese (Tiếng Việt)
-- **Translation Categories**: Marketing, Strategy, Sales, Product, Finance, HR, E-commerce, Design, Software Development frameworks
-
-### BizPrompt Architect Pro - Major Expansion (November 28, 2025)
-- **Comprehensive 4-Level Cascading System**: Expanded business consultant mode with 8 domains, 40+ industries, 207 roles, and corresponding frameworks
-- **User-Specific Industries Integrated**:
-  - Fashion/Footwear/Accessories across E-commerce, Product, and Design domains
-  - Mother & Baby across E-commerce, Product, and Design domains
-  - Pet Industry across E-commerce and Product domains
-  - Art Toy (Popmart) across E-commerce, Product, and Design domains
-- **Domain Coverage (8 Total)**:
-  - E-commerce Operations (TikTok Shop, Shopee, FB Marketplace, Fashion, Mother&Baby, Pet, Art Toy)
-  - Marketing (SEO/GEO, Social, Performance, Brand, Content)
-  - Product Management (Fashion, Baby, Pet, Toy, Tech Products)
-  - Product Design (Industrial, Fashion, Toy, UX/UI, Graphic)
-  - Software Development (Vibe Coding, Web, Mobile, AI/ML, E-commerce)
-  - Strategy (E-com, Brand, Growth, Consulting, Startup)
-  - Finance (E-com, Corporate, Accounting, Investment, Business)
-  - Human Resources (Talent, OD, Compensation, Learning, HR Tech)
-- **Role Framework System**: 207 unique roles, each with 5+ professional frameworks plus custom option
-- **Custom Input Support**: Full custom input support at all 4 levels (L1/L2/L3/L4)
-- **Complete Translation Coverage**: All domains, industries, roles, and frameworks translated in zh-TW, en, vi
-
-### BizPrompt Architect Pro - New Tab 4 (November 28, 2025)
-- **New Feature**: Added 4th tab "AI 指令架構師" (BizPrompt Architect Pro) to the platform
-- **Three-Mode System**:
-  - **Business Consultant Mode**: 4-level cascading dropdown (L1 Domain → L2 Industry → L3 Role → L4 Framework) with support for custom inputs at each level
-  - **Software Development Mode**: Natural language input with AI-powered conversion to structured PRD using Gemini 3 Pro
-  - **Visual Image Mode**: AI-powered Midjourney/DALL-E prompt optimization with style, ratio, and quality tag selection
-- **New API Endpoints**:
-  - `/api/refine-prompt`: Handles AI prompt refinement for coding and image modes
-  - `/api/export-prompt-word`: Exports generated prompts to Word documents
-- **Tool Features**: One-click copy to clipboard and Word document export
-- **Multi-Language Support**: Full i18n support for Traditional Chinese, English, and Vietnamese
-- **UI Consistency**: Follows existing design patterns with sky blue to pink gradient theme
-
-### AI Model Upgrade to Gemini 3 Pro (November 23, 2025)
-- **Upgrade Scope**: Platform-wide AI model upgrade with hybrid configuration
-- **Text Reasoning Models Upgraded** ✅:
-  - `geminiAI.js`: gemini-2.5-flash → **gemini-3-pro-preview**
-  - `scenarioGenerator.js` (Tab 1): gemini-2.5-flash → **gemini-3-pro-preview**
-  - `adsAnalyzer.js` (Tab 2): gemini-2.5-flash → **gemini-3-pro-preview**
-  - `chatAdvisor.js`: gemini-2.5-flash → **gemini-3-pro-preview**
-  - `courseGenerator.js` (Tab 3): gemini-2.5-flash → **gemini-3-pro-preview**
-- **Image Generation Models** ⚠️:
-  - **Status**: Kept at **gemini-2.5-flash-image-preview** (stable Replit-supported model)
-  - **Reason**: gemini-3-pro-image-preview is not supported by Replit AI Integrations
-  - **Decision**: Use stable 2.5 Flash Image model for reliable image generation
-- **Benefits**:
-  - ✅ Enhanced text reasoning and response quality across all AI-powered features
-  - ✅ Better multi-language understanding and content generation
-  - ✅ More sophisticated prompt optimization and analysis capabilities
-  - ✅ Stable and reliable image generation with proven 2.5 Flash Image model
-- **Fallback Strategy**: Text models use gemini-2.5-flash and gemini-2.0-flash-exp as fallbacks
-
-### PDF Chinese Font Support Fix (November 14, 2025)
-- **Issue**: PDF exports displayed Chinese characters as mojibake (����) due to missing CJK font support
-- **Solution**: 
-  - Downloaded genuine Source Han Sans CN Regular OTF font (16MB) from Adobe/jsDelivr CDN
-  - Bundled font in `assets/fonts/SourceHanSansCN-Regular.otf` for deployment reliability
-  - Modified `DocumentExportService` to load bundled OTF font before PDF text rendering
-  - Verified font signature (OTTO) and successful PDFKit integration
-- **Result**: All Traditional Chinese, Simplified Chinese, Japanese, and Korean characters now render correctly in exported PDFs
