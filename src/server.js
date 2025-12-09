@@ -10,9 +10,14 @@ const AdsAnalyzer = require('./services/adsAnalyzer');
 const ChatAdvisor = require('./services/chatAdvisor');
 const CourseGeneratorService = require('./services/courseGenerator');
 const DocumentExportService = require('./services/documentExport');
+const SupabaseAuthService = require('./services/supabaseAuth');
+const { authMiddleware, optionalAuthMiddleware } = require('./middleware/authMiddleware');
 const { PLATFORM_CONFIGS, CONTENT_TEMPLATES, BABY_TOY_CATEGORIES } = require('./schemas/platforms');
 
 dotenv.config();
+
+// Initialize Supabase Auth Service
+const supabaseAuth = new SupabaseAuthService();
 
 // Initialize AI services
 const apiKey = process.env.GEMINI_API_KEY_NEW || process.env.GEMINI_API_KEY;
@@ -97,6 +102,133 @@ app.get('/', (req, res) => {
 app.get('/api/health', (req, res) => {
   res.json({ status: 'OK', message: `${BRAND_CONFIG.name} Facebook Auto Workflow API is running` });
 });
+
+// ==================== Authentication Routes ====================
+
+app.post('/api/auth/signup', async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+      return res.status(400).json({ error: 'Email and password are required' });
+    }
+
+    if (password.length < 6) {
+      return res.status(400).json({ error: 'Password must be at least 6 characters' });
+    }
+
+    const data = await supabaseAuth.signUp(email, password);
+    console.log(`📧 New user signed up: ${email}`);
+
+    res.json({
+      success: true,
+      message: 'Sign up successful. Please check your email for verification.',
+      user: data.user,
+      session: data.session
+    });
+  } catch (error) {
+    console.error('Sign up error:', error.message);
+    res.status(400).json({ error: error.message });
+  }
+});
+
+app.post('/api/auth/signin', async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+      return res.status(400).json({ error: 'Email and password are required' });
+    }
+
+    const data = await supabaseAuth.signIn(email, password);
+    console.log(`🔓 User signed in: ${email}`);
+
+    res.json({
+      success: true,
+      message: 'Sign in successful',
+      user: data.user,
+      session: data.session
+    });
+  } catch (error) {
+    console.error('Sign in error:', error.message);
+    res.status(401).json({ error: error.message });
+  }
+});
+
+app.post('/api/auth/signout', authMiddleware, async (req, res) => {
+  try {
+    console.log(`🔒 User signed out: ${req.user?.email}`);
+    res.json({ success: true, message: 'Signed out successfully' });
+  } catch (error) {
+    console.error('Sign out error:', error.message);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.get('/api/auth/user', authMiddleware, async (req, res) => {
+  try {
+    res.json({
+      success: true,
+      user: req.user
+    });
+  } catch (error) {
+    console.error('Get user error:', error.message);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.post('/api/auth/refresh', async (req, res) => {
+  try {
+    const { refresh_token } = req.body;
+
+    if (!refresh_token) {
+      return res.status(400).json({ error: 'Refresh token is required' });
+    }
+
+    const data = await supabaseAuth.refreshSession(refresh_token);
+
+    res.json({
+      success: true,
+      session: data.session,
+      user: data.user
+    });
+  } catch (error) {
+    console.error('Refresh token error:', error.message);
+    res.status(401).json({ error: error.message });
+  }
+});
+
+app.post('/api/auth/reset-password', async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    if (!email) {
+      return res.status(400).json({ error: 'Email is required' });
+    }
+
+    await supabaseAuth.resetPassword(email);
+    console.log(`📧 Password reset email sent to: ${email}`);
+
+    res.json({
+      success: true,
+      message: 'Password reset email sent'
+    });
+  } catch (error) {
+    console.error('Reset password error:', error.message);
+    res.status(400).json({ error: error.message });
+  }
+});
+
+app.get('/api/auth/status', (req, res) => {
+  const enabled = supabaseAuth.isEnabled();
+  res.json({
+    enabled: enabled,
+    message: enabled ? 'Authentication is enabled' : 'Authentication is disabled',
+    requiresLogin: enabled
+  });
+});
+
+// ==================== End Authentication Routes ====================
 
 // 安全的圖片下載端點 - 防止路徑遍歷攻擊
 app.get('/api/download-image', async (req, res) => {
@@ -266,7 +398,7 @@ app.post('/api/upload-image', upload.array('images', 5), (req, res) => {
 });
 
 // AI-powered product analysis endpoint - Support multiple images
-app.post('/api/analyze-product', async (req, res) => {
+app.post('/api/analyze-product', authMiddleware, async (req, res) => {
   try {
     const { imagePath, imagePaths, productInfo } = req.body;
     
@@ -336,7 +468,7 @@ app.post('/api/analyze-product', async (req, res) => {
 });
 
 // Multi-platform content generation endpoint
-app.post('/api/generate-platform-content', async (req, res) => {
+app.post('/api/generate-platform-content', authMiddleware, async (req, res) => {
   try {
     const { 
       productInfo, 
@@ -467,7 +599,7 @@ app.post('/api/generate-platform-content', async (req, res) => {
 });
 
 // Scene generation endpoint for creating marketing scenarios
-app.post('/api/generate-scenarios', async (req, res) => {
+app.post('/api/generate-scenarios', authMiddleware, async (req, res) => {
   try {
     const { 
       productInfo, 
@@ -729,7 +861,7 @@ function getDesignBrief(template) {
 // ==================== Page 2: AI 廣告顧問 API ====================
 
 // API endpoint for ads analysis
-app.post('/api/analyze-ads', adsUpload.array('files', 10), async (req, res) => {
+app.post('/api/analyze-ads', authMiddleware, adsUpload.array('files', 10), async (req, res) => {
   try {
     console.log('📊 Received ads analysis request');
     
@@ -839,7 +971,7 @@ const chatUpload = multer({
 });
 
 // API endpoint for generating course content
-app.post('/api/generate-course', async (req, res) => {
+app.post('/api/generate-course', authMiddleware, async (req, res) => {
   try {
     console.log('📚 Generating course content...');
     
@@ -986,7 +1118,7 @@ app.get('/api/download-document', async (req, res) => {
 });
 
 // API endpoint for chat with advisor
-app.post('/api/chat-with-advisor', chatUpload.array('files', 5), async (req, res) => {
+app.post('/api/chat-with-advisor', authMiddleware, chatUpload.array('files', 5), async (req, res) => {
   try {
     console.log('💬 Received chat message');
     
@@ -1253,7 +1385,7 @@ function buildReferenceContext(references) {
 }
 
 // API endpoint for refining prompts (coding and image modes)
-app.post('/api/refine-prompt', async (req, res) => {
+app.post('/api/refine-prompt', authMiddleware, async (req, res) => {
   try {
     const { mode, input, platform, complexity, style, ratio, qualityTags, references } = req.body;
     

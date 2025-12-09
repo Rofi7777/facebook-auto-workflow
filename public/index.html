@@ -33,12 +33,227 @@
             position: relative;
         }
         
-        /* 語言切換器樣式 */
-        .language-switcher {
+        /* 用戶認證區域樣式 */
+        .header-top-bar {
             position: absolute;
             top: 20px;
             right: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
             z-index: 100;
+        }
+        
+        .user-info {
+            display: none;
+            align-items: center;
+            gap: 10px;
+            background: rgba(255,255,255,0.9);
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 13px;
+            color: #333;
+        }
+        
+        .user-info .user-avatar {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #87CEEB 0%, #FFB6C1 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 12px;
+        }
+        
+        .auth-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 8px 18px;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.3s;
+        }
+        
+        .auth-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+        
+        .auth-btn.logout-btn {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a5a 100%);
+        }
+        
+        .auth-btn.logout-btn:hover {
+            box-shadow: 0 4px 12px rgba(255, 107, 107, 0.4);
+        }
+        
+        /* 認證彈窗樣式 */
+        .auth-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+        }
+        
+        .auth-modal-content {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            width: 90%;
+            max-width: 420px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            position: relative;
+        }
+        
+        .auth-modal-close {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 24px;
+            color: #999;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+        
+        .auth-modal-close:hover {
+            color: #333;
+        }
+        
+        .auth-tabs {
+            display: flex;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #eee;
+        }
+        
+        .auth-tab {
+            flex: 1;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            font-weight: 600;
+            color: #999;
+            transition: all 0.3s;
+            border-bottom: 3px solid transparent;
+            margin-bottom: -2px;
+        }
+        
+        .auth-tab:hover {
+            color: #667eea;
+        }
+        
+        .auth-tab.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+        }
+        
+        .auth-form-container {
+            display: none;
+        }
+        
+        .auth-form-container.active,
+        #loginFormContainer {
+            display: block;
+        }
+        
+        .auth-form-group {
+            margin-bottom: 20px;
+        }
+        
+        .auth-form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+            font-size: 14px;
+        }
+        
+        .auth-form-group input {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 15px;
+            transition: border-color 0.3s;
+        }
+        
+        .auth-form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .auth-submit-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .auth-submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        .auth-submit-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .auth-error {
+            display: none;
+            background: #ffe6e6;
+            color: #d63031;
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+        
+        .auth-divider {
+            text-align: center;
+            margin: 25px 0;
+            color: #999;
+            font-size: 13px;
+        }
+        
+        .loading-spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 0.8s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* 語言切換器樣式 */
+        .language-switcher {
+            position: relative;
         }
         
         .language-dropdown {
@@ -737,21 +952,40 @@
 <body>
     <div class="main-container">
         <div class="header">
-            <!-- 語言切換器 -->
-            <div class="language-switcher">
-                <div class="language-dropdown">
-                    <button class="language-btn" onclick="toggleLanguageMenu()">
-                        🌐 <span id="currentLanguageDisplay">繁體中文</span> ▼
+            <!-- 頂部工具列：用戶認證 + 語言切換 -->
+            <div class="header-top-bar">
+                <!-- 用戶資訊 (登入後顯示) -->
+                <div class="user-info" id="userInfo">
+                    <div class="user-avatar" id="userAvatar">U</div>
+                    <span id="userEmail">user@email.com</span>
+                    <button class="auth-btn logout-btn" id="logoutBtn" onclick="handleLogout()" style="display: none;">
+                        <span data-i18n="auth_logout">登出</span>
                     </button>
-                    <div class="language-menu" id="languageMenu">
-                        <div class="language-option active" onclick="selectLanguage('zh-TW')">
-                            🇹🇼 繁體中文
-                        </div>
-                        <div class="language-option" onclick="selectLanguage('en')">
-                            🇬🇧 English
-                        </div>
-                        <div class="language-option" onclick="selectLanguage('vi')">
-                            🇻🇳 Tiếng Việt
+                </div>
+                
+                <!-- 登入按鈕 (未登入時顯示) -->
+                <div id="authButtons">
+                    <button class="auth-btn" id="loginBtn" onclick="AuthManager.showLoginModal()">
+                        🔐 <span data-i18n="auth_login">登入</span>
+                    </button>
+                </div>
+                
+                <!-- 語言切換器 -->
+                <div class="language-switcher">
+                    <div class="language-dropdown">
+                        <button class="language-btn" onclick="toggleLanguageMenu()">
+                            🌐 <span id="currentLanguageDisplay">繁體中文</span> ▼
+                        </button>
+                        <div class="language-menu" id="languageMenu">
+                            <div class="language-option active" onclick="selectLanguage('zh-TW')">
+                                🇹🇼 繁體中文
+                            </div>
+                            <div class="language-option" onclick="selectLanguage('en')">
+                                🇬🇧 English
+                            </div>
+                            <div class="language-option" onclick="selectLanguage('vi')">
+                                🇻🇳 Tiếng Việt
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1845,7 +2079,7 @@
                     showStatus(`🧠 AI 產品分析中... (${language})`, 'info');
                     console.log('🌐 Selected language for analysis:', language);
                     
-                    const analysisResponse = await fetch('/api/analyze-product', {
+                    const analysisResponse = await AuthManager.authFetch('/api/analyze-product', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json'
@@ -1876,7 +2110,7 @@
                 // Step 3: Generate platform content
                 showStatus('🎯 生成多平台內容中...', 'info');
                 
-                const contentResponse = await fetch('/api/generate-platform-content', {
+                const contentResponse = await AuthManager.authFetch('/api/generate-platform-content', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -1968,7 +2202,7 @@
                     }
                 }
                 
-                const scenarioResponse = await fetch('/api/generate-scenarios', {
+                const scenarioResponse = await AuthManager.authFetch('/api/generate-scenarios', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -2061,7 +2295,7 @@
                 switchScenarioBtn.innerHTML = '<span class="loading"></span>重新生成中...';
                 
                 // Generate platform content with existing product analysis
-                const contentResponse = await fetch('/api/generate-platform-content', {
+                const contentResponse = await AuthManager.authFetch('/api/generate-platform-content', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -2650,7 +2884,7 @@
                     });
                     
                     // 發送到後端 API
-                    const response = await fetch('/api/analyze-ads', {
+                    const response = await AuthManager.authFetch('/api/analyze-ads', {
                         method: 'POST',
                         body: formData
                     });
@@ -2874,7 +3108,7 @@
                 });
                 
                 // 發送請求
-                const response = await fetch('/api/chat-with-advisor', {
+                const response = await AuthManager.authFetch('/api/chat-with-advisor', {
                     method: 'POST',
                     body: formData
                 });
@@ -3129,7 +3363,7 @@
             preview.innerHTML = '<p style="text-align: center; padding: 40px;"><span class="loading"></span><br>AI 生成中...</p>';
 
             try {
-                const response = await fetch('/api/generate-course', {
+                const response = await AuthManager.authFetch('/api/generate-course', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -4277,7 +4511,7 @@
             showPromptStatus('🔄 AI 正在分析您的專業背景並生成深度 Prompt...', 'info');
 
             try {
-                const response = await fetch('/api/refine-prompt', {
+                const response = await AuthManager.authFetch('/api/refine-prompt', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -4327,7 +4561,7 @@
             try {
                 const references = await prepareReferencesForAPI('coding');
                 
-                const response = await fetch('/api/refine-prompt', {
+                const response = await AuthManager.authFetch('/api/refine-prompt', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -4630,7 +4864,7 @@
             try {
                 const references = await prepareReferencesForAPI('image');
                 
-                const response = await fetch('/api/refine-prompt', {
+                const response = await AuthManager.authFetch('/api/refine-prompt', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -4745,11 +4979,65 @@
     
     <!-- 引入多語言翻譯系統 -->
     <script src="/js/translations.js"></script>
+    <!-- 引入用戶認證系統 -->
+    <script src="/js/auth.js"></script>
     <script>
         // 初始化時應用語言設定
         document.addEventListener('DOMContentLoaded', function() {
             updatePageLanguage();
         });
     </script>
+    
+    <!-- 認證彈窗 Modal -->
+    <div class="auth-modal" id="authModal">
+        <div class="auth-modal-content">
+            <span class="auth-modal-close" onclick="AuthManager.hideLoginModal()">&times;</span>
+            
+            <div class="auth-tabs">
+                <div class="auth-tab active" id="loginTab" onclick="AuthManager.switchAuthTab('login')">
+                    <span data-i18n="auth_login_tab">登入</span>
+                </div>
+                <div class="auth-tab" id="registerTab" onclick="AuthManager.switchAuthTab('register')">
+                    <span data-i18n="auth_register_tab">註冊</span>
+                </div>
+            </div>
+            
+            <!-- 登入表單 -->
+            <div class="auth-form-container" id="loginFormContainer" style="display: block;">
+                <div class="auth-error" id="loginError"></div>
+                <form onsubmit="handleLogin(event)">
+                    <div class="auth-form-group">
+                        <label for="loginEmail" data-i18n="auth_email">電子郵件</label>
+                        <input type="email" id="loginEmail" placeholder="your@email.com" required>
+                    </div>
+                    <div class="auth-form-group">
+                        <label for="loginPassword" data-i18n="auth_password">密碼</label>
+                        <input type="password" id="loginPassword" placeholder="••••••••" required>
+                    </div>
+                    <button type="submit" class="auth-submit-btn" data-i18n="auth_login_btn">登入</button>
+                </form>
+            </div>
+            
+            <!-- 註冊表單 -->
+            <div class="auth-form-container" id="registerFormContainer">
+                <div class="auth-error" id="registerError"></div>
+                <form onsubmit="handleRegister(event)">
+                    <div class="auth-form-group">
+                        <label for="registerEmail" data-i18n="auth_email">電子郵件</label>
+                        <input type="email" id="registerEmail" placeholder="your@email.com" required>
+                    </div>
+                    <div class="auth-form-group">
+                        <label for="registerPassword" data-i18n="auth_password">密碼</label>
+                        <input type="password" id="registerPassword" placeholder="至少6個字符" required>
+                    </div>
+                    <div class="auth-form-group">
+                        <label for="registerConfirmPassword" data-i18n="auth_confirm_password">確認密碼</label>
+                        <input type="password" id="registerConfirmPassword" placeholder="再次輸入密碼" required>
+                    </div>
+                    <button type="submit" class="auth-submit-btn" data-i18n="auth_register_btn">註冊</button>
+                </form>
+            </div>
+        </div>
+    </div>
 </body>
 </html>

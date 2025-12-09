@@ -1859,7 +1859,26 @@ const translations = {
     'biz_role_cost_analyst': '成本分析師',
     'biz_role_profitability_analyst': '獲利分析師',
     'biz_role_cash_flow_manager': '現金流經理',
-    'biz_role_financial_planner': '財務規劃師'
+    'biz_role_financial_planner': '財務規劃師',
+    
+    // 用戶認證翻譯
+    'auth_login': '登入',
+    'auth_logout': '登出',
+    'auth_login_tab': '登入',
+    'auth_register_tab': '註冊',
+    'auth_email': '電子郵件',
+    'auth_password': '密碼',
+    'auth_confirm_password': '確認密碼',
+    'auth_login_btn': '登入',
+    'auth_register_btn': '註冊',
+    'auth_login_success': '登入成功！',
+    'auth_register_success': '註冊成功！',
+    'auth_logout_success': '已成功登出！',
+    'auth_verify_email': '請查看您的電子郵件進行驗證。',
+    'auth_error_required': '請填寫所有欄位',
+    'auth_error_password_mismatch': '密碼不一致',
+    'auth_error_password_length': '密碼至少需要6個字符',
+    'auth_session_expired': '登入已過期，請重新登入'
   },
   
   'en': {
@@ -3599,7 +3618,26 @@ const translations = {
     'biz_role_people_analytics': 'People Analytics',
     'biz_role_hr_systems': 'HR Systems',
     'biz_role_digital_hr': 'Digital HR',
-    'biz_role_ai_hr_specialist': 'AI HR Specialist'
+    'biz_role_ai_hr_specialist': 'AI HR Specialist',
+    
+    // User Authentication
+    'auth_login': 'Login',
+    'auth_logout': 'Logout',
+    'auth_login_tab': 'Login',
+    'auth_register_tab': 'Register',
+    'auth_email': 'Email',
+    'auth_password': 'Password',
+    'auth_confirm_password': 'Confirm Password',
+    'auth_login_btn': 'Login',
+    'auth_register_btn': 'Register',
+    'auth_login_success': 'Successfully logged in!',
+    'auth_register_success': 'Successfully registered!',
+    'auth_logout_success': 'Successfully logged out!',
+    'auth_verify_email': 'Please check your email to verify your account.',
+    'auth_error_required': 'Please fill in all fields',
+    'auth_error_password_mismatch': 'Passwords do not match',
+    'auth_error_password_length': 'Password must be at least 6 characters',
+    'auth_session_expired': 'Session expired. Please log in again.'
   },
   
   'vi': {
@@ -5214,7 +5252,26 @@ const translations = {
     'biz_role_fraud_analyst': 'Phân tích gian lận',
     'biz_role_revenue_ops': 'Vận hành doanh thu',
     'biz_role_recruiter': 'Tuyển dụng',
-    'biz_role_hr_manager': 'Quản lý HR'
+    'biz_role_hr_manager': 'Quản lý HR',
+    
+    // User Authentication (Vietnamese)
+    'auth_login': 'Đăng nhập',
+    'auth_logout': 'Đăng xuất',
+    'auth_login_tab': 'Đăng nhập',
+    'auth_register_tab': 'Đăng ký',
+    'auth_email': 'Email',
+    'auth_password': 'Mật khẩu',
+    'auth_confirm_password': 'Xác nhận mật khẩu',
+    'auth_login_btn': 'Đăng nhập',
+    'auth_register_btn': 'Đăng ký',
+    'auth_login_success': 'Đăng nhập thành công!',
+    'auth_register_success': 'Đăng ký thành công!',
+    'auth_logout_success': 'Đã đăng xuất thành công!',
+    'auth_verify_email': 'Vui lòng kiểm tra email để xác minh tài khoản.',
+    'auth_error_required': 'Vui lòng điền tất cả các trường',
+    'auth_error_password_mismatch': 'Mật khẩu không khớp',
+    'auth_error_password_length': 'Mật khẩu phải có ít nhất 6 ký tự',
+    'auth_session_expired': 'Phiên đã hết hạn. Vui lòng đăng nhập lại.'
   }
 };
 

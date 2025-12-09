@@ -39,7 +39,30 @@ The project follows a client-server architecture:
 ## External Dependencies
 - **AI Services**: Google Gemini 3 Pro Preview (text reasoning), Google Gemini 2.5 Flash Image Preview (image generation), Google Gemini 2.0 Flash (multimodal vision for reference image analysis), Google Gemini 2.5 Flash (fallback), Google Gemini 2.0 Flash Experimental (legacy)
 
-## Recent Changes (November 29, 2025)
+## Recent Changes (December 9, 2025)
+
+### User Authentication System (Supabase Integration)
+- **New Feature**: Implemented complete user authentication system using Supabase Auth
+- **Backend Components**:
+  - `src/services/supabaseAuth.js` - Supabase authentication service with signUp, signIn, signOut, token verification, and session refresh
+  - `src/middleware/authMiddleware.js` - Express middleware for protecting API endpoints
+  - All AI-consuming endpoints now require authentication (analyze-product, generate-platform-content, generate-scenarios, analyze-ads, generate-course, chat-with-advisor, refine-prompt)
+- **Frontend Components**:
+  - `public/js/auth.js` - Client-side authentication manager with token storage, automatic session refresh, and authFetch for authenticated API calls
+  - Login/Register modal with professional UI matching the existing gradient design
+  - User info display and logout button in header
+- **Features**:
+  - Email/password authentication
+  - JWT token-based API authorization
+  - Automatic session refresh on token expiration
+  - Multi-language support for auth UI (zh-TW, en, vi)
+  - Graceful fallback when auth is disabled
+- **Benefits**:
+  - Control Gemini API costs by requiring user login
+  - Track API usage per user
+  - Foundation for future usage-based billing
+
+## Previous Changes (November 29, 2025)
 
 ### Gemini Multimodal Vision Integration
 - **New Feature**: Implemented Gemini's native multimodal vision capabilities for reference material analysis in BizPrompt Architect Pro
