@@ -74,31 +74,34 @@ The project follows a client-server architecture:
 - Professional branding with robot icon, "Googoogaga AI" brand name
 - Responsive design optimized for tablets and mobile devices
 
-### Admin Dashboard System
-- **New Feature**: Implemented admin management panel for user administration
+### Admin Console (Supabase-like Backend Interface)
+- **New Feature**: Comprehensive admin console with database control capabilities similar to Supabase Dashboard
 - **Backend Components**:
-  - `src/services/adminService.js` - Admin service for user management operations (list users, approve, suspend, promote, demote, delete)
-  - `src/middleware/adminMiddleware.js` - Express middleware for admin-only route protection (requireAdmin, requireSuperAdmin)
-  - Admin API endpoints: `/api/admin/users`, `/api/admin/pending`, `/api/admin/users/:id/approve`, `/api/admin/users/:id/suspend`, `/api/admin/users/:id/promote`, `/api/admin/users/:id/demote`, `/api/admin/users/:id` (DELETE), `/api/admin/status`
+  - `src/services/adminService.js` - Admin service for user management operations
+  - `src/services/databaseAdminService.js` - Database admin service for table operations, CRUD, export, stats
+  - `src/middleware/adminMiddleware.js` - Express middleware for admin-only route protection
+  - User Management API: `/api/admin/users`, `/api/admin/pending`, approve, suspend, promote, demote, delete
+  - Database API: `/api/admin/db/tables`, `/api/admin/db/tables/:name/schema`, `/api/admin/db/tables/:name/rows`, insert, update, delete, bulk-delete, export, stats, activity
 - **Frontend Components**:
-  - `public/js/admin.js` - Client-side admin manager for UI and API interactions
-  - Admin tab (page5) with pending users and all users tables
-  - Role badges (super_admin, admin, user, pending) and status badges (active, suspended, pending)
+  - `public/js/admin.js` - User management UI
+  - `public/js/adminConsole.js` - Database console with table browser, data viewer, CRUD modals
+  - `public/css/adminConsole.css` - Purple gradient styling for admin console
+- **Admin Console Tabs**:
+  1. **會員管理 (User Management)**: View/approve/suspend/promote/demote/delete users
+  2. **資料庫 (Database)**: Table browser, schema info, data viewer with pagination, CRUD operations, CSV/JSON export
+  3. **系統統計 (System Stats)**: User counts, record counts, table statistics, recent activity
+- **Database Features**:
+  - Table list sidebar with row counts
+  - Schema viewer showing column names, types, required fields
+  - Data grid with pagination (20 rows per page)
+  - Insert/Edit modals with schema-driven form fields
+  - Single and bulk delete with confirmation
+  - Export to CSV or JSON format
 - **Admin Roles**:
-  - Super Admin (rofi90@hotmail.com): Full access to all admin functions including promote/demote/delete
-  - Admin: Can view users, approve, and suspend
-  - User: Regular authenticated user
-- **Features**:
-  - View all registered users with role and status information
-  - Approve pending user registrations
-  - Suspend/unsuspend user accounts
-  - Promote users to admin (super admin only)
-  - Demote admins to regular users (super admin only)
-  - Delete users (super admin only)
-  - Multi-language support (zh-TW, en, vi)
+  - Super Admin (rofi90@hotmail.com): Full access including destructive operations
+  - Admin: Read-only database access, user management
 - **Requirements**:
   - SUPABASE_SERVICE_KEY required for full admin operations
-  - Without service key, admin tab displays but operations are limited
 
 ## Previous Changes (December 9, 2025)
 

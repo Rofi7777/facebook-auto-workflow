@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Multi-Platform Baby Toy Content Generator</title>
+    <link rel="stylesheet" href="/css/adminConsole.css">
     <style>
         * {
             margin: 0;
@@ -2476,43 +2477,57 @@
         </div>
         <!-- End of Page 4 -->
 
-        <!-- Page 5: Admin Panel (管理員面板) - Only visible to admins -->
+        <!-- Page 5: Admin Console (管理員控制台) - Only visible to admins -->
         <div id="page5" class="page-content admin-only" style="display: none;">
-            <div class="workflow-container" style="grid-template-columns: 1fr;">
-                <div class="input-panel" style="max-width: 1200px; margin: 0 auto;">
-                    <h2 class="panel-title">👑 <span data-i18n="admin_panel_title">會員管理系統</span></h2>
-                    <p style="color: #666; margin-bottom: 20px;">管理註冊用戶、審核新會員、調整用戶權限</p>
-                    
-                    <!-- Admin Status Banner -->
-                    <div id="adminStatusBanner" style="padding: 15px; background: linear-gradient(135deg, #fff3cd 0%, #ffe69c 100%); border-radius: 10px; margin-bottom: 20px; display: none;">
-                        <p style="color: #856404; margin: 0;">⚠️ <span data-i18n="admin_service_key_required">需要 Supabase Service Key 才能執行管理操作</span></p>
-                    </div>
-                    
-                    <!-- Refresh Button -->
-                    <div style="text-align: right; margin-bottom: 15px;">
-                        <button class="btn" onclick="loadAdminData()" style="padding: 10px 20px; background: linear-gradient(135deg, #87CEEB 0%, #FFB6C1 100%); color: white; border: none; border-radius: 8px; cursor: pointer;">
+            <div class="admin-console">
+                <!-- Admin Console Header -->
+                <div class="admin-console-header">
+                    <h2 class="admin-title">🗄️ <span data-i18n="admin_console_title">後台管理控制台</span></h2>
+                    <div class="admin-header-actions">
+                        <button class="btn-refresh" id="dbRefreshBtn" onclick="AdminConsole.refresh()">
                             🔄 <span data-i18n="admin_refresh">重新整理</span>
                         </button>
                     </div>
+                </div>
 
+                <!-- Admin Status Banner -->
+                <div id="adminStatusBanner" class="admin-status-banner" style="display: none;">
+                    <p>⚠️ <span data-i18n="admin_service_key_required">需要 Supabase Service Key 才能執行管理操作</span></p>
+                </div>
+
+                <!-- Admin Console Tabs -->
+                <div class="admin-tabs">
+                    <button class="admin-tab active" onclick="switchAdminTab('users')">
+                        👥 <span data-i18n="admin_tab_users">會員管理</span>
+                    </button>
+                    <button class="admin-tab" onclick="switchAdminTab('database')">
+                        🗃️ <span data-i18n="admin_tab_database">資料庫</span>
+                    </button>
+                    <button class="admin-tab" onclick="switchAdminTab('stats')">
+                        📊 <span data-i18n="admin_tab_stats">系統統計</span>
+                    </button>
+                </div>
+
+                <!-- Users Management Panel -->
+                <div id="adminUsersPanel" class="admin-panel active">
                     <!-- Pending Users Section -->
-                    <div style="margin-bottom: 30px;">
-                        <h3 style="color: #333; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 2px solid #FFB6C1;">
+                    <div class="admin-section">
+                        <h3 class="section-title">
                             ⏳ <span data-i18n="admin_pending_users">待審核用戶</span>
-                            <span id="pendingCount" style="background: #FFB6C1; color: white; padding: 2px 10px; border-radius: 15px; font-size: 14px; margin-left: 10px;">0</span>
+                            <span id="pendingCount" class="badge badge-warning">0</span>
                         </h3>
-                        <div id="pendingUsersTable" style="overflow-x: auto;">
-                            <table style="width: 100%; border-collapse: collapse; background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+                        <div class="table-container">
+                            <table class="admin-table">
                                 <thead>
-                                    <tr style="background: linear-gradient(135deg, #87CEEB 0%, #a8d8ea 100%); color: white;">
-                                        <th style="padding: 12px 15px; text-align: left;" data-i18n="admin_user_email">電子郵件</th>
-                                        <th style="padding: 12px 15px; text-align: left;" data-i18n="admin_user_created">註冊時間</th>
-                                        <th style="padding: 12px 15px; text-align: center;" data-i18n="admin_action">操作</th>
+                                    <tr>
+                                        <th data-i18n="admin_user_email">電子郵件</th>
+                                        <th data-i18n="admin_user_created">註冊時間</th>
+                                        <th class="col-actions" data-i18n="admin_action">操作</th>
                                     </tr>
                                 </thead>
                                 <tbody id="pendingUsersBody">
                                     <tr>
-                                        <td colspan="3" style="padding: 30px; text-align: center; color: #888;" data-i18n="admin_no_pending">目前沒有待審核的用戶</td>
+                                        <td colspan="3" class="empty-cell" data-i18n="admin_no_pending">目前沒有待審核的用戶</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -2520,38 +2535,87 @@
                     </div>
 
                     <!-- All Users Section -->
-                    <div>
-                        <h3 style="color: #333; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 2px solid #87CEEB;">
+                    <div class="admin-section">
+                        <h3 class="section-title">
                             👥 <span data-i18n="admin_all_users">所有會員</span>
-                            <span id="totalCount" style="background: #87CEEB; color: white; padding: 2px 10px; border-radius: 15px; font-size: 14px; margin-left: 10px;">0</span>
+                            <span id="totalCount" class="badge badge-info">0</span>
                         </h3>
-                        <div id="allUsersTable" style="overflow-x: auto;">
-                            <table style="width: 100%; border-collapse: collapse; background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+                        <div class="table-container">
+                            <table class="admin-table">
                                 <thead>
-                                    <tr style="background: linear-gradient(135deg, #87CEEB 0%, #a8d8ea 100%); color: white;">
-                                        <th style="padding: 12px 15px; text-align: left;" data-i18n="admin_user_email">電子郵件</th>
-                                        <th style="padding: 12px 15px; text-align: center;" data-i18n="admin_user_role">角色</th>
-                                        <th style="padding: 12px 15px; text-align: center;" data-i18n="admin_user_status">狀態</th>
-                                        <th style="padding: 12px 15px; text-align: left;" data-i18n="admin_user_created">註冊時間</th>
-                                        <th style="padding: 12px 15px; text-align: left;" data-i18n="admin_user_last_login">最後登入</th>
-                                        <th style="padding: 12px 15px; text-align: center;" data-i18n="admin_action">操作</th>
+                                    <tr>
+                                        <th data-i18n="admin_user_email">電子郵件</th>
+                                        <th class="col-center" data-i18n="admin_user_role">角色</th>
+                                        <th class="col-center" data-i18n="admin_user_status">狀態</th>
+                                        <th data-i18n="admin_user_created">註冊時間</th>
+                                        <th data-i18n="admin_user_last_login">最後登入</th>
+                                        <th class="col-actions" data-i18n="admin_action">操作</th>
                                     </tr>
                                 </thead>
                                 <tbody id="allUsersBody">
                                     <tr>
-                                        <td colspan="6" style="padding: 30px; text-align: center; color: #888;" data-i18n="admin_no_users">目前沒有會員資料</td>
+                                        <td colspan="6" class="empty-cell" data-i18n="admin_no_users">目前沒有會員資料</td>
                                     </tr>
                                 </tbody>
                             </table>
                         </div>
                     </div>
+                </div>
 
-                    <!-- Admin Loading Overlay -->
-                    <div id="adminLoading" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(255,255,255,0.8); z-index: 9999; justify-content: center; align-items: center;">
-                        <div style="text-align: center;">
-                            <div class="loading" style="width: 50px; height: 50px; margin: 0 auto;"></div>
-                            <p style="margin-top: 15px; color: #666;">Loading...</p>
+                <!-- Database Panel -->
+                <div id="adminDatabasePanel" class="admin-panel">
+                    <div class="db-console-layout">
+                        <!-- Left Sidebar - Table List -->
+                        <div class="db-sidebar">
+                            <div class="db-sidebar-header">
+                                <h4>📋 資料表</h4>
+                            </div>
+                            <div id="dbTableList" class="db-table-list">
+                                <div class="loading-text">載入中...</div>
+                            </div>
                         </div>
+
+                        <!-- Right Content - Data Viewer -->
+                        <div class="db-main">
+                            <!-- Stats Overview -->
+                            <div id="dbStatsContainer" class="db-stats">
+                                <div class="stats-placeholder">
+                                    <div class="placeholder-icon">📊</div>
+                                    <p>選擇左側資料表以檢視資料</p>
+                                </div>
+                            </div>
+
+                            <!-- Schema Info -->
+                            <div id="dbSchemaInfo" class="db-schema"></div>
+
+                            <!-- Data Table -->
+                            <div id="dbDataContainer" class="db-data">
+                                <div class="data-placeholder">
+                                    <div class="placeholder-icon">🗃️</div>
+                                    <p>請從左側選擇一個資料表</p>
+                                </div>
+                            </div>
+
+                            <!-- Pagination -->
+                            <div id="dbPagination" class="db-pagination"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Stats Panel -->
+                <div id="adminStatsPanel" class="admin-panel">
+                    <div class="stats-dashboard">
+                        <div id="systemStatsContainer" class="system-stats">
+                            <div class="stats-loading">載入統計資料中...</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Admin Loading Overlay -->
+                <div id="adminLoading" class="admin-loading-overlay">
+                    <div class="loading-content">
+                        <div class="loading-spinner"></div>
+                        <p>Loading...</p>
                     </div>
                 </div>
             </div>
@@ -5708,6 +5772,96 @@
     <!-- 引入用戶學習追蹤系統 -->
     <script src="/js/userLearning.js"></script>
     <script src="/js/admin.js"></script>
+    <script src="/js/adminConsole.js"></script>
+    <script>
+        function switchAdminTab(tabName) {
+            document.querySelectorAll('.admin-tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.admin-panel').forEach(panel => panel.classList.remove('active'));
+            
+            event.target.closest('.admin-tab').classList.add('active');
+            
+            if (tabName === 'users') {
+                document.getElementById('adminUsersPanel').classList.add('active');
+                AdminManager.loadAdminData();
+            } else if (tabName === 'database') {
+                document.getElementById('adminDatabasePanel').classList.add('active');
+                AdminConsole.init();
+            } else if (tabName === 'stats') {
+                document.getElementById('adminStatsPanel').classList.add('active');
+                loadSystemStats();
+            }
+        }
+        
+        async function loadSystemStats() {
+            const container = document.getElementById('systemStatsContainer');
+            if (!container) return;
+            
+            container.innerHTML = '<div class="stats-loading">載入統計資料中...</div>';
+            
+            try {
+                const [statsRes, activityRes, usersRes] = await Promise.all([
+                    AuthManager.authFetch('/api/admin/db/stats'),
+                    AuthManager.authFetch('/api/admin/db/activity?limit=10'),
+                    AuthManager.authFetch('/api/admin/users')
+                ]);
+                
+                const stats = await statsRes.json();
+                const activity = await activityRes.json();
+                const users = await usersRes.json();
+                
+                const userCount = users.users?.length || 0;
+                const activeUsers = users.users?.filter(u => u.status === 'active').length || 0;
+                
+                container.innerHTML = `
+                    <div class="stats-grid">
+                        <div class="stat-card stat-card-primary">
+                            <div class="stat-icon">👥</div>
+                            <div class="stat-value">${userCount}</div>
+                            <div class="stat-label">總用戶數</div>
+                        </div>
+                        <div class="stat-card stat-card-success">
+                            <div class="stat-icon">✅</div>
+                            <div class="stat-value">${activeUsers}</div>
+                            <div class="stat-label">活躍用戶</div>
+                        </div>
+                        <div class="stat-card stat-card-info">
+                            <div class="stat-icon">📊</div>
+                            <div class="stat-value">${stats.stats?.totalRecords || 0}</div>
+                            <div class="stat-label">總記錄數</div>
+                        </div>
+                    </div>
+                    
+                    <div class="stats-section">
+                        <h4>📋 資料表統計</h4>
+                        <div class="table-stats">
+                            ${Object.entries(stats.stats?.tables || {}).map(([name, count]) => `
+                                <div class="table-stat-item">
+                                    <span class="table-name">${name}</span>
+                                    <span class="table-count">${count}</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                    
+                    <div class="stats-section">
+                        <h4>🕐 最近活動</h4>
+                        <div class="activity-list">
+                            ${activity.activity?.length > 0 ? activity.activity.map(item => `
+                                <div class="activity-item">
+                                    <span class="activity-feature">${item.feature_tab || 'N/A'}</span>
+                                    <span class="activity-platform">${item.platform || ''}</span>
+                                    <span class="activity-time">${new Date(item.created_at).toLocaleString()}</span>
+                                </div>
+                            `).join('') : '<div class="no-activity">暫無活動記錄</div>'}
+                        </div>
+                    </div>
+                `;
+            } catch (error) {
+                console.error('Failed to load system stats:', error);
+                container.innerHTML = '<div class="error-text">載入統計資料失敗</div>';
+            }
+        }
+    </script>
     <script>
         // 初始化時應用語言設定
         document.addEventListener('DOMContentLoaded', function() {

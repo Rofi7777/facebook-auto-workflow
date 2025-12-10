@@ -13,6 +13,7 @@ const DocumentExportService = require('./services/documentExport');
 const SupabaseAuthService = require('./services/supabaseAuth');
 const AdminService = require('./services/adminService');
 const UserLearningService = require('./services/userLearningService');
+const DatabaseAdminService = require('./services/databaseAdminService');
 const { authMiddleware, optionalAuthMiddleware } = require('./middleware/authMiddleware');
 const { requireAdmin, requireSuperAdmin, adminService } = require('./middleware/adminMiddleware');
 const { PLATFORM_CONFIGS, CONTENT_TEMPLATES, BABY_TOY_CATEGORIES } = require('./schemas/platforms');
@@ -386,6 +387,190 @@ app.get('/api/admin/status', authMiddleware, requireAdmin, async (req, res) => {
       isSuperAdmin: req.isSuperAdmin
     });
   } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// ==================== Database Admin Routes ====================
+
+app.get('/api/admin/db/tables', authMiddleware, requireAdmin, async (req, res) => {
+  try {
+    const result = await DatabaseAdminService.listTables();
+    res.json({ success: true, ...result });
+  } catch (error) {
+    console.error('List tables error:', error.message);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+app.get('/api/admin/db/tables/:tableName/schema', authMiddleware, requireAdmin, async (req, res) => {
+  try {
+    const { tableName } = req.params;
+    const result = await DatabaseAdminService.getTableSchema(tableName);
+    res.json({ success: true, tableName, ...result });
+  } catch (error) {
+    console.error('Get schema error:', error.message);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+app.get('/api/admin/db/tables/:tableName/rows', authMiddleware, requireAdmin, async (req, res) => {
+  try {
+    const { tableName } = req.params;
+    const { page = 1, pageSize = 50, orderBy, orderDir, ...filters } = req.query;
+    
+    const result = await DatabaseAdminService.fetchRows(tableName, {
+      page: parseInt(page),
+      pageSize: parseInt(pageSize),
+      orderBy,
+      orderDir,
+      filters
+    });
+    
+    res.json({ success: true, tableName, ...result });
+  } catch (error) {
+    console.error('Fetch rows error:', error.message);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+app.post('/api/admin/db/tables/:tableName/rows', authMiddleware, requireSuperAdmin, async (req, res) => {
+  try {
+    const { tableName } = req.params;
+    const result = await DatabaseAdminService.insertRow(tableName, req.body);
+    
+    if (!result.success) {
+      return res.status(400).json(result);
+    }
+    
+    console.log(`📝 Row inserted into ${tableName} by ${req.user.email}`);
+    res.json(result);
+  } catch (error) {
+    console.error('Insert row error:', error.message);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+app.put('/api/admin/db/tables/:tableName/rows/:rowId', authMiddleware, requireSuperAdmin, async (req, res) => {
+  try {
+    const { tableName, rowId } = req.params;
+    const result = await DatabaseAdminService.updateRow(tableName, rowId, req.body);
+    
+    if (!result.success) {
+      return res.status(400).json(result);
+    }
+    
+    console.log(`✏️ Row ${rowId} updated in ${tableName} by ${req.user.email}`);
+    res.json(result);
+  } catch (error) {
+    console.error('Update row error:', error.message);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+app.delete('/api/admin/db/tables/:tableName/rows/:rowId', authMiddleware, requireSuperAdmin, async (req, res) => {
+  try {
+    const { tableName, rowId } = req.params;
+    const result = await DatabaseAdminService.deleteRow(tableName, rowId);
+    
+    if (!result.success) {
+      return res.status(400).json(result);
+    }
+    
+    console.log(`🗑️ Row ${rowId} deleted from ${tableName} by ${req.user.email}`);
+    res.json(result);
+  } catch (error) {
+    console.error('Delete row error:', error.message);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+app.post('/api/admin/db/tables/:tableName/rows/bulk-delete', authMiddleware, requireSuperAdmin, async (req, res) => {
+  try {
+    const { tableName } = req.params;
+    const { rowIds } = req.body;
+    
+    if (!rowIds || !Array.isArray(rowIds) || rowIds.length === 0) {
+      return res.status(400).json({ success: false, error: 'rowIds array required' });
+    }
+    
+    const result = await DatabaseAdminService.deleteRows(tableName, rowIds);
+    
+    if (!result.success) {
+      return res.status(400).json(result);
+    }
+    
+    console.log(`🗑️ ${rowIds.length} rows deleted from ${tableName} by ${req.user.email}`);
+    res.json(result);
+  } catch (error) {
+    console.error('Bulk delete error:', error.message);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+app.post('/api/admin/db/sql', authMiddleware, requireSuperAdmin, async (req, res) => {
+  try {
+    const { sql } = req.body;
+    
+    if (!sql || typeof sql !== 'string') {
+      return res.status(400).json({ success: false, error: 'SQL query required' });
+    }
+    
+    const result = await DatabaseAdminService.runSql(sql);
+    
+    console.log(`🔍 SQL executed by ${req.user.email}: ${sql.substring(0, 100)}...`);
+    res.json(result);
+  } catch (error) {
+    console.error('SQL execution error:', error.message);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+app.get('/api/admin/db/tables/:tableName/export', authMiddleware, requireAdmin, async (req, res) => {
+  try {
+    const { tableName } = req.params;
+    const { format = 'json' } = req.query;
+    
+    const result = await DatabaseAdminService.exportTable(tableName, format);
+    
+    if (!result.success) {
+      return res.status(400).json(result);
+    }
+    
+    console.log(`📤 Table ${tableName} exported as ${format} by ${req.user.email}`);
+    
+    if (format === 'csv') {
+      res.setHeader('Content-Type', 'text/csv');
+      res.setHeader('Content-Disposition', `attachment; filename="${tableName}_export.csv"`);
+      res.send(result.data);
+    } else {
+      res.setHeader('Content-Type', 'application/json');
+      res.setHeader('Content-Disposition', `attachment; filename="${tableName}_export.json"`);
+      res.json(result.data);
+    }
+  } catch (error) {
+    console.error('Export error:', error.message);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+app.get('/api/admin/db/stats', authMiddleware, requireAdmin, async (req, res) => {
+  try {
+    const result = await DatabaseAdminService.getStats();
+    res.json({ success: true, ...result });
+  } catch (error) {
+    console.error('Stats error:', error.message);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+app.get('/api/admin/db/activity', authMiddleware, requireAdmin, async (req, res) => {
+  try {
+    const { limit = 10 } = req.query;
+    const result = await DatabaseAdminService.getRecentActivity(parseInt(limit));
+    res.json({ success: true, ...result });
+  } catch (error) {
+    console.error('Activity error:', error.message);
     res.status(500).json({ success: false, error: error.message });
   }
 });
