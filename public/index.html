@@ -96,7 +96,207 @@
             box-shadow: 0 4px 12px rgba(255, 107, 107, 0.4);
         }
         
-        /* 認證彈窗樣式 */
+        /* 全屏認證頁面樣式 */
+        #authShell {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+            overflow: hidden;
+        }
+        
+        #authShell::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at 30% 40%, rgba(135, 206, 235, 0.1) 0%, transparent 40%),
+                        radial-gradient(circle at 70% 60%, rgba(255, 182, 193, 0.1) 0%, transparent 40%);
+            animation: authBgMove 20s ease-in-out infinite;
+        }
+        
+        @keyframes authBgMove {
+            0%, 100% { transform: translate(0, 0); }
+            50% { transform: translate(-5%, -5%); }
+        }
+        
+        #authShell.hidden {
+            display: none;
+        }
+        
+        #appShell {
+            display: none;
+        }
+        
+        #appShell.visible {
+            display: block;
+        }
+        
+        .auth-card {
+            background: white;
+            border-radius: 24px;
+            padding: 50px 40px;
+            width: 90%;
+            max-width: 440px;
+            box-shadow: 0 25px 80px rgba(0,0,0,0.4);
+            position: relative;
+            z-index: 1;
+            text-align: center;
+        }
+        
+        .auth-logo {
+            margin-bottom: 10px;
+        }
+        
+        .auth-logo img {
+            height: 60px;
+            margin-bottom: 5px;
+        }
+        
+        .auth-brand-name {
+            font-size: 28px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #87CEEB 0%, #FFB6C1 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 5px;
+        }
+        
+        .auth-welcome-title {
+            font-size: 26px;
+            font-weight: 700;
+            color: #1a1a2e;
+            margin-bottom: 8px;
+        }
+        
+        .auth-welcome-subtitle {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 30px;
+        }
+        
+        .auth-form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        
+        .auth-form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+        }
+        
+        .auth-form-group input {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid #e8e8e8;
+            border-radius: 12px;
+            font-size: 15px;
+            transition: all 0.3s;
+            background: #fafafa;
+        }
+        
+        .auth-form-group input:focus {
+            outline: none;
+            border-color: #87CEEB;
+            background: white;
+            box-shadow: 0 0 0 4px rgba(135, 206, 235, 0.1);
+        }
+        
+        .auth-form-group input::placeholder {
+            color: #aaa;
+        }
+        
+        .auth-submit-btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #87CEEB 0%, #a8d8ea 50%, #FFB6C1 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 10px;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }
+        
+        .auth-submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(135, 206, 235, 0.4);
+        }
+        
+        .auth-submit-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .auth-toggle-link {
+            margin-top: 25px;
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .auth-toggle-link a {
+            color: #667eea;
+            font-weight: 600;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        
+        .auth-toggle-link a:hover {
+            text-decoration: underline;
+        }
+        
+        .auth-error {
+            background: #fff5f5;
+            border: 1px solid #ffcdd2;
+            color: #c62828;
+            padding: 12px 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-size: 13px;
+            display: none;
+            text-align: left;
+        }
+        
+        .auth-lang-switcher {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 10001;
+        }
+        
+        .auth-lang-switcher select {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 20px;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            font-size: 13px;
+            cursor: pointer;
+            backdrop-filter: blur(10px);
+        }
+        
+        .auth-lang-switcher select option {
+            background: #1a1a2e;
+            color: white;
+        }
+        
+        /* 保留舊的 modal 樣式作為備用 */
         .auth-modal {
             display: none;
             position: fixed;
@@ -950,6 +1150,79 @@
     </style>
 </head>
 <body>
+    <!-- 全屏登入頁面 (未登入時顯示) -->
+    <div id="authShell">
+        <div class="auth-lang-switcher">
+            <select id="authLangSelect" onchange="selectLanguage(this.value)">
+                <option value="zh-TW">🇹🇼 繁體中文</option>
+                <option value="en">🇬🇧 English</option>
+                <option value="vi">🇻🇳 Tiếng Việt</option>
+            </select>
+        </div>
+        
+        <div class="auth-card">
+            <div class="auth-logo">
+                <div class="auth-brand-name">Googoogaga AI Hub</div>
+            </div>
+            
+            <!-- 登入表單 -->
+            <div id="authLoginForm">
+                <h2 class="auth-welcome-title" data-i18n="auth_welcome_title">歡迎使用</h2>
+                <p class="auth-welcome-subtitle" data-i18n="auth_welcome_subtitle">請登入以繼續使用服務</p>
+                
+                <div class="auth-error" id="authLoginError"></div>
+                
+                <form onsubmit="handleAuthLogin(event)">
+                    <div class="auth-form-group">
+                        <label for="authEmail" data-i18n="auth_email">電子郵件</label>
+                        <input type="email" id="authEmail" placeholder="your@email.com" required>
+                    </div>
+                    <div class="auth-form-group">
+                        <label for="authPassword" data-i18n="auth_password">密碼</label>
+                        <input type="password" id="authPassword" placeholder="••••••••" required>
+                    </div>
+                    <button type="submit" class="auth-submit-btn" id="authLoginBtn" data-i18n="auth_login_btn">登入</button>
+                </form>
+                
+                <div class="auth-toggle-link">
+                    <span data-i18n="auth_no_account">還沒有帳號？</span>
+                    <a onclick="toggleAuthForm('register')" data-i18n="auth_register_now">立即註冊</a>
+                </div>
+            </div>
+            
+            <!-- 註冊表單 -->
+            <div id="authRegisterForm" style="display: none;">
+                <h2 class="auth-welcome-title" data-i18n="auth_register_title">建立帳號</h2>
+                <p class="auth-welcome-subtitle" data-i18n="auth_register_subtitle">註冊以開始使用 AI 功能</p>
+                
+                <div class="auth-error" id="authRegisterError"></div>
+                
+                <form onsubmit="handleAuthRegister(event)">
+                    <div class="auth-form-group">
+                        <label for="authRegEmail" data-i18n="auth_email">電子郵件</label>
+                        <input type="email" id="authRegEmail" placeholder="your@email.com" required>
+                    </div>
+                    <div class="auth-form-group">
+                        <label for="authRegPassword" data-i18n="auth_password">密碼</label>
+                        <input type="password" id="authRegPassword" placeholder="••••••••" minlength="6" required>
+                    </div>
+                    <div class="auth-form-group">
+                        <label for="authRegConfirmPassword" data-i18n="auth_confirm_password">確認密碼</label>
+                        <input type="password" id="authRegConfirmPassword" placeholder="••••••••" minlength="6" required>
+                    </div>
+                    <button type="submit" class="auth-submit-btn" id="authRegisterBtn" data-i18n="auth_register_btn">註冊</button>
+                </form>
+                
+                <div class="auth-toggle-link">
+                    <span data-i18n="auth_has_account">已有帳號？</span>
+                    <a onclick="toggleAuthForm('login')" data-i18n="auth_login_now">立即登入</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 主應用內容 (登入後顯示) -->
+    <div id="appShell">
     <div class="main-container">
         <div class="header">
             <!-- 頂部工具列：用戶認證 + 語言切換 -->
@@ -5073,9 +5346,10 @@
             updatePageLanguage();
         });
     </script>
+    </div><!-- End of appShell -->
     
-    <!-- 認證彈窗 Modal -->
-    <div class="auth-modal" id="authModal">
+    <!-- 認證彈窗 Modal (舊版，保留作為備用) -->
+    <div class="auth-modal" id="authModal" style="display: none !important;">
         <div class="auth-modal-content">
             <div class="auth-tabs">
                 <div class="auth-tab active" id="loginTab" onclick="AuthManager.switchAuthTab('login')">

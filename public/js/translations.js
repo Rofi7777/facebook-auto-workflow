@@ -1879,6 +1879,15 @@ const translations = {
     'auth_error_password_mismatch': '密碼不一致',
     'auth_error_password_length': '密碼至少需要6個字符',
     'auth_session_expired': '登入已過期，請重新登入',
+    'auth_welcome_title': '歡迎使用',
+    'auth_welcome_subtitle': '請登入以繼續使用服務',
+    'auth_register_title': '建立帳號',
+    'auth_register_subtitle': '註冊以開始使用 AI 功能',
+    'auth_no_account': '還沒有帳號？',
+    'auth_register_now': '立即註冊',
+    'auth_has_account': '已有帳號？',
+    'auth_login_now': '立即登入',
+    'auth_loading': '處理中...',
     
     // 管理員面板
     'tab_admin': '管理員',
@@ -3677,6 +3686,15 @@ const translations = {
     'auth_error_password_mismatch': 'Passwords do not match',
     'auth_error_password_length': 'Password must be at least 6 characters',
     'auth_session_expired': 'Session expired. Please log in again.',
+    'auth_welcome_title': 'Welcome',
+    'auth_welcome_subtitle': 'Please login to continue',
+    'auth_register_title': 'Create Account',
+    'auth_register_subtitle': 'Register to start using AI features',
+    'auth_no_account': 'Don\'t have an account?',
+    'auth_register_now': 'Register now',
+    'auth_has_account': 'Already have an account?',
+    'auth_login_now': 'Login now',
+    'auth_loading': 'Loading...',
     
     // Admin Panel
     'tab_admin': 'Admin',
@@ -5350,6 +5368,15 @@ const translations = {
     'auth_error_password_mismatch': 'Mật khẩu không khớp',
     'auth_error_password_length': 'Mật khẩu phải có ít nhất 6 ký tự',
     'auth_session_expired': 'Phiên đã hết hạn. Vui lòng đăng nhập lại.',
+    'auth_welcome_title': 'Chào mừng',
+    'auth_welcome_subtitle': 'Vui lòng đăng nhập để tiếp tục',
+    'auth_register_title': 'Tạo tài khoản',
+    'auth_register_subtitle': 'Đăng ký để bắt đầu sử dụng tính năng AI',
+    'auth_no_account': 'Chưa có tài khoản?',
+    'auth_register_now': 'Đăng ký ngay',
+    'auth_has_account': 'Đã có tài khoản?',
+    'auth_login_now': 'Đăng nhập ngay',
+    'auth_loading': 'Đang xử lý...',
     
     // Admin Panel
     'tab_admin': 'Quản trị',

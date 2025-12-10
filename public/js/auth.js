@@ -337,6 +337,13 @@ async function handleRegister(event) {
 
 async function handleLogout() {
   await AuthManager.signOut();
+  
+  const authShell = document.getElementById('authShell');
+  const appShell = document.getElementById('appShell');
+  
+  if (authShell) authShell.classList.remove('hidden');
+  if (appShell) appShell.classList.remove('visible');
+  
   showNotification(translations[currentLanguage]?.auth_logout_success || 'Successfully logged out!', 'success');
 }
 
@@ -384,17 +391,129 @@ function showNotification(message, type = 'info') {
   }, 4000);
 }
 
+function toggleAuthForm(form) {
+  const loginForm = document.getElementById('authLoginForm');
+  const registerForm = document.getElementById('authRegisterForm');
+  
+  if (form === 'register') {
+    if (loginForm) loginForm.style.display = 'none';
+    if (registerForm) registerForm.style.display = 'block';
+  } else {
+    if (loginForm) loginForm.style.display = 'block';
+    if (registerForm) registerForm.style.display = 'none';
+  }
+  
+  document.querySelectorAll('#authShell .auth-error').forEach(el => {
+    el.style.display = 'none';
+    el.textContent = '';
+  });
+}
+
+function showAuthError(formType, message) {
+  const errorEl = document.getElementById(formType === 'login' ? 'authLoginError' : 'authRegisterError');
+  if (errorEl) {
+    errorEl.textContent = message;
+    errorEl.style.display = 'block';
+  }
+}
+
+async function handleAuthLogin(event) {
+  event.preventDefault();
+  
+  const email = document.getElementById('authEmail').value;
+  const password = document.getElementById('authPassword').value;
+  const submitBtn = document.getElementById('authLoginBtn');
+  
+  submitBtn.disabled = true;
+  submitBtn.textContent = translations[currentLanguage]?.auth_loading || 'Loading...';
+  
+  try {
+    await AuthManager.signIn(email, password);
+    
+    const authShell = document.getElementById('authShell');
+    const appShell = document.getElementById('appShell');
+    
+    if (authShell) authShell.classList.add('hidden');
+    if (appShell) appShell.classList.add('visible');
+    
+    AuthManager.updateUI();
+    showNotification(translations[currentLanguage]?.auth_login_success || 'Successfully logged in!', 'success');
+    
+    if (typeof AdminManager !== 'undefined') {
+      AdminManager.checkAdminStatus();
+    }
+  } catch (error) {
+    showAuthError('login', error.message);
+  } finally {
+    submitBtn.disabled = false;
+    submitBtn.textContent = translations[currentLanguage]?.auth_login_btn || 'Login';
+  }
+}
+
+async function handleAuthRegister(event) {
+  event.preventDefault();
+  
+  const email = document.getElementById('authRegEmail').value;
+  const password = document.getElementById('authRegPassword').value;
+  const confirmPassword = document.getElementById('authRegConfirmPassword').value;
+  const submitBtn = document.getElementById('authRegisterBtn');
+  
+  if (password !== confirmPassword) {
+    showAuthError('register', translations[currentLanguage]?.auth_password_mismatch || 'Passwords do not match');
+    return;
+  }
+  
+  submitBtn.disabled = true;
+  submitBtn.textContent = translations[currentLanguage]?.auth_loading || 'Loading...';
+  
+  try {
+    const result = await AuthManager.signUp(email, password);
+    
+    if (result.session) {
+      const authShell = document.getElementById('authShell');
+      const appShell = document.getElementById('appShell');
+      
+      if (authShell) authShell.classList.add('hidden');
+      if (appShell) appShell.classList.add('visible');
+      
+      AuthManager.updateUI();
+      showNotification(translations[currentLanguage]?.auth_register_success || 'Successfully registered!', 'success');
+    } else {
+      showNotification(translations[currentLanguage]?.auth_verify_email || 'Please check your email to verify your account.', 'info');
+      toggleAuthForm('login');
+    }
+  } catch (error) {
+    showAuthError('register', error.message);
+  } finally {
+    submitBtn.disabled = false;
+    submitBtn.textContent = translations[currentLanguage]?.auth_register_btn || 'Register';
+  }
+}
+
 document.addEventListener('DOMContentLoaded', async function() {
   const authEnabled = await AuthManager.checkAuthStatus();
   
+  const authShell = document.getElementById('authShell');
+  const appShell = document.getElementById('appShell');
+  
   if (authEnabled) {
-    AuthManager.updateUI();
-    
-    if (!AuthManager.isLoggedIn()) {
-      AuthManager.showLoginModal();
+    if (AuthManager.isLoggedIn()) {
+      if (authShell) authShell.classList.add('hidden');
+      if (appShell) appShell.classList.add('visible');
+      AuthManager.updateUI();
+    } else {
+      if (authShell) authShell.classList.remove('hidden');
+      if (appShell) appShell.classList.remove('visible');
     }
   } else {
+    if (authShell) authShell.classList.add('hidden');
+    if (appShell) appShell.classList.add('visible');
     const authElements = document.querySelectorAll('.auth-required');
     authElements.forEach(el => el.style.display = 'none');
+  }
+  
+  const authLangSelect = document.getElementById('authLangSelect');
+  if (authLangSelect) {
+    authLangSelect.value = currentLanguage;
   }
 });
