@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Multi-Platform Baby Toy Content Generator</title>
-    <link rel="stylesheet" href="/css/adminConsole.css?v=20251210">
+    <link rel="stylesheet" href="/css/adminConsole.css?v=20251210b">
     <style>
         * {
             margin: 0;
@@ -3532,6 +3532,11 @@
             
             // 設置對應按鈕為 active
             event.target.classList.add('active');
+            
+            // 如果切換到管理員頁面，初始化管理控制台
+            if (pageId === 'page5' && typeof AdminConsole !== 'undefined') {
+                AdminConsole.init();
+            }
         }
         
         // Page 2 檔案上傳處理
@@ -5772,7 +5777,7 @@
     <!-- 引入用戶學習追蹤系統 -->
     <script src="/js/userLearning.js"></script>
     <script src="/js/admin.js"></script>
-    <script src="/js/adminConsole.js?v=20251210"></script>
+    <script src="/js/adminConsole.js?v=20251210c"></script>
     <script>
         function switchAdminTab(tabName) {
             document.querySelectorAll('.admin-tab').forEach(tab => tab.classList.remove('active'));

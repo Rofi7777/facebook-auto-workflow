@@ -9,11 +9,20 @@ const AdminConsole = {
   stats: null,
 
   async init() {
-    if (!AdminManager.isAdmin) return;
+    // Check if AdminManager exists and isAdmin, or if admin tab is visible (user verified)
+    const adminTab = document.getElementById('adminTabBtn');
+    const isAdminVisible = adminTab && adminTab.style.display !== 'none';
     
+    if (!isAdminVisible && (!AdminManager || !AdminManager.isAdmin)) {
+      console.log('AdminConsole: Not admin, skipping init');
+      return;
+    }
+    
+    console.log('AdminConsole: Initializing...');
     await this.loadStats();
     await this.loadTables();
     this.setupEventListeners();
+    console.log('AdminConsole: Initialized');
   },
 
   setupEventListeners() {
