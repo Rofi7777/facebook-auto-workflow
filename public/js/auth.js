@@ -213,6 +213,9 @@ const AuthManager = {
   },
 
   hideLoginModal() {
+    if (!this.isLoggedIn()) {
+      return;
+    }
     const modal = document.getElementById('authModal');
     if (modal) {
       modal.style.display = 'none';
