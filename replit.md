@@ -41,6 +41,39 @@ The project follows a client-server architecture:
 
 ## Recent Changes (December 10, 2025)
 
+### AI Learning & Personalization System
+- **New Feature**: Implemented AI automatic learning and user personalization system
+- **Backend Components**:
+  - `src/services/userLearningService.js` - Complete service for tracking user interactions, learning preferences, and generating personalized context
+  - `database/user_learning_schema.sql` - Supabase schema with user_interactions, user_preferences, user_feedback tables
+  - Learning API endpoints: `/api/learning/track`, `/api/learning/feedback`, `/api/learning/preferences`, DELETE `/api/learning/data`
+- **Frontend Components**:
+  - `public/js/userLearning.js` - Client-side tracking manager with feedback buttons (👍👎)
+  - CSS for feedback buttons with gradient styling
+- **Features**:
+  - Automatic user interaction tracking (feature usage, platforms, industries, styles)
+  - Preference learning with weighted analysis from recent 30-day activity
+  - Personalized context injection into AI prompts (ChatAdvisor)
+  - User feedback collection (thumbs up/down, copy, edit, regenerate)
+  - Privacy-compliant data deletion option
+  - Row Level Security (RLS) for user data protection
+- **How It Works**:
+  1. User interactions are automatically tracked and stored in Supabase
+  2. System aggregates preferences (platforms, industries, styles) with weighted scoring
+  3. Positive feedback boosts preference weights, negative feedback reduces them
+  4. Personalized context is injected into AI prompts for better, tailored responses
+  5. AI responses improve over time as more user data is collected
+- **Database Tables**:
+  - `user_interactions`: Logs all feature usage with metadata
+  - `user_preferences`: Aggregated preference weights and learning data
+  - `user_feedback`: User feedback on AI responses
+
+### Enhanced Login Page Design
+- Beautiful purple gradient glass-morphism login page
+- Floating decorative elements (stars ✨⭐, balloon 🎈, rocket 🚀) with animations
+- Professional branding with robot icon, "Googoogaga AI" brand name
+- Responsive design optimized for tablets and mobile devices
+
 ### Admin Dashboard System
 - **New Feature**: Implemented admin management panel for user administration
 - **Backend Components**:

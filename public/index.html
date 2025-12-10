@@ -741,6 +741,64 @@
             to { transform: rotate(360deg); }
         }
         
+        /* 用戶回饋按鈕樣式 */
+        .feedback-buttons {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 15px;
+            padding: 12px 16px;
+            background: linear-gradient(135deg, rgba(135, 206, 235, 0.1) 0%, rgba(255, 182, 193, 0.1) 100%);
+            border-radius: 12px;
+            border: 1px solid rgba(135, 206, 235, 0.2);
+        }
+        
+        .feedback-buttons .feedback-label {
+            font-size: 13px;
+            color: #666;
+            margin-right: 8px;
+        }
+        
+        .feedback-buttons .feedback-label.thanks {
+            color: #27ae60;
+            font-weight: 500;
+        }
+        
+        .feedback-buttons .feedback-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            border: 2px solid #e0e0e0;
+            border-radius: 50%;
+            background: white;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 16px;
+        }
+        
+        .feedback-buttons .feedback-btn:hover {
+            transform: scale(1.1);
+            border-color: #87CEEB;
+        }
+        
+        .feedback-buttons .feedback-btn.thumbs-up:hover,
+        .feedback-buttons .feedback-btn.thumbs-up.selected {
+            background: #d4edda;
+            border-color: #27ae60;
+        }
+        
+        .feedback-buttons .feedback-btn.thumbs-down:hover,
+        .feedback-buttons .feedback-btn.thumbs-down.selected {
+            background: #f8d7da;
+            border-color: #e74c3c;
+        }
+        
+        .feedback-buttons .feedback-btn.selected {
+            transform: scale(1.15);
+        }
+        
         /* 語言切換器樣式 */
         .language-switcher {
             position: relative;
@@ -5647,6 +5705,8 @@
     <script src="/js/translations.js"></script>
     <!-- 引入用戶認證系統 -->
     <script src="/js/auth.js"></script>
+    <!-- 引入用戶學習追蹤系統 -->
+    <script src="/js/userLearning.js"></script>
     <script src="/js/admin.js"></script>
     <script>
         // 初始化時應用語言設定

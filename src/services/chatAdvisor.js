@@ -143,17 +143,25 @@ Please respond in JSON format as follows:
   /**
    * 處理對話訊息
    */
-  async chat(message, chatHistory, analysisContext, uploadedFiles = [], language = 'zh-TW') {
+  async chat(message, chatHistory, analysisContext, uploadedFiles = [], language = 'zh-TW', personalizedContext = '') {
     try {
       console.log(`💬 Processing chat message in ${language}: "${message.substring(0, 50)}..."`);
       console.log(`📁 Files uploaded: ${uploadedFiles.length}`);
       console.log(`📜 Chat history length: ${chatHistory.length}`);
+      if (personalizedContext) {
+        console.log('🧠 Personalized context available');
+      }
       
       // 準備檔案內容
       const fileParts = await this.prepareFileContents(uploadedFiles);
       
-      // 構建對話提示詞（包含語言參數）
-      const systemPrompt = this.buildChatPrompt(analysisContext, chatHistory, language);
+      // 構建對話提示詞（包含語言參數和個人化上下文）
+      let systemPrompt = this.buildChatPrompt(analysisContext, chatHistory, language);
+      
+      // 注入個人化上下文
+      if (personalizedContext) {
+        systemPrompt += personalizedContext;
+      }
       
       // 準備對話內容
       const contentParts = [

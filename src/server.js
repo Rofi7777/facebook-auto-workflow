@@ -12,6 +12,7 @@ const CourseGeneratorService = require('./services/courseGenerator');
 const DocumentExportService = require('./services/documentExport');
 const SupabaseAuthService = require('./services/supabaseAuth');
 const AdminService = require('./services/adminService');
+const UserLearningService = require('./services/userLearningService');
 const { authMiddleware, optionalAuthMiddleware } = require('./middleware/authMiddleware');
 const { requireAdmin, requireSuperAdmin, adminService } = require('./middleware/adminMiddleware');
 const { PLATFORM_CONFIGS, CONTENT_TEMPLATES, BABY_TOY_CATEGORIES } = require('./schemas/platforms');
@@ -390,6 +391,71 @@ app.get('/api/admin/status', authMiddleware, requireAdmin, async (req, res) => {
 });
 
 // ==================== End Admin Routes ====================
+
+// ==================== User Learning Routes ====================
+
+app.post('/api/learning/track', authMiddleware, async (req, res) => {
+  try {
+    const userId = req.user?.id;
+    if (!userId) {
+      return res.status(401).json({ error: 'User not authenticated' });
+    }
+
+    const result = await UserLearningService.trackInteraction(userId, req.body);
+    res.json({ success: true, interactionId: result?.id || null });
+  } catch (error) {
+    console.error('Track interaction error:', error.message);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.post('/api/learning/feedback', authMiddleware, async (req, res) => {
+  try {
+    const userId = req.user?.id;
+    if (!userId) {
+      return res.status(401).json({ error: 'User not authenticated' });
+    }
+
+    const { interactionId, feedbackType, rating } = req.body;
+    const result = await UserLearningService.recordFeedback(userId, interactionId, feedbackType, rating);
+    res.json({ success: true, feedbackId: result?.id || null });
+  } catch (error) {
+    console.error('Record feedback error:', error.message);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.get('/api/learning/preferences', authMiddleware, async (req, res) => {
+  try {
+    const userId = req.user?.id;
+    if (!userId) {
+      return res.status(401).json({ error: 'User not authenticated' });
+    }
+
+    const preferences = await UserLearningService.getUserPreferences(userId);
+    res.json({ success: true, preferences });
+  } catch (error) {
+    console.error('Get preferences error:', error.message);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.delete('/api/learning/data', authMiddleware, async (req, res) => {
+  try {
+    const userId = req.user?.id;
+    if (!userId) {
+      return res.status(401).json({ error: 'User not authenticated' });
+    }
+
+    const result = await UserLearningService.deleteUserData(userId);
+    res.json({ success: result, message: result ? 'All learning data deleted' : 'Failed to delete data' });
+  } catch (error) {
+    console.error('Delete learning data error:', error.message);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// ==================== End User Learning Routes ====================
 
 // 安全的圖片下載端點 - 防止路徑遍歷攻擊
 app.get('/api/download-image', async (req, res) => {
@@ -1316,13 +1382,28 @@ app.post('/api/chat-with-advisor', authMiddleware, chatUpload.array('files', 5),
     
     console.log(`🤖 Calling chat advisor in ${userLanguage}...`);
     
+    // 獲取用戶個人化上下文
+    let personalizedContext = '';
+    try {
+      const userId = req.user?.id;
+      if (userId && UserLearningService.isEnabled()) {
+        personalizedContext = await UserLearningService.getPersonalizedPromptContext(userId);
+        if (personalizedContext) {
+          console.log('🧠 Personalized context injected for user');
+        }
+      }
+    } catch (learningErr) {
+      console.warn('⚠️ Failed to get personalized context:', learningErr.message);
+    }
+    
     // 調用對話服務（傳入用戶選擇的語言）
     const chatResult = await chatAdvisor.chat(
       message || '',
       parsedChatHistory,
       parsedAnalysisContext,
       fileInfos,
-      userLanguage
+      userLanguage,
+      personalizedContext
     );
     
     console.log('✅ Chat response generated successfully');
