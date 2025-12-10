@@ -170,7 +170,8 @@ app.post('/api/auth/signout', authMiddleware, async (req, res) => {
 app.get('/api/auth/user', authMiddleware, async (req, res) => {
   try {
     const userEmail = req.user?.email;
-    const role = await adminService.getUserRole(userEmail);
+    const userMetadata = req.user?.user_metadata || {};
+    const role = await adminService.getUserRole(userEmail, userMetadata);
     
     res.json({
       success: true,

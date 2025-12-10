@@ -11,8 +11,11 @@ const requireAdmin = async (req, res, next) => {
   }
 
   const userEmail = req.user.email;
+  const userMetadata = req.user.user_metadata || {};
   
-  if (!adminService.isAdmin(userEmail)) {
+  const isAdmin = await adminService.isAdmin(userEmail, userMetadata);
+  
+  if (!isAdmin) {
     return res.status(403).json({ 
       error: 'Forbidden',
       message: 'Admin access required'

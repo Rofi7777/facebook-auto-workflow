@@ -39,18 +39,53 @@ class AdminService {
     return email && email.toLowerCase() === this.SUPER_ADMIN_EMAIL.toLowerCase();
   }
 
-  isAdmin(email) {
+  isAdminByEmail(email) {
     if (!email) return false;
     return this.ADMIN_EMAILS.some(adminEmail => 
       adminEmail.toLowerCase() === email.toLowerCase()
     );
   }
 
-  async getUserRole(email) {
+  async isAdmin(email, userMetadata = null) {
+    if (!email) return false;
+    
+    if (this.isAdminByEmail(email)) {
+      return true;
+    }
+    
+    if (userMetadata && userMetadata.role === 'admin') {
+      return true;
+    }
+    
+    return false;
+  }
+
+  async checkAdminByUserId(userId) {
+    if (!this.enabled || !this.hasServiceKey) {
+      return false;
+    }
+
+    try {
+      const { data, error } = await this.client.auth.admin.getUserById(userId);
+      if (error || !data.user) return false;
+      
+      const email = data.user.email;
+      const metadata = data.user.user_metadata;
+      
+      return this.isSuperAdmin(email) || 
+             this.isAdminByEmail(email) || 
+             (metadata && metadata.role === 'admin');
+    } catch (err) {
+      console.error('Error checking admin by userId:', err);
+      return false;
+    }
+  }
+
+  async getUserRole(email, userMetadata = null) {
     if (this.isSuperAdmin(email)) {
       return 'super_admin';
     }
-    if (this.isAdmin(email)) {
+    if (await this.isAdmin(email, userMetadata)) {
       return 'admin';
     }
     return 'user';
