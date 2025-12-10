@@ -11,7 +11,9 @@ const ChatAdvisor = require('./services/chatAdvisor');
 const CourseGeneratorService = require('./services/courseGenerator');
 const DocumentExportService = require('./services/documentExport');
 const SupabaseAuthService = require('./services/supabaseAuth');
+const AdminService = require('./services/adminService');
 const { authMiddleware, optionalAuthMiddleware } = require('./middleware/authMiddleware');
+const { requireAdmin, requireSuperAdmin, adminService } = require('./middleware/adminMiddleware');
 const { PLATFORM_CONFIGS, CONTENT_TEMPLATES, BABY_TOY_CATEGORIES } = require('./schemas/platforms');
 
 dotenv.config();
@@ -167,9 +169,17 @@ app.post('/api/auth/signout', authMiddleware, async (req, res) => {
 
 app.get('/api/auth/user', authMiddleware, async (req, res) => {
   try {
+    const userEmail = req.user?.email;
+    const role = await adminService.getUserRole(userEmail);
+    
     res.json({
       success: true,
-      user: req.user
+      user: {
+        ...req.user,
+        role: role,
+        isAdmin: role === 'admin' || role === 'super_admin',
+        isSuperAdmin: role === 'super_admin'
+      }
     });
   } catch (error) {
     console.error('Get user error:', error.message);
@@ -229,6 +239,156 @@ app.get('/api/auth/status', (req, res) => {
 });
 
 // ==================== End Authentication Routes ====================
+
+// ==================== Admin Routes ====================
+
+const adminServiceInstance = new AdminService();
+
+app.get('/api/admin/users', authMiddleware, requireAdmin, async (req, res) => {
+  try {
+    const { users, error } = await adminServiceInstance.getAllUsers();
+    
+    if (error) {
+      return res.status(500).json({ success: false, error });
+    }
+    
+    res.json({ success: true, users });
+  } catch (error) {
+    console.error('Admin get users error:', error.message);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+app.get('/api/admin/pending', authMiddleware, requireAdmin, async (req, res) => {
+  try {
+    const { users, error } = await adminServiceInstance.getPendingUsers();
+    
+    if (error) {
+      return res.status(500).json({ success: false, error });
+    }
+    
+    res.json({ success: true, users });
+  } catch (error) {
+    console.error('Admin get pending users error:', error.message);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+app.get('/api/admin/users/:userId', authMiddleware, requireAdmin, async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const { user, error } = await adminServiceInstance.getUserById(userId);
+    
+    if (error) {
+      return res.status(404).json({ success: false, error });
+    }
+    
+    res.json({ success: true, user });
+  } catch (error) {
+    console.error('Admin get user error:', error.message);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+app.post('/api/admin/users/:userId/approve', authMiddleware, requireAdmin, async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const result = await adminServiceInstance.approveUser(userId);
+    
+    if (!result.success) {
+      return res.status(400).json(result);
+    }
+    
+    console.log(`✅ User ${userId} approved by ${req.user.email}`);
+    res.json(result);
+  } catch (error) {
+    console.error('Admin approve user error:', error.message);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+app.post('/api/admin/users/:userId/suspend', authMiddleware, requireAdmin, async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const result = await adminServiceInstance.suspendUser(userId);
+    
+    if (!result.success) {
+      return res.status(400).json(result);
+    }
+    
+    console.log(`⏸️ User ${userId} suspended by ${req.user.email}`);
+    res.json(result);
+  } catch (error) {
+    console.error('Admin suspend user error:', error.message);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+app.post('/api/admin/users/:userId/promote', authMiddleware, requireSuperAdmin, async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const result = await adminServiceInstance.promoteToAdmin(userId);
+    
+    if (!result.success) {
+      return res.status(400).json(result);
+    }
+    
+    console.log(`⬆️ User ${userId} promoted to admin by ${req.user.email}`);
+    res.json(result);
+  } catch (error) {
+    console.error('Admin promote user error:', error.message);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+app.post('/api/admin/users/:userId/demote', authMiddleware, requireSuperAdmin, async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const result = await adminServiceInstance.demoteFromAdmin(userId);
+    
+    if (!result.success) {
+      return res.status(400).json(result);
+    }
+    
+    console.log(`⬇️ User ${userId} demoted from admin by ${req.user.email}`);
+    res.json(result);
+  } catch (error) {
+    console.error('Admin demote user error:', error.message);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+app.delete('/api/admin/users/:userId', authMiddleware, requireSuperAdmin, async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const result = await adminServiceInstance.deleteUser(userId);
+    
+    if (!result.success) {
+      return res.status(400).json(result);
+    }
+    
+    console.log(`🗑️ User ${userId} deleted by ${req.user.email}`);
+    res.json(result);
+  } catch (error) {
+    console.error('Admin delete user error:', error.message);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+app.get('/api/admin/status', authMiddleware, requireAdmin, async (req, res) => {
+  try {
+    res.json({
+      success: true,
+      hasServiceKey: adminServiceInstance.hasServiceKey,
+      enabled: adminServiceInstance.isEnabled(),
+      isSuperAdmin: req.isSuperAdmin
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// ==================== End Admin Routes ====================
 
 // 安全的圖片下載端點 - 防止路徑遍歷攻擊
 app.get('/api/download-image', async (req, res) => {

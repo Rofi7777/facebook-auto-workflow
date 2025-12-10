@@ -1010,6 +1010,9 @@
                 <button class="tab-btn" onclick="switchPage('page4')">
                     <span data-i18n="tab_prompt_architect">📝 AI 指令架構師</span>
                 </button>
+                <button class="tab-btn admin-only" id="adminTabBtn" onclick="switchPage('page5')" style="display: none;">
+                    <span data-i18n="tab_admin">👑 管理員</span>
+                </button>
             </div>
         </div>
         
@@ -1833,6 +1836,88 @@
             </div>
         </div>
         <!-- End of Page 4 -->
+
+        <!-- Page 5: Admin Panel (管理員面板) - Only visible to admins -->
+        <div id="page5" class="page-content admin-only" style="display: none;">
+            <div class="workflow-container" style="grid-template-columns: 1fr;">
+                <div class="input-panel" style="max-width: 1200px; margin: 0 auto;">
+                    <h2 class="panel-title">👑 <span data-i18n="admin_panel_title">會員管理系統</span></h2>
+                    <p style="color: #666; margin-bottom: 20px;">管理註冊用戶、審核新會員、調整用戶權限</p>
+                    
+                    <!-- Admin Status Banner -->
+                    <div id="adminStatusBanner" style="padding: 15px; background: linear-gradient(135deg, #fff3cd 0%, #ffe69c 100%); border-radius: 10px; margin-bottom: 20px; display: none;">
+                        <p style="color: #856404; margin: 0;">⚠️ <span data-i18n="admin_service_key_required">需要 Supabase Service Key 才能執行管理操作</span></p>
+                    </div>
+                    
+                    <!-- Refresh Button -->
+                    <div style="text-align: right; margin-bottom: 15px;">
+                        <button class="btn" onclick="loadAdminData()" style="padding: 10px 20px; background: linear-gradient(135deg, #87CEEB 0%, #FFB6C1 100%); color: white; border: none; border-radius: 8px; cursor: pointer;">
+                            🔄 <span data-i18n="admin_refresh">重新整理</span>
+                        </button>
+                    </div>
+
+                    <!-- Pending Users Section -->
+                    <div style="margin-bottom: 30px;">
+                        <h3 style="color: #333; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 2px solid #FFB6C1;">
+                            ⏳ <span data-i18n="admin_pending_users">待審核用戶</span>
+                            <span id="pendingCount" style="background: #FFB6C1; color: white; padding: 2px 10px; border-radius: 15px; font-size: 14px; margin-left: 10px;">0</span>
+                        </h3>
+                        <div id="pendingUsersTable" style="overflow-x: auto;">
+                            <table style="width: 100%; border-collapse: collapse; background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+                                <thead>
+                                    <tr style="background: linear-gradient(135deg, #87CEEB 0%, #a8d8ea 100%); color: white;">
+                                        <th style="padding: 12px 15px; text-align: left;" data-i18n="admin_user_email">電子郵件</th>
+                                        <th style="padding: 12px 15px; text-align: left;" data-i18n="admin_user_created">註冊時間</th>
+                                        <th style="padding: 12px 15px; text-align: center;" data-i18n="admin_action">操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="pendingUsersBody">
+                                    <tr>
+                                        <td colspan="3" style="padding: 30px; text-align: center; color: #888;" data-i18n="admin_no_pending">目前沒有待審核的用戶</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- All Users Section -->
+                    <div>
+                        <h3 style="color: #333; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 2px solid #87CEEB;">
+                            👥 <span data-i18n="admin_all_users">所有會員</span>
+                            <span id="totalCount" style="background: #87CEEB; color: white; padding: 2px 10px; border-radius: 15px; font-size: 14px; margin-left: 10px;">0</span>
+                        </h3>
+                        <div id="allUsersTable" style="overflow-x: auto;">
+                            <table style="width: 100%; border-collapse: collapse; background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+                                <thead>
+                                    <tr style="background: linear-gradient(135deg, #87CEEB 0%, #a8d8ea 100%); color: white;">
+                                        <th style="padding: 12px 15px; text-align: left;" data-i18n="admin_user_email">電子郵件</th>
+                                        <th style="padding: 12px 15px; text-align: center;" data-i18n="admin_user_role">角色</th>
+                                        <th style="padding: 12px 15px; text-align: center;" data-i18n="admin_user_status">狀態</th>
+                                        <th style="padding: 12px 15px; text-align: left;" data-i18n="admin_user_created">註冊時間</th>
+                                        <th style="padding: 12px 15px; text-align: left;" data-i18n="admin_user_last_login">最後登入</th>
+                                        <th style="padding: 12px 15px; text-align: center;" data-i18n="admin_action">操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="allUsersBody">
+                                    <tr>
+                                        <td colspan="6" style="padding: 30px; text-align: center; color: #888;" data-i18n="admin_no_users">目前沒有會員資料</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Admin Loading Overlay -->
+                    <div id="adminLoading" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(255,255,255,0.8); z-index: 9999; justify-content: center; align-items: center;">
+                        <div style="text-align: center;">
+                            <div class="loading" style="width: 50px; height: 50px; margin: 0 auto;"></div>
+                            <p style="margin-top: 15px; color: #666;">Loading...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- End of Page 5 -->
 
     </div>
 
@@ -4981,6 +5066,7 @@
     <script src="/js/translations.js"></script>
     <!-- 引入用戶認證系統 -->
     <script src="/js/auth.js"></script>
+    <script src="/js/admin.js"></script>
     <script>
         // 初始化時應用語言設定
         document.addEventListener('DOMContentLoaded', function() {

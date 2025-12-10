@@ -39,7 +39,35 @@ The project follows a client-server architecture:
 ## External Dependencies
 - **AI Services**: Google Gemini 3 Pro Preview (text reasoning), Google Gemini 2.5 Flash Image Preview (image generation), Google Gemini 2.0 Flash (multimodal vision for reference image analysis), Google Gemini 2.5 Flash (fallback), Google Gemini 2.0 Flash Experimental (legacy)
 
-## Recent Changes (December 9, 2025)
+## Recent Changes (December 10, 2025)
+
+### Admin Dashboard System
+- **New Feature**: Implemented admin management panel for user administration
+- **Backend Components**:
+  - `src/services/adminService.js` - Admin service for user management operations (list users, approve, suspend, promote, demote, delete)
+  - `src/middleware/adminMiddleware.js` - Express middleware for admin-only route protection (requireAdmin, requireSuperAdmin)
+  - Admin API endpoints: `/api/admin/users`, `/api/admin/pending`, `/api/admin/users/:id/approve`, `/api/admin/users/:id/suspend`, `/api/admin/users/:id/promote`, `/api/admin/users/:id/demote`, `/api/admin/users/:id` (DELETE), `/api/admin/status`
+- **Frontend Components**:
+  - `public/js/admin.js` - Client-side admin manager for UI and API interactions
+  - Admin tab (page5) with pending users and all users tables
+  - Role badges (super_admin, admin, user, pending) and status badges (active, suspended, pending)
+- **Admin Roles**:
+  - Super Admin (rofi90@hotmail.com): Full access to all admin functions including promote/demote/delete
+  - Admin: Can view users, approve, and suspend
+  - User: Regular authenticated user
+- **Features**:
+  - View all registered users with role and status information
+  - Approve pending user registrations
+  - Suspend/unsuspend user accounts
+  - Promote users to admin (super admin only)
+  - Demote admins to regular users (super admin only)
+  - Delete users (super admin only)
+  - Multi-language support (zh-TW, en, vi)
+- **Requirements**:
+  - SUPABASE_SERVICE_KEY required for full admin operations
+  - Without service key, admin tab displays but operations are limited
+
+## Previous Changes (December 9, 2025)
 
 ### User Authentication System (Supabase Integration)
 - **New Feature**: Implemented complete user authentication system using Supabase Auth
