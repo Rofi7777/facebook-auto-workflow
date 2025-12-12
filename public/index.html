@@ -14,23 +14,57 @@
         
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #87CEEB 0%, #FFB6C1 100%);
+            background: linear-gradient(135deg, #1a0d2e 0%, #2d1b4e 25%, #4a2c7a 50%, #6b3fa0 75%, #8b5ab5 100%);
             min-height: 100vh;
-            padding: 20px;
+            padding: 0;
+            margin: 0;
         }
         
         .main-container {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
+            padding: 0;
+        }
+        
+        /* 頂部標題和導航欄 - LingoVerse AI 風格 */
+        .app-top-header {
+            background: linear-gradient(135deg, #1a0d2e 0%, #2d1b4e 25%, #4a2c7a 50%, #6b3fa0 75%, #8b5ab5 100%);
+            padding: 40px 30px 20px;
+            text-align: center;
+            position: relative;
+        }
+        
+        .app-main-title {
+            font-size: 42px;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 8px;
+            letter-spacing: 1px;
+        }
+        
+        .app-subtitle {
+            font-size: 16px;
+            color: rgba(255, 255, 255, 0.85);
+            margin-bottom: 30px;
+            font-weight: 400;
+        }
+        
+        .app-top-actions {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
         }
         
         .header {
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            padding: 30px;
+            background: transparent;
+            border-radius: 0;
+            box-shadow: none;
+            padding: 0;
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 0;
             position: relative;
         }
         
@@ -97,19 +131,34 @@
             box-shadow: 0 4px 12px rgba(255, 107, 107, 0.4);
         }
         
-        /* 全屏認證頁面樣式 - 精美版 */
+        /* 全屏認證頁面樣式 - LingoVerse AI 風格 */
         #authShell {
             position: fixed;
             top: 0;
             left: 0;
             right: 0;
             bottom: 0;
-            background: linear-gradient(135deg, #2d1b4e 0%, #4a2c7a 30%, #6b3fa0 60%, #8b5ab5 100%);
+            background: linear-gradient(135deg, #1a0d2e 0%, #2d1b4e 25%, #4a2c7a 50%, #6b3fa0 75%, #8b5ab5 100%);
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
             z-index: 10000;
             overflow: hidden;
+        }
+        
+        /* 頂部標題區域 */
+        .auth-top-title {
+            position: absolute;
+            top: 60px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 32px;
+            font-weight: 700;
+            color: rgba(255, 255, 255, 0.95);
+            text-align: center;
+            z-index: 5;
+            letter-spacing: 1px;
         }
         
         #authShell::before {
@@ -162,26 +211,23 @@
         }
         
         .auth-card {
-            background: rgba(255, 255, 255, 0.12);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 28px;
-            padding: 45px 40px;
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 24px;
+            padding: 50px 45px;
             width: 90%;
-            max-width: 420px;
-            box-shadow: 0 25px 80px rgba(0,0,0,0.3);
+            max-width: 440px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.1) inset;
             position: relative;
             z-index: 10;
             text-align: center;
+            margin-top: 80px;
         }
         
         .auth-header-title {
-            font-size: 22px;
-            font-weight: 700;
-            color: rgba(255, 255, 255, 0.9);
-            margin-bottom: 20px;
-            letter-spacing: 2px;
+            display: none; /* 移到顶部，不在这里显示 */
         }
         
         .auth-logo {
@@ -189,29 +235,31 @@
         }
         
         .auth-logo-icon {
-            width: 70px;
-            height: 70px;
-            background: linear-gradient(135deg, #7c4dff 0%, #b388ff 100%);
-            border-radius: 18px;
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #8b5cf6 0%, #a78bfa 50%, #c4b5fd 100%);
+            border-radius: 20px;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin: 0 auto 15px;
-            font-size: 36px;
-            box-shadow: 0 8px 25px rgba(124, 77, 255, 0.4);
+            margin: 0 auto 20px;
+            font-size: 40px;
+            box-shadow: 0 10px 30px rgba(139, 92, 246, 0.5);
         }
         
         .auth-brand-name {
-            font-size: 26px;
+            font-size: 32px;
             font-weight: 700;
             color: white;
-            margin-bottom: 6px;
+            margin-bottom: 8px;
+            letter-spacing: 0.5px;
         }
         
         .auth-tagline {
-            font-size: 14px;
-            color: rgba(255, 255, 255, 0.8);
-            margin-bottom: 4px;
+            font-size: 15px;
+            color: rgba(255, 255, 255, 0.85);
+            margin-bottom: 6px;
+            font-weight: 400;
         }
         
         .auth-tagline .emoji {
@@ -883,21 +931,33 @@
         .tab-navigation {
             display: flex;
             justify-content: center;
-            gap: 15px;
-            margin-top: 20px;
+            gap: 12px;
+            margin-top: 30px;
             flex-wrap: wrap;
+            padding: 0 20px;
         }
         
         .tab-btn {
-            padding: 12px 30px;
-            font-size: 16px;
+            padding: 14px 28px;
+            font-size: 15px;
             font-weight: 600;
-            border: 2px solid #87CEEB;
-            background: white;
-            color: #87CEEB;
-            border-radius: 25px;
+            border: none;
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
+            border-radius: 12px;
             cursor: pointer;
             transition: all 0.3s;
+            backdrop-filter: blur(10px);
+        }
+        
+        .tab-btn:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: translateY(-2px);
+        }
+        
+        .tab-btn.active {
+            background: rgba(255, 255, 255, 0.3);
+            box-shadow: 0 4px 15px rgba(255, 255, 255, 0.2);
         }
         
         .tab-btn:hover {
@@ -1501,6 +1561,9 @@
 <body>
     <!-- 全屏登入頁面 (未登入時顯示) -->
     <div id="authShell">
+        <!-- 頂部標題 -->
+        <div class="auth-top-title" data-i18n="auth_top_title">您的AI學習宇宙</div>
+        
         <!-- 裝飾性浮動元素 -->
         <div class="auth-decoration star1">✨</div>
         <div class="auth-decoration star2">⭐</div>
@@ -1518,14 +1581,12 @@
         </div>
         
         <div class="auth-card">
-            <!-- 頂部標題 -->
-            <div class="auth-header-title" data-i18n="auth_header_title">AI 智慧內容平台</div>
             
             <!-- Logo 圖標 -->
             <div class="auth-logo">
                 <div class="auth-logo-icon">🤖</div>
                 <div class="auth-brand-name">Googoogaga AI</div>
-                <div class="auth-tagline" data-i18n="auth_tagline">您的 AI 內容創作夥伴<span class="emoji">🌟</span></div>
+                <div class="auth-tagline" data-i18n="auth_tagline">您的 AI 內容創作夥伴</div>
             </div>
             
             <!-- 登入表單 -->
@@ -1590,10 +1651,13 @@
 
     <!-- 主應用內容 (登入後顯示) -->
     <div id="appShell">
-    <div class="main-container">
-        <div class="header">
-            <!-- 頂部工具列：用戶認證 + 語言切換 -->
-            <div class="header-top-bar">
+    <!-- 頂部標題和導航欄 -->
+    <div class="app-top-header">
+        <div class="app-main-title">Googoogaga AI</div>
+        <div class="app-subtitle">您的AI學習宇宙</div>
+        
+        <!-- 頂部工具列：用戶認證 + 語言切換 -->
+        <div class="app-top-actions">
                 <!-- 用戶資訊 (登入後顯示) -->
                 <div class="user-info" id="userInfo">
                     <div class="user-avatar" id="userAvatar">U</div>
@@ -1631,11 +1695,6 @@
                 </div>
             </div>
             
-            <img id="brandLogo" src="" alt="Brand Logo" style="max-height: 120px; margin-bottom: 15px; border-radius: 10px; display: none;">
-            <h1 id="brandTitle" data-i18n="app_title">🧸 Googoogaga Multi-Platform Generator</h1>
-            <p id="brandSlogan" data-i18n="app_subtitle_line1">Cùng bé khám phá thế giới diệu kỳ mỗi ngày</p>
-            <p data-i18n="app_subtitle_line2">AI 驅動的多平台嬰幼兒玩具行銷內容生成器</p>
-            
             <!-- 分頁切換導航 -->
             <div class="tab-navigation">
                 <button class="tab-btn active" onclick="switchPage('page1')">
@@ -1654,8 +1713,9 @@
                     <span data-i18n="tab_admin">👑 管理員</span>
                 </button>
             </div>
-        </div>
-        
+    </div>
+    
+    <div class="main-container">
         <!-- Page 1: AI 圖片生成 -->
         <div id="page1" class="page-content active">
         <div class="workflow-container">
