@@ -43,11 +43,23 @@ const AuthManager = {
   async checkAuthStatus() {
     try {
       const response = await fetch('/api/auth/status');
+      if (!response.ok) {
+        // API 返回错误，假设认证已启用（安全起见）
+        console.warn('Auth status API returned error:', response.status);
+        return true; // 返回 true 表示需要登录
+      }
+      const contentType = response.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        // 返回的不是 JSON，可能是 HTML 错误页面
+        console.warn('Auth status API returned non-JSON response');
+        return true; // 返回 true 表示需要登录
+      }
       const data = await response.json();
-      return data.enabled;
+      return data.enabled !== false; // 默认启用认证
     } catch (error) {
       console.error('Auth status check failed:', error);
-      return false;
+      // 错误时假设认证已启用，需要登录
+      return true;
     }
   },
 
@@ -557,16 +569,21 @@ async function handleAuthRegister(event) {
 }
 
 document.addEventListener('DOMContentLoaded', async function() {
-  // 默認顯示登入頁面 - 不執行自動登入
+  // 強制清除自動登入狀態 - 無論如何都先顯示登入頁面
   const authShell = document.getElementById('authShell');
   const appShell = document.getElementById('appShell');
   
-  // 確保初始狀態：顯示登入頁面，隱藏主應用
+  // 強制設置初始狀態：顯示登入頁面，隱藏主應用
+  // 即使 localStorage 中有 token，也不自動登入
   if (authShell) {
     authShell.classList.remove('hidden');
+    authShell.style.display = 'flex';
+    authShell.style.visibility = 'visible';
   }
   if (appShell) {
     appShell.classList.remove('visible');
+    appShell.style.display = 'none';
+    appShell.style.visibility = 'hidden';
   }
   document.body.classList.add('not-logged-in');
   document.body.classList.remove('logged-in');
@@ -580,6 +597,7 @@ document.addEventListener('DOMContentLoaded', async function() {
     if (authShell) {
       authShell.classList.remove('hidden');
       authShell.style.display = 'flex';
+      authShell.style.visibility = 'visible';
     }
     if (appShell) {
       appShell.classList.remove('visible');
@@ -588,12 +606,19 @@ document.addEventListener('DOMContentLoaded', async function() {
     }
     document.body.classList.add('not-logged-in');
     document.body.classList.remove('logged-in');
-    // 只更新 UI 元素，不切換頁面
+    // 只更新 UI 元素（用戶資訊等），不切換頁面
     AuthManager.updateUI(false);
   } else {
     // 認證未啟用：直接顯示主應用
-    if (authShell) authShell.classList.add('hidden');
-    if (appShell) appShell.classList.add('visible');
+    if (authShell) {
+      authShell.classList.add('hidden');
+      authShell.style.display = 'none';
+    }
+    if (appShell) {
+      appShell.classList.add('visible');
+      appShell.style.display = 'block';
+      appShell.style.visibility = 'visible';
+    }
     document.body.classList.add('logged-in');
     document.body.classList.remove('not-logged-in');
     const authElements = document.querySelectorAll('.auth-required');
