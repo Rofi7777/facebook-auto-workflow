@@ -182,12 +182,14 @@
             left: 0;
             right: 0;
             bottom: 0;
+            width: 100vw;
+            height: 100vh;
             background: linear-gradient(135deg, #1a0d2e 0%, #2d1b4e 25%, #4a2c7a 50%, #6b3fa0 75%, #8b5ab5 100%);
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            z-index: 10000;
+            z-index: 99999;
             overflow: hidden;
         }
         
@@ -257,15 +259,27 @@
         /* 確保登入頁面完全覆蓋背景內容 */
         body:not(.logged-in) #appShell {
             display: none !important;
+            visibility: hidden !important;
         }
         
         body.logged-in #authShell {
             display: none !important;
+            visibility: hidden !important;
         }
         
         /* 確保未登入時只顯示登入頁面 */
         #authShell:not(.hidden) {
             display: flex !important;
+            visibility: visible !important;
+        }
+        
+        /* 確保登入頁面在最上層 */
+        body:not(.logged-in) #authShell {
+            z-index: 99999 !important;
+        }
+        
+        body:not(.logged-in) #appShell {
+            z-index: -1 !important;
         }
         
         .auth-card {
