@@ -194,15 +194,15 @@
         /* 頂部標題區域 */
         .auth-top-title {
             position: absolute;
-            top: 80px;
+            top: 60px;
             left: 50%;
             transform: translateX(-50%);
-            font-size: 36px;
+            font-size: 32px;
             font-weight: 700;
             color: rgba(255, 255, 255, 0.95);
             text-align: center;
             z-index: 5;
-            letter-spacing: 2px;
+            letter-spacing: 1px;
         }
         
         #authShell::before {
@@ -254,13 +254,18 @@
             display: block !important;
         }
         
-        /* 確保登入時完全隱藏主應用 */
+        /* 確保登入頁面完全覆蓋背景內容 */
         body:not(.logged-in) #appShell {
             display: none !important;
         }
         
         body.logged-in #authShell {
             display: none !important;
+        }
+        
+        /* 確保未登入時只顯示登入頁面 */
+        #authShell:not(.hidden) {
+            display: flex !important;
         }
         
         .auth-card {
