@@ -244,22 +244,32 @@
             75% { transform: translateY(-15px) rotate(2deg); }
         }
         
+        /* 默認狀態：顯示登入頁面，隱藏主應用 */
+        #authShell {
+            display: flex !important;
+            visibility: visible !important;
+        }
+        
         #authShell.hidden {
             display: none !important;
+            visibility: hidden !important;
         }
         
         #appShell {
             display: none !important;
+            visibility: hidden !important;
         }
         
         #appShell.visible {
             display: block !important;
+            visibility: visible !important;
         }
         
         /* 確保登入頁面完全覆蓋背景內容 */
         body:not(.logged-in) #appShell {
             display: none !important;
             visibility: hidden !important;
+            z-index: -1 !important;
         }
         
         body.logged-in #authShell {
@@ -267,19 +277,13 @@
             visibility: hidden !important;
         }
         
-        /* 確保未登入時只顯示登入頁面 */
-        #authShell:not(.hidden) {
-            display: flex !important;
-            visibility: visible !important;
-        }
-        
         /* 確保登入頁面在最上層 */
-        body:not(.logged-in) #authShell {
+        #authShell:not(.hidden) {
             z-index: 99999 !important;
         }
         
-        body:not(.logged-in) #appShell {
-            z-index: -1 !important;
+        body:not(.logged-in) #authShell {
+            z-index: 99999 !important;
         }
         
         .auth-card {
@@ -1721,7 +1725,7 @@
     </div>
 
     <!-- 主應用內容 (登入後顯示) -->
-    <div id="appShell">
+    <div id="appShell" style="display: none;">
     <!-- 頂部標題和導航欄 -->
     <div class="app-top-header">
         <div class="app-main-title">Googa Ai Hub</div>

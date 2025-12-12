@@ -509,19 +509,34 @@ async function handleAuthRegister(event) {
 }
 
 document.addEventListener('DOMContentLoaded', async function() {
-  const authEnabled = await AuthManager.checkAuthStatus();
-  
+  // 默認顯示登入頁面
   const authShell = document.getElementById('authShell');
   const appShell = document.getElementById('appShell');
   
+  // 確保初始狀態：顯示登入頁面，隱藏主應用
+  if (authShell) {
+    authShell.classList.remove('hidden');
+  }
+  if (appShell) {
+    appShell.classList.remove('visible');
+  }
+  document.body.classList.add('not-logged-in');
+  document.body.classList.remove('logged-in');
+  
+  // 檢查認證狀態
+  const authEnabled = await AuthManager.checkAuthStatus();
+  
   if (authEnabled) {
+    // 如果認證已啟用，檢查是否已登入
     if (AuthManager.isLoggedIn()) {
+      // 已登入：隱藏登入頁面，顯示主應用
       if (authShell) authShell.classList.add('hidden');
       if (appShell) appShell.classList.add('visible');
       document.body.classList.add('logged-in');
       document.body.classList.remove('not-logged-in');
       AuthManager.updateUI();
     } else {
+      // 未登入：確保顯示登入頁面
       if (authShell) authShell.classList.remove('hidden');
       if (appShell) appShell.classList.remove('visible');
       document.body.classList.add('not-logged-in');
@@ -529,6 +544,7 @@ document.addEventListener('DOMContentLoaded', async function() {
       AuthManager.updateUI();
     }
   } else {
+    // 認證未啟用：直接顯示主應用
     if (authShell) authShell.classList.add('hidden');
     if (appShell) appShell.classList.add('visible');
     document.body.classList.add('logged-in');
