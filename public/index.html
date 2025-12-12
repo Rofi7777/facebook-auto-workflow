@@ -194,15 +194,15 @@
         /* 頂部標題區域 */
         .auth-top-title {
             position: absolute;
-            top: 60px;
+            top: 80px;
             left: 50%;
             transform: translateX(-50%);
-            font-size: 32px;
+            font-size: 36px;
             font-weight: 700;
             color: rgba(255, 255, 255, 0.95);
             text-align: center;
             z-index: 5;
-            letter-spacing: 1px;
+            letter-spacing: 2px;
         }
         
         #authShell::before {
@@ -243,15 +243,24 @@
         }
         
         #authShell.hidden {
-            display: none;
+            display: none !important;
         }
         
         #appShell {
-            display: none;
+            display: none !important;
         }
         
         #appShell.visible {
-            display: block;
+            display: block !important;
+        }
+        
+        /* 確保登入時完全隱藏主應用 */
+        body:not(.logged-in) #appShell {
+            display: none !important;
+        }
+        
+        body.logged-in #authShell {
+            display: none !important;
         }
         
         .auth-card {
@@ -1628,7 +1637,7 @@
             <!-- Logo 圖標 -->
             <div class="auth-logo">
                 <div class="auth-logo-icon">🤖</div>
-                <div class="auth-brand-name">Googoogaga AI</div>
+                <div class="auth-brand-name">Googa Ai Hub</div>
                 <div class="auth-tagline" data-i18n="auth_tagline">您的 AI 內容創作夥伴</div>
             </div>
             
@@ -1696,7 +1705,7 @@
     <div id="appShell">
     <!-- 頂部標題和導航欄 -->
     <div class="app-top-header">
-        <div class="app-main-title">Googoogaga AI</div>
+        <div class="app-main-title">Googa Ai Hub</div>
         <div class="app-subtitle">您的AI學習宇宙</div>
         
         <!-- 頂部工具列：用戶認證 + 語言切換 -->

@@ -498,16 +498,42 @@ document.addEventListener('DOMContentLoaded', async function() {
   
   if (authEnabled) {
     if (AuthManager.isLoggedIn()) {
-      if (authShell) authShell.classList.add('hidden');
-      if (appShell) appShell.classList.add('visible');
+      // 登入狀態
+      if (authShell) {
+        authShell.classList.add('hidden');
+        authShell.style.display = 'none';
+      }
+      if (appShell) {
+        appShell.classList.add('visible');
+        appShell.style.display = 'block';
+      }
+      document.body.classList.add('logged-in');
+      document.body.classList.remove('not-logged-in');
       AuthManager.updateUI();
     } else {
-      if (authShell) authShell.classList.remove('hidden');
-      if (appShell) appShell.classList.remove('visible');
+      // 未登入狀態：完全顯示登入頁面
+      if (authShell) {
+        authShell.classList.remove('hidden');
+        authShell.style.display = 'flex';
+      }
+      if (appShell) {
+        appShell.classList.remove('visible');
+        appShell.style.display = 'none';
+      }
+      document.body.classList.add('not-logged-in');
+      document.body.classList.remove('logged-in');
     }
   } else {
-    if (authShell) authShell.classList.add('hidden');
-    if (appShell) appShell.classList.add('visible');
+    // 認證未啟用：直接顯示主應用
+    if (authShell) {
+      authShell.classList.add('hidden');
+      authShell.style.display = 'none';
+    }
+    if (appShell) {
+      appShell.classList.add('visible');
+      appShell.style.display = 'block';
+    }
+    document.body.classList.add('logged-in');
     const authElements = document.querySelectorAll('.auth-required');
     authElements.forEach(el => el.style.display = 'none');
   }
