@@ -188,14 +188,40 @@ const AuthManager = {
     const loginBtnEl = document.getElementById('loginBtn');
     const logoutBtnEl = document.getElementById('logoutBtn');
     const userEmailEl = document.getElementById('userEmail');
+    const authShell = document.getElementById('authShell');
+    const appShell = document.getElementById('appShell');
 
     if (this.isLoggedIn() && user) {
+      // 登入狀態：隱藏登入頁面，顯示主應用
+      if (authShell) {
+        authShell.classList.add('hidden');
+        authShell.style.display = 'none';
+      }
+      if (appShell) {
+        appShell.classList.add('visible');
+        appShell.style.display = 'block';
+      }
+      document.body.classList.add('logged-in');
+      document.body.classList.remove('not-logged-in');
+      
       if (userInfoEl) userInfoEl.style.display = 'flex';
       if (authButtonsEl) authButtonsEl.style.display = 'none';
       if (loginBtnEl) loginBtnEl.style.display = 'none';
       if (logoutBtnEl) logoutBtnEl.style.display = 'inline-flex';
       if (userEmailEl) userEmailEl.textContent = user.email || 'User';
     } else {
+      // 未登入狀態：顯示登入頁面，隱藏主應用
+      if (authShell) {
+        authShell.classList.remove('hidden');
+        authShell.style.display = 'flex';
+      }
+      if (appShell) {
+        appShell.classList.remove('visible');
+        appShell.style.display = 'none';
+      }
+      document.body.classList.add('not-logged-in');
+      document.body.classList.remove('logged-in');
+      
       if (userInfoEl) userInfoEl.style.display = 'none';
       if (authButtonsEl) authButtonsEl.style.display = 'flex';
       if (loginBtnEl) loginBtnEl.style.display = 'inline-flex';
