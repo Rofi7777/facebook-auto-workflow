@@ -503,6 +503,27 @@ async function handleAuthLogin(event) {
       appShell.style.zIndex = '1';
     }
     
+    // 確保第一個功能頁面顯示（page1）
+    setTimeout(() => {
+      const page1 = document.getElementById('page1');
+      if (page1) {
+        // 隱藏所有頁面
+        document.querySelectorAll('.page-content').forEach(page => {
+          page.classList.remove('active');
+        });
+        // 顯示第一個頁面
+        page1.classList.add('active');
+        // 設置第一個按鈕為 active
+        const firstTabBtn = document.querySelector('.tab-btn[onclick*="page1"]');
+        if (firstTabBtn) {
+          document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.classList.remove('active');
+          });
+          firstTabBtn.classList.add('active');
+        }
+      }
+    }, 100);
+    
     // 滾動到頂部
     window.scrollTo(0, 0);
     
