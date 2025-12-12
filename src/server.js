@@ -51,8 +51,9 @@ app.use(express.static('public'));
 app.use('/assets', express.static('assets'));
 
 // Configure multer for multi-file uploads with security validation (Product Images)
+// Note: In Vercel, we use /tmp for file uploads (temporary storage)
 const upload = multer({
-  dest: 'assets/uploads/',
+  dest: process.env.VERCEL ? '/tmp/uploads/' : 'assets/uploads/',
   limits: { 
     fileSize: 10 * 1024 * 1024, // 10MB limit per file
     files: 5 // Maximum 5 files
@@ -73,7 +74,7 @@ const upload = multer({
 
 // Configure multer for ads analysis files (images, PDF, Excel, Word, CSV)
 const adsUpload = multer({
-  dest: 'assets/ads-uploads/',
+  dest: process.env.VERCEL ? '/tmp/ads-uploads/' : 'assets/ads-uploads/',
   limits: { 
     fileSize: 10 * 1024 * 1024, // 10MB limit per file
     files: 10 // Maximum 10 files

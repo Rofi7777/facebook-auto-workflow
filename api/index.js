@@ -4,19 +4,19 @@ const path = require('path');
 const dotenv = require('dotenv');
 const multer = require('multer');
 const fs = require('fs-extra');
-const GeminiAIService = require('../src/services/geminiAI');
-const ScenarioGeneratorService = require('../src/services/scenarioGenerator');
-const AdsAnalyzer = require('../src/services/adsAnalyzer');
-const ChatAdvisor = require('../src/services/chatAdvisor');
-const CourseGeneratorService = require('../src/services/courseGenerator');
-const DocumentExportService = require('../src/services/documentExport');
-const SupabaseAuthService = require('../src/services/supabaseAuth');
-const AdminService = require('../src/services/adminService');
-const UserLearningService = require('../src/services/userLearningService');
-const DatabaseAdminService = require('../src/services/databaseAdminService');
-const { authMiddleware, optionalAuthMiddleware } = require('../src/middleware/authMiddleware');
-const { requireAdmin, requireSuperAdmin, adminService } = require('../src/middleware/adminMiddleware');
-const { PLATFORM_CONFIGS, CONTENT_TEMPLATES, BABY_TOY_CATEGORIES } = require('../src/schemas/platforms');
+const GeminiAIService = require('./services/geminiAI');
+const ScenarioGeneratorService = require('./services/scenarioGenerator');
+const AdsAnalyzer = require('./services/adsAnalyzer');
+const ChatAdvisor = require('./services/chatAdvisor');
+const CourseGeneratorService = require('./services/courseGenerator');
+const DocumentExportService = require('./services/documentExport');
+const SupabaseAuthService = require('./services/supabaseAuth');
+const AdminService = require('./services/adminService');
+const UserLearningService = require('./services/userLearningService');
+const DatabaseAdminService = require('./services/databaseAdminService');
+const { authMiddleware, optionalAuthMiddleware } = require('./middleware/authMiddleware');
+const { requireAdmin, requireSuperAdmin, adminService } = require('./middleware/adminMiddleware');
+const { PLATFORM_CONFIGS, CONTENT_TEMPLATES, BABY_TOY_CATEGORIES } = require('./schemas/platforms');
 
 dotenv.config();
 
@@ -47,8 +47,8 @@ const PORT = process.env.PORT || 5000;
 app.use(cors());
 app.use(express.json({ limit: '15mb' }));
 app.use(express.urlencoded({ limit: '15mb', extended: true }));
-app.use(express.static(path.join(__dirname, '..', 'public')));
-app.use('/assets', express.static(path.join(__dirname, '..', 'assets')));
+app.use(express.static('public'));
+app.use('/assets', express.static('assets'));
 
 // Configure multer for multi-file uploads with security validation (Product Images)
 // Note: In Vercel, we use /tmp for file uploads (temporary storage)
@@ -101,7 +101,7 @@ const adsUpload = multer({
 
 // Routes
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, '..', 'public', 'index.html'));
+  res.sendFile(path.join(__dirname, '../public/index.html'));
 });
 
 app.get('/api/health', (req, res) => {
@@ -1359,7 +1359,7 @@ app.post('/api/analyze-ads', authMiddleware, adsUpload.array('files', 10), async
 
 // Configure multer for chat advisor files
 const chatUpload = multer({
-  dest: process.env.VERCEL ? '/tmp/chat-uploads/' : 'assets/chat-uploads/',
+  dest: 'assets/chat-uploads/',
   limits: { 
     fileSize: 10 * 1024 * 1024, // 10MB limit per file
     files: 5 // Maximum 5 files per message
