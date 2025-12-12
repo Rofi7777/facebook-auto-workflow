@@ -4,7 +4,6 @@ const path = require('path');
 const dotenv = require('dotenv');
 const multer = require('multer');
 const fs = require('fs-extra');
-const path = require('path');
 const GeminiAIService = require('../src/services/geminiAI');
 const ScenarioGeneratorService = require('../src/services/scenarioGenerator');
 const AdsAnalyzer = require('../src/services/adsAnalyzer');
@@ -37,14 +36,21 @@ try {
   };
 }
 
-// Initialize AI services
-const apiKey = process.env.GEMINI_API_KEY_NEW || process.env.GEMINI_API_KEY;
-const aiService = new GeminiAIService();
-const scenarioService = new ScenarioGeneratorService();
-const adsAnalyzer = new AdsAnalyzer();
-const chatAdvisor = new ChatAdvisor();
-const courseGenerator = new CourseGeneratorService(apiKey);
-const documentExporter = new DocumentExportService();
+// Initialize AI services with error handling
+let aiService, scenarioService, adsAnalyzer, chatAdvisor, courseGenerator, documentExporter;
+try {
+  const apiKey = process.env.GEMINI_API_KEY_NEW || process.env.GEMINI_API_KEY;
+  aiService = new GeminiAIService();
+  scenarioService = new ScenarioGeneratorService();
+  adsAnalyzer = new AdsAnalyzer();
+  chatAdvisor = new ChatAdvisor();
+  courseGenerator = new CourseGeneratorService(apiKey);
+  documentExporter = new DocumentExportService();
+  console.log('✅ AI services initialized successfully');
+} catch (error) {
+  console.error('❌ Failed to initialize AI services:', error);
+  // Services will be undefined, but we'll handle errors in routes
+}
 
 // Brand configuration from environment variables
 const ASSETS_BASE_URL = process.env.ASSETS_BASE_URL || '/brand';
@@ -119,7 +125,19 @@ app.get('/', (req, res) => {
 });
 
 app.get('/api/health', (req, res) => {
-  res.json({ status: 'OK', message: `${BRAND_CONFIG.name} Facebook Auto Workflow API is running` });
+  try {
+    res.json({ 
+      status: 'OK', 
+      message: `${BRAND_CONFIG.name} Facebook Auto Workflow API is running`,
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    console.error('Health check error:', error);
+    res.status(500).json({ 
+      status: 'ERROR', 
+      error: error.message 
+    });
+  }
 });
 
 // ==================== Authentication Routes ====================
@@ -136,6 +154,10 @@ app.post('/api/auth/signup', async (req, res) => {
       return res.status(400).json({ error: 'Password must be at least 6 characters' });
     }
 
+    if (!supabaseAuth || typeof supabaseAuth.signUp !== 'function') {
+      return res.status(500).json({ error: 'Authentication service not available' });
+    }
+
     const data = await supabaseAuth.signUp(email, password);
     console.log(`📧 New user signed up: ${email}`);
 
@@ -147,7 +169,7 @@ app.post('/api/auth/signup', async (req, res) => {
     });
   } catch (error) {
     console.error('Sign up error:', error.message);
-    res.status(400).json({ error: error.message });
+    res.status(400).json({ error: error.message || 'Sign up failed' });
   }
 });
 
@@ -157,6 +179,10 @@ app.post('/api/auth/signin', async (req, res) => {
 
     if (!email || !password) {
       return res.status(400).json({ error: 'Email and password are required' });
+    }
+
+    if (!supabaseAuth || typeof supabaseAuth.signIn !== 'function') {
+      return res.status(500).json({ error: 'Authentication service not available' });
     }
 
     const data = await supabaseAuth.signIn(email, password);
@@ -170,7 +196,7 @@ app.post('/api/auth/signin', async (req, res) => {
     });
   } catch (error) {
     console.error('Sign in error:', error.message);
-    res.status(401).json({ error: error.message });
+    res.status(401).json({ error: error.message || 'Sign in failed' });
   }
 });
 
