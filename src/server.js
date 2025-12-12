@@ -1359,7 +1359,7 @@ app.post('/api/analyze-ads', authMiddleware, adsUpload.array('files', 10), async
 
 // Configure multer for chat advisor files
 const chatUpload = multer({
-  dest: 'assets/chat-uploads/',
+  dest: process.env.VERCEL ? '/tmp/chat-uploads/' : 'assets/chat-uploads/',
   limits: { 
     fileSize: 10 * 1024 * 1024, // 10MB limit per file
     files: 5 // Maximum 5 files per message
