@@ -56,6 +56,50 @@
             display: flex;
             align-items: center;
             gap: 15px;
+            z-index: 100;
+        }
+        
+        .app-top-actions .auth-btn {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .app-top-actions .auth-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+        
+        .app-top-actions .auth-btn.logout-btn {
+            background: rgba(239, 68, 68, 0.8);
+            border-color: rgba(239, 68, 68, 0.5);
+        }
+        
+        .app-top-actions .auth-btn.logout-btn:hover {
+            background: rgba(239, 68, 68, 1);
+        }
+        
+        .app-top-actions .language-switcher {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 6px 12px;
+        }
+        
+        .app-top-actions .language-btn {
+            background: transparent;
+            border: none;
+            color: white;
+            font-size: 14px;
+            cursor: pointer;
         }
         
         .header {
@@ -917,12 +961,11 @@
         }
         
         .header h1 {
-            color: #333;
-            margin-bottom: 10px;
-            font-size: 32px;
+            display: none; /* 已移到 app-top-header */
         }
         
         .header p {
+            display: none; /* 已移到 app-top-header */
             color: #666;
             font-size: 18px;
         }
