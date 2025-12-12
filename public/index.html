@@ -272,9 +272,22 @@
             z-index: -1 !important;
         }
         
+        /* 登入後：隱藏登入頁面，顯示主應用 */
         body.logged-in #authShell {
             display: none !important;
             visibility: hidden !important;
+        }
+        
+        body.logged-in #appShell.visible {
+            display: block !important;
+            visibility: visible !important;
+            z-index: 1 !important;
+        }
+        
+        /* 確保主應用在登入後正常顯示 */
+        body.logged-in #appShell {
+            position: relative;
+            z-index: 1;
         }
         
         /* 確保登入頁面在最上層 */

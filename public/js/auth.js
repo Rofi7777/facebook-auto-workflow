@@ -447,10 +447,25 @@ async function handleAuthLogin(event) {
     const authShell = document.getElementById('authShell');
     const appShell = document.getElementById('appShell');
     
-    if (authShell) authShell.classList.add('hidden');
-    if (appShell) appShell.classList.add('visible');
+    // 隱藏登入頁面
+    if (authShell) {
+      authShell.classList.add('hidden');
+      authShell.style.display = 'none';
+    }
+    
+    // 顯示主應用
+    if (appShell) {
+      appShell.classList.add('visible');
+      appShell.style.display = 'block';
+      appShell.style.visibility = 'visible';
+    }
+    
+    // 更新 body 類別
     document.body.classList.add('logged-in');
     document.body.classList.remove('not-logged-in');
+    
+    // 滾動到頂部
+    window.scrollTo(0, 0);
     
     AuthManager.updateUI();
     showNotification(translations[currentLanguage]?.auth_login_success || 'Successfully logged in!', 'success');
@@ -509,7 +524,7 @@ async function handleAuthRegister(event) {
 }
 
 document.addEventListener('DOMContentLoaded', async function() {
-  // 默認顯示登入頁面
+  // 默認顯示登入頁面 - 不執行自動登入
   const authShell = document.getElementById('authShell');
   const appShell = document.getElementById('appShell');
   
@@ -523,26 +538,17 @@ document.addEventListener('DOMContentLoaded', async function() {
   document.body.classList.add('not-logged-in');
   document.body.classList.remove('logged-in');
   
-  // 檢查認證狀態
+  // 檢查認證狀態（但不自動登入）
   const authEnabled = await AuthManager.checkAuthStatus();
   
   if (authEnabled) {
-    // 如果認證已啟用，檢查是否已登入
-    if (AuthManager.isLoggedIn()) {
-      // 已登入：隱藏登入頁面，顯示主應用
-      if (authShell) authShell.classList.add('hidden');
-      if (appShell) appShell.classList.add('visible');
-      document.body.classList.add('logged-in');
-      document.body.classList.remove('not-logged-in');
-      AuthManager.updateUI();
-    } else {
-      // 未登入：確保顯示登入頁面
-      if (authShell) authShell.classList.remove('hidden');
-      if (appShell) appShell.classList.remove('visible');
-      document.body.classList.add('not-logged-in');
-      document.body.classList.remove('logged-in');
-      AuthManager.updateUI();
-    }
+    // 認證已啟用：始終顯示登入頁面，不自動登入
+    // 用戶必須手動登入
+    if (authShell) authShell.classList.remove('hidden');
+    if (appShell) appShell.classList.remove('visible');
+    document.body.classList.add('not-logged-in');
+    document.body.classList.remove('logged-in');
+    AuthManager.updateUI();
   } else {
     // 認證未啟用：直接顯示主應用
     if (authShell) authShell.classList.add('hidden');
