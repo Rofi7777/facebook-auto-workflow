@@ -2192,6 +2192,24 @@ app.post('/api/export-prompt-word', async (req, res) => {
   }
 });
 
+// Global error handler - must be last
+app.use((err, req, res, next) => {
+  console.error('Unhandled error:', err);
+  // Always return JSON, never HTML
+  res.status(err.status || 500).json({
+    error: err.message || 'Internal Server Error',
+    status: err.status || 500
+  });
+});
+
+// 404 handler - must be after all routes
+app.use((req, res) => {
+  res.status(404).json({
+    error: 'Not Found',
+    message: `Route ${req.path} not found`
+  });
+});
+
 // Export for Vercel serverless functions
 module.exports = app;
 
