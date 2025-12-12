@@ -2167,8 +2167,14 @@ app.post('/api/export-prompt-word', async (req, res) => {
   }
 });
 
-// Start server - CRITICAL: Must bind to 0.0.0.0 for Replit
-app.listen(PORT, '0.0.0.0', () => {
-  console.log(`${BRAND_CONFIG.name} Facebook Auto Workflow server running on http://0.0.0.0:${PORT}`);
-  console.log(`Ready to generate ${BRAND_CONFIG.name} Facebook promotional materials for babies!`);
-});
+// Export for Vercel serverless functions
+module.exports = app;
+
+// Start server - Only for local development
+if (require.main === module) {
+  const listenHost = process.env.NODE_ENV === 'production' ? '0.0.0.0' : 'localhost';
+  app.listen(PORT, listenHost, () => {
+    console.log(`${BRAND_CONFIG.name} Facebook Auto Workflow server running on http://${listenHost}:${PORT}`);
+    console.log(`Ready to generate ${BRAND_CONFIG.name} Facebook promotional materials for babies!`);
+  });
+}
