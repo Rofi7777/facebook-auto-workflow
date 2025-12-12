@@ -4,24 +4,38 @@ const path = require('path');
 const dotenv = require('dotenv');
 const multer = require('multer');
 const fs = require('fs-extra');
-const GeminiAIService = require('./services/geminiAI');
-const ScenarioGeneratorService = require('./services/scenarioGenerator');
-const AdsAnalyzer = require('./services/adsAnalyzer');
-const ChatAdvisor = require('./services/chatAdvisor');
-const CourseGeneratorService = require('./services/courseGenerator');
-const DocumentExportService = require('./services/documentExport');
-const SupabaseAuthService = require('./services/supabaseAuth');
-const AdminService = require('./services/adminService');
-const UserLearningService = require('./services/userLearningService');
-const DatabaseAdminService = require('./services/databaseAdminService');
-const { authMiddleware, optionalAuthMiddleware } = require('./middleware/authMiddleware');
-const { requireAdmin, requireSuperAdmin, adminService } = require('./middleware/adminMiddleware');
-const { PLATFORM_CONFIGS, CONTENT_TEMPLATES, BABY_TOY_CATEGORIES } = require('./schemas/platforms');
+const path = require('path');
+const GeminiAIService = require('../src/services/geminiAI');
+const ScenarioGeneratorService = require('../src/services/scenarioGenerator');
+const AdsAnalyzer = require('../src/services/adsAnalyzer');
+const ChatAdvisor = require('../src/services/chatAdvisor');
+const CourseGeneratorService = require('../src/services/courseGenerator');
+const DocumentExportService = require('../src/services/documentExport');
+const SupabaseAuthService = require('../src/services/supabaseAuth');
+const AdminService = require('../src/services/adminService');
+const UserLearningService = require('../src/services/userLearningService');
+const DatabaseAdminService = require('../src/services/databaseAdminService');
+const { authMiddleware, optionalAuthMiddleware } = require('../src/middleware/authMiddleware');
+const { requireAdmin, requireSuperAdmin, adminService } = require('../src/middleware/adminMiddleware');
+const { PLATFORM_CONFIGS, CONTENT_TEMPLATES, BABY_TOY_CATEGORIES } = require('../src/schemas/platforms');
 
 dotenv.config();
 
 // Initialize Supabase Auth Service
-const supabaseAuth = new SupabaseAuthService();
+let supabaseAuth;
+try {
+  supabaseAuth = new SupabaseAuthService();
+} catch (error) {
+  console.error('Failed to initialize Supabase Auth Service:', error);
+  // Create a fallback service
+  supabaseAuth = {
+    isEnabled: () => true,
+    signUp: async () => { throw new Error('Supabase not initialized'); },
+    signIn: async () => { throw new Error('Supabase not initialized'); },
+    signOut: async () => { throw new Error('Supabase not initialized'); },
+    verifyToken: async () => { throw new Error('Supabase not initialized'); }
+  };
+}
 
 // Initialize AI services
 const apiKey = process.env.GEMINI_API_KEY_NEW || process.env.GEMINI_API_KEY;
@@ -53,7 +67,7 @@ app.use('/assets', express.static('assets'));
 // Configure multer for multi-file uploads with security validation (Product Images)
 // Note: In Vercel, we use /tmp for file uploads (temporary storage)
 const upload = multer({
-  dest: process.env.VERCEL ? '/tmp/uploads/' : 'assets/uploads/',
+  dest: process.env.VERCEL || process.env.NODE_ENV === 'production' ? '/tmp/uploads/' : path.join(__dirname, '..', 'assets', 'uploads'),
   limits: { 
     fileSize: 10 * 1024 * 1024, // 10MB limit per file
     files: 5 // Maximum 5 files
@@ -74,7 +88,7 @@ const upload = multer({
 
 // Configure multer for ads analysis files (images, PDF, Excel, Word, CSV)
 const adsUpload = multer({
-  dest: process.env.VERCEL ? '/tmp/ads-uploads/' : 'assets/ads-uploads/',
+  dest: process.env.VERCEL || process.env.NODE_ENV === 'production' ? '/tmp/ads-uploads/' : path.join(__dirname, '..', 'assets', 'ads-uploads'),
   limits: { 
     fileSize: 10 * 1024 * 1024, // 10MB limit per file
     files: 10 // Maximum 10 files
@@ -234,12 +248,22 @@ app.post('/api/auth/reset-password', async (req, res) => {
 });
 
 app.get('/api/auth/status', (req, res) => {
-  const enabled = supabaseAuth.isEnabled();
-  res.json({
-    enabled: enabled,
-    message: enabled ? 'Authentication is enabled' : 'Authentication is disabled',
-    requiresLogin: enabled
-  });
+  try {
+    const enabled = supabaseAuth ? supabaseAuth.isEnabled() : false;
+    res.json({
+      enabled: enabled,
+      message: enabled ? 'Authentication is enabled' : 'Authentication is disabled',
+      requiresLogin: enabled
+    });
+  } catch (error) {
+    console.error('Auth status error:', error);
+    // 如果出错，默认返回认证已启用（安全起见）
+    res.status(200).json({
+      enabled: true,
+      message: 'Authentication is enabled',
+      requiresLogin: true
+    });
+  }
 });
 
 // ==================== End Authentication Routes ====================
@@ -1359,7 +1383,7 @@ app.post('/api/analyze-ads', authMiddleware, adsUpload.array('files', 10), async
 
 // Configure multer for chat advisor files
 const chatUpload = multer({
-  dest: process.env.VERCEL ? '/tmp/chat-uploads/' : 'assets/chat-uploads/',
+  dest: process.env.VERCEL || process.env.NODE_ENV === 'production' ? '/tmp/chat-uploads/' : path.join(__dirname, '..', 'assets', 'chat-uploads'),
   limits: { 
     fileSize: 10 * 1024 * 1024, // 10MB limit per file
     files: 5 // Maximum 5 files per message
