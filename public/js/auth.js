@@ -24,14 +24,16 @@ const AuthManager = {
     if (user) {
       localStorage.setItem(this.USER_KEY, JSON.stringify(user));
     }
-    this.updateUI();
+    // 設置 session 時不自動切換頁面，由登入函數控制
+    this.updateUI(false);
   },
 
   clearSession() {
     localStorage.removeItem(this.TOKEN_KEY);
     localStorage.removeItem(this.REFRESH_KEY);
     localStorage.removeItem(this.USER_KEY);
-    this.updateUI();
+    // 清除 session 時切換到登入頁面
+    this.updateUI(true);
   },
 
   isLoggedIn() {
@@ -181,7 +183,7 @@ const AuthManager = {
     return response;
   },
 
-  updateUI() {
+  updateUI(shouldSwitchPage = true) {
     const user = this.getUser();
     const userInfoEl = document.getElementById('userInfo');
     const authButtonsEl = document.getElementById('authButtons');
@@ -192,29 +194,51 @@ const AuthManager = {
     const appShell = document.getElementById('appShell');
 
     if (this.isLoggedIn() && user) {
-      // 登入後：隱藏登入頁面，顯示主應用
-      if (authShell) authShell.classList.add('hidden');
-      if (appShell) appShell.classList.add('visible');
-      document.body.classList.add('logged-in');
-      document.body.classList.remove('not-logged-in');
-      
+      // 更新用戶資訊 UI
       if (userInfoEl) userInfoEl.style.display = 'flex';
       if (authButtonsEl) authButtonsEl.style.display = 'none';
       if (loginBtnEl) loginBtnEl.style.display = 'none';
       if (logoutBtnEl) logoutBtnEl.style.display = 'inline-flex';
       if (userEmailEl) userEmailEl.textContent = user.email || 'User';
-    } else {
-      // 未登入：顯示登入頁面，隱藏主應用
-      if (authShell) authShell.classList.remove('hidden');
-      if (appShell) appShell.classList.remove('visible');
-      document.body.classList.add('not-logged-in');
-      document.body.classList.remove('logged-in');
       
+      // 只有在 shouldSwitchPage 為 true 時才切換頁面
+      if (shouldSwitchPage) {
+        // 登入後：隱藏登入頁面，顯示主應用
+        if (authShell) {
+          authShell.classList.add('hidden');
+          authShell.style.display = 'none';
+        }
+        if (appShell) {
+          appShell.classList.add('visible');
+          appShell.style.display = 'block';
+          appShell.style.visibility = 'visible';
+        }
+        document.body.classList.add('logged-in');
+        document.body.classList.remove('not-logged-in');
+      }
+    } else {
+      // 更新未登入 UI
       if (userInfoEl) userInfoEl.style.display = 'none';
       if (authButtonsEl) authButtonsEl.style.display = 'flex';
       if (loginBtnEl) loginBtnEl.style.display = 'inline-flex';
       if (logoutBtnEl) logoutBtnEl.style.display = 'none';
       if (userEmailEl) userEmailEl.textContent = '';
+      
+      // 只有在 shouldSwitchPage 為 true 時才切換頁面
+      if (shouldSwitchPage) {
+        // 未登入：顯示登入頁面，隱藏主應用
+        if (authShell) {
+          authShell.classList.remove('hidden');
+          authShell.style.display = 'flex';
+        }
+        if (appShell) {
+          appShell.classList.remove('visible');
+          appShell.style.display = 'none';
+          appShell.style.visibility = 'hidden';
+        }
+        document.body.classList.add('not-logged-in');
+        document.body.classList.remove('logged-in');
+      }
     }
   },
 
@@ -447,27 +471,36 @@ async function handleAuthLogin(event) {
     const authShell = document.getElementById('authShell');
     const appShell = document.getElementById('appShell');
     
+    // 先更新 body 類別
+    document.body.classList.add('logged-in');
+    document.body.classList.remove('not-logged-in');
+    
     // 隱藏登入頁面
     if (authShell) {
       authShell.classList.add('hidden');
       authShell.style.display = 'none';
+      authShell.style.visibility = 'hidden';
     }
     
-    // 顯示主應用
+    // 顯示主應用 - 使用多種方式確保顯示
     if (appShell) {
       appShell.classList.add('visible');
       appShell.style.display = 'block';
       appShell.style.visibility = 'visible';
+      appShell.style.position = 'relative';
+      appShell.style.zIndex = '1';
     }
-    
-    // 更新 body 類別
-    document.body.classList.add('logged-in');
-    document.body.classList.remove('not-logged-in');
     
     // 滾動到頂部
     window.scrollTo(0, 0);
     
-    AuthManager.updateUI();
+    // 強制重新渲染
+    if (appShell) {
+      appShell.offsetHeight; // 觸發重排
+    }
+    
+    // 更新 UI（不切換頁面，因為已經手動切換了）
+    AuthManager.updateUI(false);
     showNotification(translations[currentLanguage]?.auth_login_success || 'Successfully logged in!', 'success');
     
     if (typeof AdminManager !== 'undefined') {
@@ -544,11 +577,19 @@ document.addEventListener('DOMContentLoaded', async function() {
   if (authEnabled) {
     // 認證已啟用：始終顯示登入頁面，不自動登入
     // 用戶必須手動登入
-    if (authShell) authShell.classList.remove('hidden');
-    if (appShell) appShell.classList.remove('visible');
+    if (authShell) {
+      authShell.classList.remove('hidden');
+      authShell.style.display = 'flex';
+    }
+    if (appShell) {
+      appShell.classList.remove('visible');
+      appShell.style.display = 'none';
+      appShell.style.visibility = 'hidden';
+    }
     document.body.classList.add('not-logged-in');
     document.body.classList.remove('logged-in');
-    AuthManager.updateUI();
+    // 只更新 UI 元素，不切換頁面
+    AuthManager.updateUI(false);
   } else {
     // 認證未啟用：直接顯示主應用
     if (authShell) authShell.classList.add('hidden');

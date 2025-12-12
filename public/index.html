@@ -278,16 +278,20 @@
             visibility: hidden !important;
         }
         
+        /* 登入後主應用必須顯示 */
         body.logged-in #appShell.visible {
             display: block !important;
             visibility: visible !important;
             z-index: 1 !important;
+            position: relative;
         }
         
-        /* 確保主應用在登入後正常顯示 */
-        body.logged-in #appShell {
+        /* 確保主應用在登入後正常顯示（即使沒有 visible class） */
+        body.logged-in #appShell[style*="display: block"] {
+            display: block !important;
+            visibility: visible !important;
+            z-index: 1 !important;
             position: relative;
-            z-index: 1;
         }
         
         /* 確保登入頁面在最上層 */
