@@ -1790,19 +1790,19 @@
             
         <!-- 功能導航欄 -->
             <div class="tab-navigation">
-                <button class="tab-btn active" onclick="switchPage('page1', event)">
+                <button class="tab-btn active" data-page="page1" onclick="window.switchPage('page1', event); return false;">
                     <span data-i18n="tab_image_generation">🎨 AI 圖片生成</span>
                 </button>
-                <button class="tab-btn" onclick="switchPage('page2', event)">
+                <button class="tab-btn" data-page="page2" onclick="window.switchPage('page2', event); return false;">
                     <span data-i18n="tab_ads_advisor">📊 AI 廣告顧問</span>
                 </button>
-                <button class="tab-btn" onclick="switchPage('page3', event)">
+                <button class="tab-btn" data-page="page3" onclick="window.switchPage('page3', event); return false;">
                     <span data-i18n="tab_course_editor">📚 AI 課程編輯專家</span>
                 </button>
-                <button class="tab-btn" onclick="switchPage('page4', event)">
+                <button class="tab-btn" data-page="page4" onclick="window.switchPage('page4', event); return false;">
                     <span data-i18n="tab_prompt_architect">📝 AI 指令架構師</span>
                 </button>
-                <button class="tab-btn admin-only" id="adminTabBtn" onclick="switchPage('page5', event)" style="display: none;">
+                <button class="tab-btn admin-only" id="adminTabBtn" data-page="page5" onclick="window.switchPage('page5', event); return false;" style="display: none;">
                     <span data-i18n="tab_admin">👑 管理員</span>
                 </button>
             </div>
@@ -4331,11 +4331,22 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
         
+        // 確保 switchPage 函數在全局作用域可訪問
+        window.switchPage = switchPage;
+        
         // 使用事件委托確保按鈕點擊正常工作
-        document.addEventListener('DOMContentLoaded', function() {
+        function initTabNavigation() {
             const tabNavigation = document.querySelector('.tab-navigation');
             if (tabNavigation) {
-                tabNavigation.addEventListener('click', function(e) {
+                // 移除舊的事件監聽器（如果有的話）
+                const newTabNavigation = tabNavigation.cloneNode(true);
+                tabNavigation.parentNode.replaceChild(newTabNavigation, tabNavigation);
+                
+                // 添加新的事件監聽器
+                newTabNavigation.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
                     const btn = e.target.closest('.tab-btn');
                     if (btn) {
                         const onclick = btn.getAttribute('onclick');
@@ -4344,12 +4355,36 @@
                             const match = onclick.match(/switchPage\(['"]([^'"]+)['"]/);
                             if (match) {
                                 const pageId = match[1];
+                                console.log('Tab clicked, switching to:', pageId);
+                                switchPage(pageId, e);
+                            }
+                        } else {
+                            // 如果沒有 onclick 屬性，嘗試從按鈕的 data 屬性獲取
+                            const pageId = btn.getAttribute('data-page');
+                            if (pageId) {
+                                console.log('Tab clicked (data-page), switching to:', pageId);
                                 switchPage(pageId, e);
                             }
                         }
                     }
                 });
+                
+                console.log('Tab navigation initialized');
+            } else {
+                console.warn('Tab navigation not found');
             }
+        }
+        
+        // 在 DOM 加載完成後初始化
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initTabNavigation);
+        } else {
+            initTabNavigation();
+        }
+        
+        // 也嘗試在 window.load 時初始化（確保所有資源都加載完成）
+        window.addEventListener('load', function() {
+            setTimeout(initTabNavigation, 100);
         });
         
         // Page 2 檔案上傳處理
