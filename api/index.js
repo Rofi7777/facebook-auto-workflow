@@ -76,6 +76,9 @@ app.use('/assets', express.static(assetsPath));
 // Debug middleware - Log all incoming requests
 app.use((req, res, next) => {
   console.log(`🔍 [${new Date().toISOString()}] ${req.method} ${req.path}`);
+  console.log(`📍 Request URL: ${req.url}`);
+  console.log(`📍 Request Path: ${req.path}`);
+  console.log(`📍 Request Original URL: ${req.originalUrl}`);
   next();
 });
 
@@ -2298,9 +2301,15 @@ app.use((err, req, res, next) => {
 
 // 404 handler - must be after all routes
 app.use((req, res) => {
+  console.log(`❌ 404 - Route not found: ${req.method} ${req.path}`);
+  console.log(`📍 Full URL: ${req.url}`);
+  console.log(`📍 Original URL: ${req.originalUrl}`);
   res.status(404).json({
     error: 'Not Found',
-    message: `Route ${req.path} not found`
+    message: `Route ${req.path} not found`,
+    method: req.method,
+    url: req.url,
+    path: req.path
   });
 });
 
