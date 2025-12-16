@@ -1076,10 +1076,12 @@
         }
         
         .workflow-container {
-            display: grid;
+            display: grid !important;
             grid-template-columns: 1fr 1fr;
             gap: 30px;
             margin-bottom: 30px;
+            visibility: visible !important;
+            opacity: 1 !important;
         }
         
         .input-panel, .output-panel {
@@ -1087,6 +1089,46 @@
             border-radius: 15px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.1);
             padding: 30px;
+            visibility: visible !important;
+            opacity: 1 !important;
+            display: block !important;
+        }
+        
+        /* 確保 page4 和 page5 的內容可見 */
+        #page4,
+        #page4 *,
+        #page5,
+        #page5 * {
+            visibility: visible !important;
+            opacity: 1 !important;
+        }
+        
+        #page4 .workflow-container {
+            display: grid !important;
+        }
+        
+        #page4 .input-panel,
+        #page4 .output-panel {
+            display: block !important;
+        }
+        
+        #page5 .modern-card {
+            display: block !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+        }
+        
+        #page5 .admin-panel {
+            display: block !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+        }
+        
+        /* 確保 admin-only 類別不會隱藏內容 */
+        .admin-only.page-content.active {
+            display: block !important;
+            visibility: visible !important;
+            opacity: 1 !important;
         }
         
         .panel-title {

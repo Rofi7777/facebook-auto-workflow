@@ -26,7 +26,12 @@ function switchPage(pageId) {
         
         targetPage.classList.add('active');
         targetPage.style.display = 'block';
+        targetPage.style.visibility = 'visible';
+        targetPage.style.opacity = '1';
         console.log('[switchPage] Page activated:', pageId);
+        
+        // 強制觸發重排，確保內容顯示
+        targetPage.offsetHeight;
         
         // 設置對應按鈕為 active
         const targetBtn = document.querySelector(`.tab-btn[data-page="${pageId}"]`);
