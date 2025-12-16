@@ -1852,7 +1852,23 @@
                     <div class="form-group">
                         <label data-i18n="target_platform">目標平台 / Target Platforms</label>
                         <div class="checkbox-group" id="platformsGroup">
-                            <!-- Platforms will be loaded dynamically -->
+                            <!-- Default platforms - will be replaced by API config if available -->
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="platform_tiktok" value="tiktok" checked>
+                                <label for="platform_tiktok">TikTok 抖音</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="platform_shopee" value="shopee" checked>
+                                <label for="platform_shopee">Shopee 蝦皮購物</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="platform_facebook" value="facebook" checked>
+                                <label for="platform_facebook">Facebook</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="platform_instagram" value="instagram" checked>
+                                <label for="platform_instagram">Instagram</label>
+                            </div>
                         </div>
                     </div>
                     
@@ -3638,22 +3654,28 @@
                 // Title and slogan will be updated by updatePageLanguage() function
                 document.title = `${config.brand.name} Multi-Platform Content Generator`;
                 
-                // Populate platforms
-                const platformsGroup = document.getElementById('platformsGroup');
-                platformsGroup.innerHTML = '';
-                config.platforms.forEach(platform => {
-                    const item = document.createElement('div');
-                    item.className = 'checkbox-item';
-                    item.innerHTML = `
-                        <input type="checkbox" id="platform_${platform.value}" value="${platform.value}" checked>
-                        <label for="platform_${platform.value}">${platform.label}</label>
-                    `;
-                    platformsGroup.appendChild(item);
-                });
+                // Populate platforms - only update if API returns platforms
+                if (config.platforms && Array.isArray(config.platforms) && config.platforms.length > 0) {
+                    const platformsGroup = document.getElementById('platformsGroup');
+                    if (platformsGroup) {
+                        platformsGroup.innerHTML = '';
+                        config.platforms.forEach(platform => {
+                            const item = document.createElement('div');
+                            item.className = 'checkbox-item';
+                            item.innerHTML = `
+                                <input type="checkbox" id="platform_${platform.value}" value="${platform.value}" checked>
+                                <label for="platform_${platform.value}">${platform.label}</label>
+                            `;
+                            platformsGroup.appendChild(item);
+                        });
+                    }
+                }
+                // If API fails or platforms not returned, default platforms in HTML will be used
                 
                 console.log('Brand configuration loaded:', config);
             } catch (error) {
                 console.error('Failed to load brand configuration:', error);
+                // Default platforms in HTML will be used if API fails
             }
         }
         
