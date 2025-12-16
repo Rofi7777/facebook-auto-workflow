@@ -2788,11 +2788,6 @@
     </div>
 
     <script>
-        let uploadedImagePath = null;
-        let productAnalysis = null;
-        let painPointsAnalysis = null;
-        let generatedContent = null;
-        
         const form = document.getElementById('productForm');
         const statusDiv = document.getElementById('status');
         const fileUpload = document.getElementById('imageUpload');
@@ -4013,20 +4008,7 @@
             scenariosContainer.style.display = 'block';
         }
         
-        // Toggle scenario options based on generateImages checkbox
-        function toggleScenarioOptions() {
-            const generateImages = document.getElementById('generateImages').checked;
-            const modelSceneOptionsGroup = document.getElementById('modelSceneOptionsGroup');
-            const scenarioOptionsGroup = document.getElementById('scenarioOptionsGroup');
-            
-            if (generateImages) {
-                modelSceneOptionsGroup.style.display = 'block';
-                scenarioOptionsGroup.style.display = 'block';
-            } else {
-                modelSceneOptionsGroup.style.display = 'none';
-                scenarioOptionsGroup.style.display = 'none';
-            }
-        }
+        // toggleScenarioOptions 函數已移除，因為不再需要全局的圖片生成選項
 
         // Load brand configuration and populate UI
         async function loadBrandConfig() {
