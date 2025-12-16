@@ -2665,13 +2665,14 @@
 
         <!-- Page 5: Admin Console (管理員控制台) - Only visible to admins -->
         <div id="page5" class="page-content admin-only">
-            <div class="admin-console">
+            <div class="modern-card" style="max-width: 1400px; margin: 0 auto;">
                 <!-- Admin Console Header -->
                 <div class="admin-console-header">
                     <h2 class="admin-title">🗄️ <span data-i18n="admin_console_title">後台管理控制台</span></h2>
                     <div class="admin-header-actions">
-                        <button class="btn-refresh" id="dbRefreshBtn" onclick="AdminConsole.refresh()">
-                            🔄 <span data-i18n="admin_refresh">重新整理</span>
+                        <button class="modern-btn modern-btn-secondary" id="dbRefreshBtn" onclick="AdminConsole.refresh()">
+                            <span>🔄</span>
+                            <span data-i18n="admin_refresh">重新整理</span>
                         </button>
                     </div>
                 </div>
@@ -6517,8 +6518,16 @@
         // 顯示 Prompt 結果
         function displayPromptResult(prompt) {
             const resultDiv = document.getElementById('promptResult');
+            if (!resultDiv) return;
+            
             resultDiv.innerHTML = prompt.replace(/\n/g, '<br>');
-            document.getElementById('promptActions').style.display = 'flex';
+            const promptActions = document.getElementById('promptActions');
+            if (promptActions) {
+                promptActions.style.display = 'flex';
+            }
+            
+            // Update step indicator to step 3
+            updateStepIndicatorForPage(4, 3);
         }
 
         // 顯示狀態提示
