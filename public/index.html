@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Multi-Platform Baby Toy Content Generator</title>
+    <title>Googa AI Hub - 您的AI學習宇宙</title>
     <link rel="stylesheet" href="/css/adminConsole.css?v=20251210d">
     <link rel="stylesheet" href="/css/modern-ui.css?v=20251216">
     <style>
@@ -1962,74 +1962,128 @@
 
         <!-- Page 2: AI 廣告顧問 -->
         <div id="page2" class="page-content">
+            <!-- Step Indicator -->
+            <div class="step-indicator">
+                <div class="step-item active" id="page2-step1">
+                    <div class="step-number">1</div>
+                    <div class="step-label">資料輸入</div>
+                </div>
+                <div class="step-item" id="page2-step2">
+                    <div class="step-number">2</div>
+                    <div class="step-label">AI 分析</div>
+                </div>
+                <div class="step-item" id="page2-step3">
+                    <div class="step-number">3</div>
+                    <div class="step-label">顧問對話</div>
+                </div>
+            </div>
+            
             <div class="workflow-container">
                 <!-- 左側：資料輸入區 -->
                 <div class="input-panel">
-                    <h2 class="panel-title">📤 <span data-i18n="data_input_area">資料輸入區</span></h2>
-                    
-                    <form id="adsAnalysisForm">
-                        <div class="form-group">
-                            <label for="brandName" data-i18n="brand_name">品牌名稱 / Brand Name (選填)</label>
-                            <input type="text" id="brandName" name="brandName" data-i18n-placeholder="brand_name_placeholder" placeholder="輸入品牌名稱">
-                        </div>
+                    <div class="modern-card">
+                        <h2 class="panel-title" style="margin-bottom: 25px;">📤 <span data-i18n="data_input_area">資料輸入區</span></h2>
                         
-                        <div class="form-group">
-                            <label for="adProductName" data-i18n="product_name_optional">產品名稱 / Product Name (選填)</label>
-                            <input type="text" id="adProductName" name="adProductName" data-i18n-placeholder="product_name_optional_placeholder" placeholder="輸入產品名稱">
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="coreProduct" data-i18n="core_product">核心產品 / Core Product (選填)</label>
-                            <textarea id="coreProduct" name="coreProduct" data-i18n-placeholder="core_product_placeholder" placeholder="描述核心產品特色..." rows="2"></textarea>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="targetMarket" data-i18n="target_market">目標與市場 / Target Market (選填)</label>
-                            <textarea id="targetMarket" name="targetMarket" data-i18n-placeholder="target_market_placeholder" placeholder="描述目標客群與市場定位..." rows="2"></textarea>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label data-i18n="file_upload">檔案上傳 / File Upload (選填，支援 1-10 個檔案)</label>
-                            <div class="file-upload" onclick="document.getElementById('adsFileUpload').click()">
-                                <input type="file" id="adsFileUpload" accept="image/*,.pdf,.xlsx,.xls,.doc,.docx,.csv" multiple>
-                                <p data-i18n="file_upload_text">📁 上傳廣告資料檔案</p>
-                                <small data-i18n="file_upload_hint">支援 Image, PDF, Excel, Word, CSV (每個檔案最大 10MB，最多10個檔案)</small>
+                        <form id="adsAnalysisForm" class="modern-form">
+                            <div class="modern-form-group">
+                                <label class="modern-form-label" for="brandName">
+                                    <span>🏷️</span>
+                                    <span data-i18n="brand_name">品牌名稱 (選填)</span>
+                                </label>
+                                <input type="text" id="brandName" name="brandName" class="modern-form-input" 
+                                       data-i18n-placeholder="brand_name_placeholder" placeholder="輸入品牌名稱">
                             </div>
-                            <div id="adsFilePreviewContainer" class="image-preview-container"></div>
-                            <div id="selectedAdsFileCount" class="selected-count" style="display: none;"></div>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label data-i18n="platform_selection">平台勾選 / Platform Selection</label>
-                            <div class="checkbox-group">
-                                <div class="checkbox-item">
-                                    <input type="checkbox" id="platform_tiktok" name="adsPlatform" value="TikTok">
-                                    <label for="platform_tiktok" data-i18n="platform_tiktok">📱 TikTok Ads</label>
+                            
+                            <div class="modern-form-group">
+                                <label class="modern-form-label" for="adProductName">
+                                    <span>📦</span>
+                                    <span data-i18n="product_name_optional">產品名稱 (選填)</span>
+                                </label>
+                                <input type="text" id="adProductName" name="adProductName" class="modern-form-input" 
+                                       data-i18n-placeholder="product_name_optional_placeholder" placeholder="輸入產品名稱">
+                            </div>
+                            
+                            <div class="modern-form-group">
+                                <label class="modern-form-label" for="coreProduct">
+                                    <span>💎</span>
+                                    <span data-i18n="core_product">核心產品 (選填)</span>
+                                </label>
+                                <textarea id="coreProduct" name="coreProduct" class="modern-form-input" 
+                                          data-i18n-placeholder="core_product_placeholder" 
+                                          placeholder="描述核心產品特色..." rows="3" style="resize: vertical;"></textarea>
+                            </div>
+                            
+                            <div class="modern-form-group">
+                                <label class="modern-form-label" for="targetMarket">
+                                    <span>🎯</span>
+                                    <span data-i18n="target_market">目標市場 (選填)</span>
+                                </label>
+                                <textarea id="targetMarket" name="targetMarket" class="modern-form-input" 
+                                          data-i18n-placeholder="target_market_placeholder" 
+                                          placeholder="描述目標客群與市場定位..." rows="3" style="resize: vertical;"></textarea>
+                            </div>
+                            
+                            <!-- Modern File Upload -->
+                            <div class="modern-form-group">
+                                <label class="modern-form-label">
+                                    <span>📁</span>
+                                    <span data-i18n="file_upload">檔案上傳 (選填)</span>
+                                </label>
+                                <div class="upload-area" id="adsUploadArea" onclick="document.getElementById('adsFileUpload').click()">
+                                    <input type="file" id="adsFileUpload" accept="image/*,.pdf,.xlsx,.xls,.doc,.docx,.csv" multiple style="display: none;">
+                                    <div class="upload-icon">📤</div>
+                                    <div class="upload-text" data-i18n="file_upload_text">點擊或拖拽上傳檔案</div>
+                                    <div class="upload-hint" data-i18n="file_upload_hint">支援 Image, PDF, Excel, Word, CSV (每個檔案最大 10MB，最多10個檔案)</div>
                                 </div>
-                                <div class="checkbox-item">
-                                    <input type="checkbox" id="platform_shopee" name="adsPlatform" value="Shopee">
-                                    <label for="platform_shopee" data-i18n="platform_shopee">🛍️ Shopee Ads</label>
-                                </div>
-                                <div class="checkbox-item">
-                                    <input type="checkbox" id="platform_meta" name="adsPlatform" value="Meta">
-                                    <label for="platform_meta" data-i18n="platform_meta">👥 Meta Ads (Facebook/Instagram)</label>
-                                </div>
-                                <div class="checkbox-item">
-                                    <input type="checkbox" id="platform_zalo" name="adsPlatform" value="Zalo">
-                                    <label for="platform_zalo" data-i18n="platform_zalo">💬 Zalo Ads</label>
+                                <div id="adsFilePreviewContainer" class="image-preview-grid" style="display: none;"></div>
+                            </div>
+                            
+                            <!-- Icon-based Platform Selection -->
+                            <div class="modern-form-group">
+                                <label class="modern-form-label">
+                                    <span>📱</span>
+                                    <span data-i18n="platform_selection">目標平台</span>
+                                </label>
+                                <div class="platform-selection" id="adsPlatformsGroup">
+                                    <div class="platform-card" data-platform="tiktok" onclick="toggleAdsPlatform('tiktok')">
+                                        <input type="checkbox" id="ads_platform_tiktok" name="adsPlatform" value="TikTok">
+                                        <div class="platform-icon">📱</div>
+                                        <div class="platform-name">TikTok</div>
+                                        <div class="checkmark">✓</div>
+                                    </div>
+                                    <div class="platform-card" data-platform="shopee" onclick="toggleAdsPlatform('shopee')">
+                                        <input type="checkbox" id="ads_platform_shopee" name="adsPlatform" value="Shopee">
+                                        <div class="platform-icon">🛍️</div>
+                                        <div class="platform-name">Shopee</div>
+                                        <div class="checkmark">✓</div>
+                                    </div>
+                                    <div class="platform-card" data-platform="meta" onclick="toggleAdsPlatform('meta')">
+                                        <input type="checkbox" id="ads_platform_meta" name="adsPlatform" value="Meta">
+                                        <div class="platform-icon">👥</div>
+                                        <div class="platform-name">Meta</div>
+                                        <div class="checkmark">✓</div>
+                                    </div>
+                                    <div class="platform-card" data-platform="zalo" onclick="toggleAdsPlatform('zalo')">
+                                        <input type="checkbox" id="ads_platform_zalo" name="adsPlatform" value="Zalo">
+                                        <div class="platform-icon">💬</div>
+                                        <div class="platform-name">Zalo</div>
+                                        <div class="checkmark">✓</div>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        
-                        <button type="submit" class="btn" id="analyzeAdsBtn">
-                            🧠 <span data-i18n="start_analysis">開始分析 (Start Analysis)</span>
-                        </button>
+                            
+                            <button type="submit" class="modern-btn modern-btn-primary" id="analyzeAdsBtn" style="width: 100%;">
+                                <span>🧠</span>
+                                <span data-i18n="start_analysis">開始分析</span>
+                            </button>
                     </form>
                     
-                    <div id="adsStatus" class="status"></div>
-                    
-                    <!-- AI 廣告顧問對話視窗 -->
-                    <div class="chat-advisor-container" id="chatAdvisorContainer">
+                        <div id="adsStatus" class="status" style="margin-top: 20px;"></div>
+                    </form>
+                </div>
+                
+                <!-- AI 廣告顧問對話視窗 -->
+                <div class="modern-card" id="chatAdvisorContainer" style="margin-top: 20px;">
                         <div class="chat-header">
                             💬 <span data-i18n="chat_advisor_title">AI 廣告顧問對話</span>
                         </div>
@@ -2075,21 +2129,26 @@
                 
                 <!-- 右側：AI 分析結果區 -->
                 <div class="output-panel">
-                    <h2 class="panel-title">🤖 <span data-i18n="ai_analysis_results_area">AI 分析結果區</span></h2>
-                    <div id="adsAnalysisResults">
-                        <p style="text-align: center; color: #666; padding: 40px;">
-                            上傳廣告資料並點擊分析按鈕開始 AI 智慧分析
-                        </p>
-                    </div>
-                    
-                    <!-- 報告操作按鈕 -->
-                    <div id="reportActions" style="display: none; margin-top: 20px; text-align: center; gap: 10px;">
-                        <button class="btn" onclick="exportPDF()" style="background: #28a745;">
-                            📄 匯出 PDF
-                        </button>
-                        <button class="btn btn-secondary" onclick="reanalyze()">
-                            🔄 重新分析
-                        </button>
+                    <div class="modern-card">
+                        <h2 class="panel-title" style="margin-bottom: 20px;">🤖 <span data-i18n="ai_analysis_results_area">AI 分析結果區</span></h2>
+                        <div id="adsAnalysisResults">
+                            <div style="text-align: center; color: #999; padding: 60px 20px;">
+                                <div style="font-size: 48px; margin-bottom: 20px; opacity: 0.5;">📊</div>
+                                <p style="font-size: 16px;">上傳廣告資料並點擊分析按鈕開始 AI 智慧分析</p>
+                            </div>
+                        </div>
+                        
+                        <!-- 報告操作按鈕 -->
+                        <div id="reportActions" style="display: none; margin-top: 20px; display: flex; gap: 10px;">
+                            <button class="modern-btn modern-btn-primary" onclick="exportPDF()" style="flex: 1;">
+                                <span>📄</span>
+                                <span>匯出 PDF</span>
+                            </button>
+                            <button class="modern-btn modern-btn-secondary" onclick="reanalyze()" style="flex: 1;">
+                                <span>🔄</span>
+                                <span>重新分析</span>
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -2098,158 +2157,151 @@
 
         <!-- Page 3: AI 課程編輯專家 -->
         <div id="page3" class="page-content">
+            <!-- Step Indicator -->
+            <div class="step-indicator">
+                <div class="step-item active" id="page3-step1">
+                    <div class="step-number">1</div>
+                    <div class="step-label">參數設定</div>
+                </div>
+                <div class="step-item" id="page3-step2">
+                    <div class="step-number">2</div>
+                    <div class="step-label">AI 生成</div>
+                </div>
+                <div class="step-item" id="page3-step3">
+                    <div class="step-number">3</div>
+                    <div class="step-label">預覽下載</div>
+                </div>
+            </div>
+            
             <div class="workflow-container">
                 <!-- 左側：課程參數設定 -->
                 <div class="input-panel">
-                    <h2 class="panel-title">📚 <span data-i18n="course_parameters">課程參數設定</span></h2>
-                    
-                    <form id="courseForm">
-                        <!-- 1. 目標年齡 -->
-                        <div class="form-group">
-                            <label for="targetAge" data-i18n="target_age">目標年齡</label>
-                            <select id="targetAge" name="targetAge" onchange="handleAgeChange()" required>
-                                <option value="3-5">3-5 歲</option>
-                                <option value="6-8">6-8 歲</option>
-                                <option value="9-11">9-11 歲</option>
-                                <option value="12-14">12-14 歲</option>
-                                <option value="custom">自定義 (Custom)</option>
-                            </select>
-                            <input type="number" id="customAgeText" style="display: none; margin-top: 10px;" placeholder="請輸入年齡數字" min="1" max="18">
-                        </div>
+                    <div class="modern-card">
+                        <h2 class="panel-title" style="margin-bottom: 25px;">📚 <span data-i18n="course_parameters">課程參數設定</span></h2>
+                        
+                        <form id="courseForm" class="modern-form">
+                            <!-- 1. 目標年齡 -->
+                            <div class="modern-form-group">
+                                <label class="modern-form-label" for="targetAge">
+                                    <span>👶</span>
+                                    <span data-i18n="target_age">目標年齡</span>
+                                </label>
+                                <select id="targetAge" name="targetAge" class="modern-form-input" onchange="handleAgeChange()" required>
+                                    <option value="3-5">3-5 歲</option>
+                                    <option value="6-8">6-8 歲</option>
+                                    <option value="9-11">9-11 歲</option>
+                                    <option value="12-14">12-14 歲</option>
+                                    <option value="custom">自定義</option>
+                                </select>
+                                <input type="number" id="customAgeText" class="modern-form-input" style="display: none; margin-top: 10px;" placeholder="請輸入年齡數字" min="1" max="18">
+                            </div>
 
-                        <!-- 2. 課程類別 -->
-                        <div class="form-group">
-                            <label for="category" data-i18n="category">課程類別</label>
-                            <select id="category" name="category" onchange="updateTopicOptions(); handleCategoryChange()" required>
-                                <option value="social">社會 Social</option>
-                                <option value="science">自然 Science</option>
-                                <option value="math">數學 Math</option>
-                                <option value="language">語文 Language</option>
-                                <option value="art">藝術 Art</option>
-                                <option value="custom">自定義 (Custom)</option>
-                            </select>
-                            <input type="text" id="customCategoryText" style="display: none; margin-top: 10px;" placeholder="請輸入自定義科別">
-                        </div>
+                            <!-- 2. 課程類別 -->
+                            <div class="modern-form-group">
+                                <label class="modern-form-label" for="category">
+                                    <span>📖</span>
+                                    <span data-i18n="category">課程類別</span>
+                                </label>
+                                <select id="category" name="category" class="modern-form-input" onchange="updateTopicOptions(); handleCategoryChange()" required>
+                                    <option value="social">社會 Social</option>
+                                    <option value="science">自然 Science</option>
+                                    <option value="math">數學 Math</option>
+                                    <option value="language">語文 Language</option>
+                                    <option value="art">藝術 Art</option>
+                                    <option value="custom">自定義</option>
+                                </select>
+                                <input type="text" id="customCategoryText" class="modern-form-input" style="display: none; margin-top: 10px;" placeholder="請輸入自定義科別">
+                            </div>
 
-                        <!-- 3. 課程主題 -->
-                        <div class="form-group">
-                            <label for="topic" data-i18n="topic">課程主題</label>
-                            <select id="topic" name="topic" onchange="handleTopicChange()" required>
-                                <option value="家庭">家庭</option>
-                                <option value="交通工具">交通工具</option>
-                                <option value="社會角色">社會角色</option>
-                                <option value="文化節日">文化節日</option>
-                                <option value="安全教育">安全教育</option>
-                                <option value="custom">自定義 (Custom)</option>
-                            </select>
-                            <input type="text" id="customTopicText" style="display: none; margin-top: 10px;" placeholder="請輸入自定義主題">
-                        </div>
+                            <!-- 3. 課程主題 -->
+                            <div class="modern-form-group">
+                                <label class="modern-form-label" for="topic">
+                                    <span>🎯</span>
+                                    <span data-i18n="topic">課程主題</span>
+                                </label>
+                                <select id="topic" name="topic" class="modern-form-input" onchange="handleTopicChange()" required>
+                                    <option value="家庭">家庭</option>
+                                    <option value="交通工具">交通工具</option>
+                                    <option value="社會角色">社會角色</option>
+                                    <option value="文化節日">文化節日</option>
+                                    <option value="安全教育">安全教育</option>
+                                    <option value="custom">自定義</option>
+                                </select>
+                                <input type="text" id="customTopicText" class="modern-form-input" style="display: none; margin-top: 10px;" placeholder="請輸入自定義主題">
+                            </div>
 
-                        <!-- 4. 課程時長 -->
-                        <div class="form-group">
-                            <label for="duration" data-i18n="duration">課程時長</label>
-                            <select id="duration" name="duration" onchange="handleDurationChange()" required>
-                                <option value="30">30 分鐘</option>
-                                <option value="60">60 分鐘</option>
-                                <option value="90">90 分鐘</option>
-                                <option value="custom">自定義 (Custom)</option>
-                            </select>
-                            <input type="number" id="customDurationText" style="display: none; margin-top: 10px;" placeholder="請輸入時間 (分鐘)" min="10" max="240">
-                        </div>
+                            <!-- 4. 課程時長 -->
+                            <div class="modern-form-group">
+                                <label class="modern-form-label" for="duration">
+                                    <span>⏱️</span>
+                                    <span data-i18n="duration">課程時長</span>
+                                </label>
+                                <select id="duration" name="duration" class="modern-form-input" onchange="handleDurationChange()" required>
+                                    <option value="30">30 分鐘</option>
+                                    <option value="60">60 分鐘</option>
+                                    <option value="90">90 分鐘</option>
+                                    <option value="custom">自定義</option>
+                                </select>
+                                <input type="number" id="customDurationText" class="modern-form-input" style="display: none; margin-top: 10px;" placeholder="請輸入時間 (分鐘)" min="10" max="240">
+                            </div>
 
-                        <!-- 5. 教學風格 -->
-                        <div class="form-group">
-                            <label for="style" data-i18n="style">教學風格</label>
-                            <select id="style" name="style" onchange="handleStyleChange()" required>
-                                <option value="story-based">故事引導式 Story-based</option>
-                                <option value="picture-book">插畫繪本風 Picture-book</option>
-                                <option value="singapore-style">思辨式 Singapore-style</option>
-                                <option value="gamified">遊戲化 Gamified</option>
-                                <option value="montessori">Montessori 蒙式</option>
-                                <option value="custom">自定義 (Custom)</option>
-                            </select>
-                            <input type="text" id="customStyleText" style="display: none; margin-top: 10px;" placeholder="請輸入自定義風格">
-                        </div>
+                            <!-- 5. 教學風格 -->
+                            <div class="modern-form-group">
+                                <label class="modern-form-label" for="style">
+                                    <span>🎨</span>
+                                    <span data-i18n="style">教學風格</span>
+                                </label>
+                                <select id="style" name="style" class="modern-form-input" onchange="handleStyleChange()" required>
+                                    <option value="story-based">故事引導式</option>
+                                    <option value="picture-book">插畫繪本風</option>
+                                    <option value="singapore-style">思辨式</option>
+                                    <option value="gamified">遊戲化</option>
+                                    <option value="montessori">Montessori 蒙式</option>
+                                    <option value="custom">自定義</option>
+                                </select>
+                                <input type="text" id="customStyleText" class="modern-form-input" style="display: none; margin-top: 10px;" placeholder="請輸入自定義風格">
+                            </div>
 
-                        <!-- 6. 輸出格式 (多選) -->
-                        <div class="form-group">
-                            <label data-i18n="output_types">輸出格式 (可多選)</label>
-                            <div class="checkbox-group">
-                                <div class="checkbox-item">
-                                    <input type="checkbox" id="outline" name="outputTypes" value="outline" checked>
-                                    <label for="outline">📋 課綱 Outline</label>
-                                </div>
-                                <div class="checkbox-item">
-                                    <input type="checkbox" id="lessonPlan" name="outputTypes" value="lessonPlan">
-                                    <label for="lessonPlan">📝 教案 Lesson Plan</label>
-                                </div>
-                                <div class="checkbox-item">
-                                    <input type="checkbox" id="story" name="outputTypes" value="story">
-                                    <label for="story">📖 故事 Story-based Content</label>
-                                </div>
-                                <div class="checkbox-item">
-                                    <input type="checkbox" id="worksheet" name="outputTypes" value="worksheet">
-                                    <label for="worksheet">✏️ Worksheet 練習題</label>
-                                </div>
-                                <div class="checkbox-item">
-                                    <input type="checkbox" id="slides" name="outputTypes" value="slides">
-                                    <label for="slides">🖼️ Slides (PPT Script)</label>
+                            <!-- 6. 輸出格式 (多選) -->
+                            <div class="modern-form-group">
+                                <label class="modern-form-label">
+                                    <span>📋</span>
+                                    <span data-i18n="output_types">輸出格式 (可多選)</span>
+                                </label>
+                                <div class="platform-selection" style="grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));">
+                                    <div class="platform-card selected" data-output="outline" onclick="toggleOutputType('outline')">
+                                        <input type="checkbox" id="outline" name="outputTypes" value="outline" checked>
+                                        <div class="platform-icon">📋</div>
+                                        <div class="platform-name">課綱</div>
+                                        <div class="checkmark">✓</div>
+                                    </div>
+                                    <div class="platform-card" data-output="lessonPlan" onclick="toggleOutputType('lessonPlan')">
+                                        <input type="checkbox" id="lessonPlan" name="outputTypes" value="lessonPlan">
+                                        <div class="platform-icon">📝</div>
+                                        <div class="platform-name">教案</div>
+                                        <div class="checkmark">✓</div>
+                                    </div>
+                                    <div class="platform-card" data-output="story" onclick="toggleOutputType('story')">
+                                        <input type="checkbox" id="story" name="outputTypes" value="story">
+                                        <div class="platform-icon">📖</div>
+                                        <div class="platform-name">故事</div>
+                                        <div class="checkmark">✓</div>
+                                    </div>
+                                    <div class="platform-card" data-output="worksheet" onclick="toggleOutputType('worksheet')">
+                                        <input type="checkbox" id="worksheet" name="outputTypes" value="worksheet">
+                                        <div class="platform-icon">✏️</div>
+                                        <div class="platform-name">練習題</div>
+                                        <div class="checkmark">✓</div>
+                                    </div>
+                                    <div class="platform-card" data-output="slides" onclick="toggleOutputType('slides')">
+                                        <input type="checkbox" id="slides" name="outputTypes" value="slides">
+                                        <div class="platform-icon">🖼️</div>
+                                        <div class="platform-name">Slides</div>
+                                        <div class="checkmark">✓</div>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
 
-                        <!-- 7. 內容語言 -->
-                        <div class="form-group">
-                            <label for="courseLanguage" data-i18n="course_language">內容語言</label>
-                            <select id="courseLanguage" name="courseLanguage" required>
-                                <option value="chinese">中文 Chinese</option>
-                                <option value="english">英文 English</option>
-                                <option value="vietnamese">越文 Vietnamese</option>
-                                <option value="chinese-english">中英雙語 Chinese-English</option>
-                                <option value="english-vietnamese">英越雙語 English-Vietnamese</option>
-                                <option value="trilingual">三語版 Trilingual (中英越)</option>
-                            </select>
-                        </div>
-
-                        <!-- 8. AI 插圖生成 -->
-                        <div class="form-group">
-                            <label for="includeImages" data-i18n="include_images">AI 插圖生成</label>
-                            <select id="includeImages" name="includeImages" required>
-                                <option value="yes">是 Yes (使用 Nano Banana)</option>
-                                <option value="no" selected>否 No</option>
-                            </select>
-                        </div>
-
-                        <!-- 生成按鈕 -->
-                        <button type="button" class="btn" id="generateCourseBtn" onclick="generateCourse()">
-                            🎓 <span data-i18n="generate_course_btn">生成課程內容</span>
-                        </button>
-                    </form>
-                </div>
-
-                <!-- 右側：課程預覽與下載 -->
-                <div class="output-panel">
-                    <h2 class="panel-title">📖 <span data-i18n="course_preview">課程內容預覽</span></h2>
-                    
-                    <div id="coursePreview" style="max-height: 600px; overflow-y: auto; padding: 20px; background: #f8f9fa; border-radius: 10px;">
-                        <p style="text-align: center; color: #666; padding: 40px;">
-                            選擇課程參數並點擊生成按鈕開始 AI 課程編輯
-                        </p>
-                    </div>
-
-                    <!-- 下載按鈕區域 -->
-                    <div id="downloadActions" style="display: none; margin-top: 20px; text-align: center; gap: 10px;">
-                        <button class="btn" onclick="downloadWord()" style="background: #2b579a;">
-                            📄 <span data-i18n="download_word">下載 Word</span>
-                        </button>
-                        <button class="btn" onclick="downloadPDF()" style="background: #d32f2f;">
-                            📕 <span data-i18n="download_pdf">下載 PDF</span>
-                        </button>
-                    </div>
-
-                    <!-- 狀態顯示 -->
-                    <div id="courseStatus" style="margin-top: 15px; padding: 10px; border-radius: 5px; display: none;"></div>
-                </div>
             </div>
         </div>
         <!-- End of Page 3 -->
@@ -2558,36 +2610,41 @@
 
                 <!-- 右側：結果輸出區 -->
                 <div class="output-panel">
-                    <h2 class="panel-title">🎯 <span data-i18n="generated_prompt">生成的專業 Prompt</span></h2>
-                    
-                    <div id="promptResult" style="max-height: 500px; overflow-y: auto; padding: 20px; background: #1e1e1e; border-radius: 10px; color: #d4d4d4; font-family: 'Consolas', 'Monaco', monospace; font-size: 14px; line-height: 1.6; white-space: pre-wrap;">
-                        <p style="text-align: center; color: #888; padding: 40px;">
-選擇模式並填寫參數後，點擊生成按鈕獲取專業 Prompt
-                        </p>
-                    </div>
+                    <div class="modern-card">
+                        <h2 class="panel-title" style="margin-bottom: 20px;">🎯 <span data-i18n="generated_prompt">生成的專業 Prompt</span></h2>
+                        
+                        <div id="promptResult" style="max-height: 500px; overflow-y: auto; padding: 20px; background: #1e1e1e; border-radius: 12px; color: #d4d4d4; font-family: 'Consolas', 'Monaco', monospace; font-size: 14px; line-height: 1.6; white-space: pre-wrap; min-height: 200px;">
+                            <div style="text-align: center; color: #888; padding: 60px 20px;">
+                                <div style="font-size: 48px; margin-bottom: 20px; opacity: 0.5;">📝</div>
+                                <p style="font-size: 16px;">選擇模式並填寫參數後，點擊生成按鈕獲取專業 Prompt</p>
+                            </div>
+                        </div>
 
-                    <!-- 工具按鈕區域 -->
-                    <div id="promptActions" style="display: none; margin-top: 20px; display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
-                        <button class="btn" onclick="copyPromptToClipboard()" style="padding: 12px 25px; background: linear-gradient(135deg, #4CAF50 0%, #8BC34A 100%); color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px;">
-                            📋 一鍵複製
-                        </button>
-                        <button class="btn" onclick="exportPromptToWord()" style="padding: 12px 25px; background: linear-gradient(135deg, #2b579a 0%, #4a7cc9 100%); color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px;">
-                            📄 導出 Word
-                        </button>
-                    </div>
+                        <!-- 工具按鈕區域 -->
+                        <div id="promptActions" style="display: none; margin-top: 20px; display: flex; gap: 10px;">
+                            <button class="modern-btn modern-btn-primary" onclick="copyPromptToClipboard()" style="flex: 1;">
+                                <span>📋</span>
+                                <span>一鍵複製</span>
+                            </button>
+                            <button class="modern-btn modern-btn-secondary" onclick="exportPromptToWord()" style="flex: 1;">
+                                <span>📄</span>
+                                <span>導出 Word</span>
+                            </button>
+                        </div>
 
-                    <!-- 狀態提示 -->
-                    <div id="promptStatus" style="margin-top: 15px; padding: 10px; border-radius: 8px; display: none; text-align: center;"></div>
+                        <!-- 狀態提示 -->
+                        <div id="promptStatus" class="status" style="margin-top: 15px;"></div>
 
-                    <!-- 使用說明 -->
-                    <div style="margin-top: 25px; padding: 20px; background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); border-radius: 10px;">
-                        <h4 style="color: #333; margin-bottom: 15px;">💡 使用說明</h4>
-                        <ul style="color: #666; font-size: 13px; line-height: 1.8; padding-left: 20px;">
-                            <li><strong>商業顧問模式</strong>：透過 4 層級選單，將模糊問題轉化為帶有專業模型的指令</li>
-                            <li><strong>軟體開發模式</strong>：輸入需求，AI 自動生成結構化 PRD 與技術棧規格</li>
-                            <li><strong>視覺繪圖模式</strong>：描述畫面，AI 生成 Midjourney/DALL-E 專用參數化指令</li>
-                            <li>生成後可<strong>一鍵複製</strong>到 ChatGPT、Gemini 或繪圖工具使用</li>
-                        </ul>
+                        <!-- 使用說明 -->
+                        <div class="modern-card" style="margin-top: 25px; background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);">
+                            <h4 style="color: #333; margin-bottom: 15px;">💡 使用說明</h4>
+                            <ul style="color: #666; font-size: 13px; line-height: 1.8; padding-left: 20px;">
+                                <li><strong>商業顧問模式</strong>：透過 4 層級選單，將模糊問題轉化為帶有專業模型的指令</li>
+                                <li><strong>軟體開發模式</strong>：輸入需求，AI 自動生成結構化 PRD 與技術棧規格</li>
+                                <li><strong>視覺繪圖模式</strong>：描述畫面，AI 生成 Midjourney/DALL-E 專用參數化指令</li>
+                                <li>生成後可<strong>一鍵複製</strong>到 ChatGPT、Gemini 或繪圖工具使用</li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -3946,6 +4003,40 @@
             }
         }
         
+        // Ads Platform Toggle Function
+        function toggleAdsPlatform(platform) {
+            const card = document.querySelector(`#adsPlatformsGroup .platform-card[data-platform="${platform}"]`);
+            const checkbox = document.getElementById(`ads_platform_${platform}`);
+            
+            if (card && checkbox) {
+                const isSelected = card.classList.contains('selected');
+                if (isSelected) {
+                    card.classList.remove('selected');
+                    checkbox.checked = false;
+                } else {
+                    card.classList.add('selected');
+                    checkbox.checked = true;
+                }
+            }
+        }
+        
+        // Output Type Toggle Function
+        function toggleOutputType(outputType) {
+            const card = document.querySelector(`.platform-card[data-output="${outputType}"]`);
+            const checkbox = document.getElementById(outputType);
+            
+            if (card && checkbox) {
+                const isSelected = card.classList.contains('selected');
+                if (isSelected) {
+                    card.classList.remove('selected');
+                    checkbox.checked = false;
+                } else {
+                    card.classList.add('selected');
+                    checkbox.checked = true;
+                }
+            }
+        }
+        
         // Drag & Drop Upload Functionality
         function setupDragAndDrop() {
             const uploadArea = document.getElementById('uploadArea');
@@ -4051,7 +4142,26 @@
         document.addEventListener('DOMContentLoaded', () => {
             setupDragAndDrop();
             updateStepIndicator(1);
+            // Initialize step indicators for other pages
+            updateStepIndicatorForPage(2, 1);
+            updateStepIndicatorForPage(3, 1);
+            updateStepIndicatorForPage(4, 1);
         });
+        
+        // Update Step Indicator for specific page
+        function updateStepIndicatorForPage(pageNum, step) {
+            for (let i = 1; i <= 3; i++) {
+                const stepItem = document.getElementById(`page${pageNum}-step${i}`);
+                if (stepItem) {
+                    stepItem.classList.remove('active', 'completed');
+                    if (i < step) {
+                        stepItem.classList.add('completed');
+                    } else if (i === step) {
+                        stepItem.classList.add('active');
+                    }
+                }
+            }
+        }
 
         // Load brand configuration and populate UI
         async function loadBrandConfig() {
@@ -5763,7 +5873,16 @@
         function switchPromptMode(mode) {
             currentPromptMode = mode;
             
-            // 更新 Tab 按鈕樣式
+            // 更新模式卡片樣式（新UI）
+            document.querySelectorAll('[data-mode]').forEach(card => {
+                card.classList.remove('selected');
+            });
+            const selectedCard = document.querySelector(`[data-mode="${mode}"]`);
+            if (selectedCard) {
+                selectedCard.classList.add('selected');
+            }
+            
+            // 更新舊的Tab按鈕樣式（向後兼容）
             document.querySelectorAll('.mode-tab').forEach(tab => {
                 tab.style.background = 'white';
                 tab.style.color = '#87CEEB';
@@ -5782,9 +5901,21 @@
             
             document.getElementById(mode + 'Mode').style.display = 'block';
             
+            // 更新步驟指示器
+            updateStepIndicatorForPage(4, 2);
+            
             // 清空結果區
-            document.getElementById('promptResult').innerHTML = `<p style="text-align: center; color: #888; padding: 40px;">選擇模式並填寫參數後，點擊生成按鈕獲取專業 Prompt</p>`;
-            document.getElementById('promptActions').style.display = 'none';
+            const promptResult = document.getElementById('promptResult');
+            if (promptResult) {
+                promptResult.innerHTML = `<div style="text-align: center; color: #888; padding: 60px 20px;">
+                    <div style="font-size: 48px; margin-bottom: 20px; opacity: 0.5;">📝</div>
+                    <p style="font-size: 16px;">選擇模式並填寫參數後，點擊生成按鈕獲取專業 Prompt</p>
+                </div>`;
+            }
+            const promptActions = document.getElementById('promptActions');
+            if (promptActions) {
+                promptActions.style.display = 'none';
+            }
         }
 
         // 更新行業選項
