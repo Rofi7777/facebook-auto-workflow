@@ -3352,35 +3352,92 @@
             }
         }
         
-        // 綁定按鈕事件 (確保在DOM加載後執行)
+        // 綁定按鈕事件 (確保在DOM加載後執行) - 徹底重構版本
         function bindButtonEvents() {
+            console.log('[bindButtonEvents] Starting button binding...');
+            
             const analyzeBtn = document.getElementById('analyzeProductBtn');
             const generateBtn = document.getElementById('generateContentBtn');
             const scenariosBtn = document.getElementById('generateScenariosBtn');
             
-            if (analyzeBtn && !analyzeBtn.hasAttribute('data-bound')) {
-                analyzeBtn.addEventListener('click', analyzeProduct);
-                analyzeBtn.setAttribute('data-bound', 'true');
+            // 綁定 AI 產品分析按鈕
+            if (analyzeBtn) {
+                // 移除舊的事件監聽器
+                const newAnalyzeBtn = analyzeBtn.cloneNode(true);
+                analyzeBtn.parentNode.replaceChild(newAnalyzeBtn, analyzeBtn);
+                
+                // 添加新的事件監聽器
+                newAnalyzeBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    console.log('[Analyze Button] Clicked');
+                    if (typeof analyzeProduct === 'function') {
+                        analyzeProduct();
+                    } else {
+                        console.error('[Analyze Button] analyzeProduct function not found');
+                    }
+                }, false);
+                
+                console.log('[bindButtonEvents] Analyze button bound');
+            } else {
+                console.warn('[bindButtonEvents] Analyze button not found');
             }
+            
+            // 綁定生成內容按鈕
             if (generateBtn && !generateBtn.hasAttribute('data-bound')) {
-                generateBtn.addEventListener('click', generateContent);
+                generateBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    if (typeof generateContent === 'function') {
+                        generateContent();
+                    }
+                }, false);
                 generateBtn.setAttribute('data-bound', 'true');
+                console.log('[bindButtonEvents] Generate button bound');
             }
+            
+            // 綁定生成場景按鈕
             if (scenariosBtn && !scenariosBtn.hasAttribute('data-bound')) {
-                scenariosBtn.addEventListener('click', generateScenarios);
+                scenariosBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    if (typeof generateScenarios === 'function') {
+                        generateScenarios();
+                    }
+                }, false);
                 scenariosBtn.setAttribute('data-bound', 'true');
+                console.log('[bindButtonEvents] Scenarios button bound');
             }
+            
+            console.log('[bindButtonEvents] Button binding complete');
+        }
+        
+        // 多重初始化機制
+        function tryBindButtonEvents() {
+            bindButtonEvents();
+            // 如果按鈕還沒找到，重試
+            setTimeout(function() {
+                const analyzeBtn = document.getElementById('analyzeProductBtn');
+                if (!analyzeBtn || !analyzeBtn.hasAttribute('data-bound')) {
+                    console.log('[tryBindButtonEvents] Retrying...');
+                    tryBindButtonEvents();
+                }
+            }, 100);
         }
         
         // 立即嘗試綁定（如果DOM已經加載）
-        bindButtonEvents();
-        
-        // 也監聽DOMContentLoaded事件
         if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', bindButtonEvents);
+            document.addEventListener('DOMContentLoaded', function() {
+                setTimeout(tryBindButtonEvents, 10);
+            });
         } else {
-            bindButtonEvents();
+            setTimeout(tryBindButtonEvents, 10);
         }
+        
+        // 也嘗試在 window.load 時初始化
+        window.addEventListener('load', function() {
+            setTimeout(tryBindButtonEvents, 50);
+        });
         
         // 舊的表單提交代碼已移除，現在使用三個獨立的按鈕函數
         
