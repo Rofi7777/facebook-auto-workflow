@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Multi-Platform Baby Toy Content Generator</title>
     <link rel="stylesheet" href="/css/adminConsole.css?v=20251210d">
+    <link rel="stylesheet" href="/css/modern-ui.css?v=20251216">
     <style>
         * {
             margin: 0;
@@ -1813,73 +1814,112 @@
     <div class="main-container">
         <!-- Page 1: AI 圖片生成 -->
         <div id="page1" class="page-content active">
+        
+        <!-- Step Indicator -->
+        <div class="step-indicator">
+            <div class="step-item active" id="step1">
+                <div class="step-number">1</div>
+                <div class="step-label">產品資訊</div>
+            </div>
+            <div class="step-item" id="step2">
+                <div class="step-number">2</div>
+                <div class="step-label">AI 分析</div>
+            </div>
+            <div class="step-item" id="step3">
+                <div class="step-number">3</div>
+                <div class="step-label">內容生成</div>
+            </div>
+        </div>
+        
         <div class="workflow-container">
             <div class="input-panel">
-                <h2 class="panel-title">📝 <span data-i18n="product_info_input">產品資訊輸入</span></h2>
-                
-                <form id="productForm">
-                    <div class="form-group">
-                        <label for="industryCategory" data-i18n="industry_category">產業類別 / Industry Category</label>
-                        <select id="industryCategory" name="industryCategory" required>
-                            <option value="mother-kids" data-i18n="industry_mother_kids">👶 Mother & Kids (母嬰用品)</option>
-                            <option value="fashion" data-i18n="industry_fashion">👗 Fashion (時尚服飾)</option>
-                            <option value="art-toy" data-i18n="industry_art_toy">🎨 Art Toy (藝術玩具)</option>
-                            <option value="others" data-i18n="industry_others">✨ Others (其他)</option>
-                        </select>
-                    </div>
+                <div class="modern-card">
+                    <h2 class="panel-title" style="margin-bottom: 25px;">✨ <span data-i18n="product_info_input">產品資訊輸入</span></h2>
                     
-                    <div class="form-group">
-                        <label for="productName" data-i18n="product_name">產品名稱 / Product Name</label>
-                        <input type="text" id="productName" name="productName" data-i18n-placeholder="product_name_placeholder" placeholder="輸入產品名稱" required>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="productDescription" data-i18n="product_description">產品描述 (可選)</label>
-                        <textarea id="productDescription" name="productDescription" data-i18n-placeholder="product_description_placeholder" placeholder="描述產品特色、功能、適用年齡等..." rows="3"></textarea>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label data-i18n="image_upload">產品圖片 / Product Image (支持1-5張圖片同時上傳)</label>
-                        <div class="file-upload" onclick="document.getElementById('imageUpload').click()">
-                            <input type="file" id="imageUpload" accept="image/*" multiple>
-                            <p data-i18n="image_upload_text">📸 上傳玩具圖片 (Upload toy images - 最多5張)</p>
-                            <small data-i18n="image_upload_hint">支援 JPG, PNG (每張最大 10MB，最多5張圖片)</small>
+                    <form id="productForm" class="modern-form">
+                        <!-- Hidden industry category (default to mother-kids) -->
+                        <input type="hidden" id="industryCategory" name="industryCategory" value="mother-kids">
+                        
+                        <!-- Simplified Form Fields -->
+                        <div class="modern-form-group">
+                            <label class="modern-form-label" for="productName">
+                                <span>📦</span>
+                                <span data-i18n="product_name">產品名稱</span>
+                            </label>
+                            <input type="text" id="productName" name="productName" class="modern-form-input" 
+                                   data-i18n-placeholder="product_name_placeholder" placeholder="輸入產品名稱" required>
                         </div>
-                        <div id="imagePreviewContainer" class="image-preview-container"></div>
-                        <div id="selectedImageCount" class="selected-count" style="display: none;"></div>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label data-i18n="target_platform">目標平台 / Target Platforms</label>
-                        <div class="checkbox-group" id="platformsGroup">
-                            <!-- Default platforms - will be replaced by API config if available -->
-                            <div class="checkbox-item">
-                                <input type="checkbox" id="platform_tiktok" value="tiktok" checked>
-                                <label for="platform_tiktok">TikTok 抖音</label>
+                        
+                        <div class="modern-form-group">
+                            <label class="modern-form-label" for="productDescription">
+                                <span>📝</span>
+                                <span data-i18n="product_description">產品描述 (可選)</span>
+                            </label>
+                            <textarea id="productDescription" name="productDescription" class="modern-form-input" 
+                                      data-i18n-placeholder="product_description_placeholder" 
+                                      placeholder="描述產品特色、功能、適用年齡等..." rows="3" style="resize: vertical;"></textarea>
+                        </div>
+                        
+                        <!-- Modern Image Upload -->
+                        <div class="modern-form-group">
+                            <label class="modern-form-label">
+                                <span>📸</span>
+                                <span data-i18n="image_upload">產品圖片</span>
+                            </label>
+                            <div class="upload-area" id="uploadArea" onclick="document.getElementById('imageUpload').click()">
+                                <input type="file" id="imageUpload" accept="image/*" multiple style="display: none;">
+                                <div class="upload-icon">📤</div>
+                                <div class="upload-text" data-i18n="image_upload_text">點擊或拖拽上傳圖片</div>
+                                <div class="upload-hint" data-i18n="image_upload_hint">支援 JPG, PNG (每張最大 10MB，最多5張)</div>
                             </div>
-                            <div class="checkbox-item">
-                                <input type="checkbox" id="platform_shopee" value="shopee" checked>
-                                <label for="platform_shopee">Shopee 蝦皮購物</label>
-                            </div>
-                            <div class="checkbox-item">
-                                <input type="checkbox" id="platform_facebook" value="facebook" checked>
-                                <label for="platform_facebook">Facebook</label>
-                            </div>
-                            <div class="checkbox-item">
-                                <input type="checkbox" id="platform_instagram" value="instagram" checked>
-                                <label for="platform_instagram">Instagram</label>
+                            <div id="imagePreviewContainer" class="image-preview-grid" style="display: none;"></div>
+                        </div>
+                        
+                        <!-- Icon-based Platform Selection -->
+                        <div class="modern-form-group">
+                            <label class="modern-form-label">
+                                <span>🎯</span>
+                                <span data-i18n="target_platform">目標平台</span>
+                            </label>
+                            <div class="platform-selection" id="platformsGroup">
+                                <div class="platform-card selected" data-platform="tiktok" onclick="togglePlatform('tiktok')">
+                                    <input type="checkbox" id="platform_tiktok" value="tiktok" checked>
+                                    <div class="platform-icon">🎵</div>
+                                    <div class="platform-name">TikTok</div>
+                                    <div class="checkmark">✓</div>
+                                </div>
+                                <div class="platform-card selected" data-platform="shopee" onclick="togglePlatform('shopee')">
+                                    <input type="checkbox" id="platform_shopee" value="shopee" checked>
+                                    <div class="platform-icon">🛒</div>
+                                    <div class="platform-name">Shopee</div>
+                                    <div class="checkmark">✓</div>
+                                </div>
+                                <div class="platform-card selected" data-platform="facebook" onclick="togglePlatform('facebook')">
+                                    <input type="checkbox" id="platform_facebook" value="facebook" checked>
+                                    <div class="platform-icon">👍</div>
+                                    <div class="platform-name">Facebook</div>
+                                    <div class="checkmark">✓</div>
+                                </div>
+                                <div class="platform-card selected" data-platform="instagram" onclick="togglePlatform('instagram')">
+                                    <input type="checkbox" id="platform_instagram" value="instagram" checked>
+                                    <div class="platform-icon">📸</div>
+                                    <div class="platform-name">Instagram</div>
+                                    <div class="checkmark">✓</div>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="language">內容語言 / Content Language</label>
-                        <select id="language" name="language">
-                            <option value="zh-TW">繁體中文 (Traditional Chinese)</option>
-                            <option value="vi">Tiếng Việt (Vietnamese)</option>
-                            <option value="bilingual">雙語 (Bilingual)</option>
-                        </select>
-                    </div>
+                        
+                        <div class="modern-form-group">
+                            <label class="modern-form-label" for="language">
+                                <span>🌐</span>
+                                <span>內容語言</span>
+                            </label>
+                            <select id="language" name="language" class="modern-form-input">
+                                <option value="zh-TW">繁體中文</option>
+                                <option value="vi">Tiếng Việt</option>
+                                <option value="bilingual">雙語</option>
+                            </select>
+                        </div>
                     
                     <!-- 移除自動生成圖片選項，改為在每個平台獨立生成 -->
                         <h4 style="color: #FF6B4A; margin-bottom: 15px;">👥 <span data-i18n="model_settings">模特兒設定</span></h4>
@@ -1981,18 +2021,21 @@
             </div>
             
             <div class="output-panel">
-                <h2 class="panel-title">📊 <span data-i18n="ai_analysis_result">AI 分析結果</span></h2>
-                <div id="analysisResults">
-                    <p style="text-align: center; color: #666; padding: 40px;">
-                        上傳產品圖片並點擊分析按鈕開始 AI 智慧分析
-                    </p>
+                <div class="modern-card">
+                    <h2 class="panel-title" style="margin-bottom: 20px;">📊 <span data-i18n="ai_analysis_result">AI 分析結果</span></h2>
+                    <div id="analysisResults">
+                        <div style="text-align: center; color: #999; padding: 60px 20px;">
+                            <div style="font-size: 48px; margin-bottom: 20px; opacity: 0.5;">🤖</div>
+                            <p style="font-size: 16px;">上傳產品圖片並點擊分析按鈕開始 AI 智慧分析</p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
         
-        <div class="results-container" id="resultsContainer">
-            <div style="background: white; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); padding: 30px;">
-                <h2 class="panel-title">🎯 多平台內容生成結果</h2>
+        <div class="results-container" id="resultsContainer" style="display: none;">
+            <div class="modern-card">
+                <h2 class="panel-title" style="margin-bottom: 25px;">🎯 多平台內容生成結果</h2>
                 <div id="platformResults"></div>
             </div>
         </div>
@@ -3009,6 +3052,7 @@
                         
                         displayAnalysisResults(productAnalysis, painPointsAnalysis);
                         showStatus('✅ AI 產品分析完成！', 'success');
+                        updateStepIndicator(2); // Keep on step 2
                         
                         // 顯示"生成多平台內容"按鈕
                         document.getElementById('generateContentBtn').style.display = 'block';
@@ -3036,6 +3080,7 @@
         async function generateContent() {
             const generateBtn = document.getElementById('generateContentBtn');
             setButtonLoading('generateContentBtn', true, '生成中...', '📝 生成多平台內容');
+            updateStepIndicator(3); // Move to step 3
             
             try {
                 const industryCategory = document.getElementById('industryCategory').value;
@@ -3100,6 +3145,7 @@
                 generatedContent = contentResult.results;
                 displayPlatformResults(contentResult.results);
                 showStatus('✅ 多平台文字內容生成完成！', 'success');
+                updateStepIndicator(3); // Keep on step 3
                 
                 // 顯示"生成行銷場景"按鈕
                 document.getElementById('generateScenariosBtn').style.display = 'block';
@@ -3998,6 +4044,130 @@
         }
         
         // toggleScenarioOptions 函數已移除，因為不再需要全局的圖片生成選項
+        
+        // Platform Toggle Function for Modern UI
+        function togglePlatform(platform) {
+            const card = document.querySelector(`.platform-card[data-platform="${platform}"]`);
+            const checkbox = document.getElementById(`platform_${platform}`);
+            
+            if (card && checkbox) {
+                const isSelected = card.classList.contains('selected');
+                if (isSelected) {
+                    card.classList.remove('selected');
+                    checkbox.checked = false;
+                } else {
+                    card.classList.add('selected');
+                    checkbox.checked = true;
+                }
+            }
+        }
+        
+        // Drag & Drop Upload Functionality
+        function setupDragAndDrop() {
+            const uploadArea = document.getElementById('uploadArea');
+            const fileInput = document.getElementById('imageUpload');
+            
+            if (!uploadArea || !fileInput) return;
+            
+            // Prevent default drag behaviors
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                uploadArea.addEventListener(eventName, preventDefaults, false);
+                document.body.addEventListener(eventName, preventDefaults, false);
+            });
+            
+            function preventDefaults(e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+            
+            // Highlight drop area when item is dragged over it
+            ['dragenter', 'dragover'].forEach(eventName => {
+                uploadArea.addEventListener(eventName, () => {
+                    uploadArea.classList.add('dragover');
+                }, false);
+            });
+            
+            ['dragleave', 'drop'].forEach(eventName => {
+                uploadArea.addEventListener(eventName, () => {
+                    uploadArea.classList.remove('dragover');
+                }, false);
+            });
+            
+            // Handle dropped files
+            uploadArea.addEventListener('drop', (e) => {
+                const dt = e.dataTransfer;
+                const files = dt.files;
+                fileInput.files = files;
+                handleFileSelect(files);
+            }, false);
+            
+            // Handle file input change
+            fileInput.addEventListener('change', (e) => {
+                handleFileSelect(e.target.files);
+            });
+        }
+        
+        // Handle File Selection and Preview
+        function handleFileSelect(files) {
+            const previewContainer = document.getElementById('imagePreviewContainer');
+            if (!previewContainer) return;
+            
+            previewContainer.innerHTML = '';
+            previewContainer.style.display = 'grid';
+            
+            Array.from(files).slice(0, 5).forEach((file, index) => {
+                if (file.type.startsWith('image/')) {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        const previewItem = document.createElement('div');
+                        previewItem.className = 'image-preview-item';
+                        previewItem.innerHTML = `
+                            <img src="${e.target.result}" alt="Preview ${index + 1}">
+                            <button class="remove-btn" onclick="removeImage(${index})" type="button">×</button>
+                        `;
+                        previewContainer.appendChild(previewItem);
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+        }
+        
+        // Remove Image from Preview
+        function removeImage(index) {
+            const fileInput = document.getElementById('imageUpload');
+            const dt = new DataTransfer();
+            const files = Array.from(fileInput.files);
+            
+            files.forEach((file, i) => {
+                if (i !== index) {
+                    dt.items.add(file);
+                }
+            });
+            
+            fileInput.files = dt.files;
+            handleFileSelect(fileInput.files);
+        }
+        
+        // Update Step Indicator
+        function updateStepIndicator(step) {
+            for (let i = 1; i <= 3; i++) {
+                const stepItem = document.getElementById(`step${i}`);
+                if (stepItem) {
+                    stepItem.classList.remove('active', 'completed');
+                    if (i < step) {
+                        stepItem.classList.add('completed');
+                    } else if (i === step) {
+                        stepItem.classList.add('active');
+                    }
+                }
+            }
+        }
+        
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            setupDragAndDrop();
+            updateStepIndicator(1);
+        });
 
         // Load brand configuration and populate UI
         async function loadBrandConfig() {
