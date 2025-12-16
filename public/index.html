@@ -1789,20 +1789,20 @@
             </div>
             
         <!-- 功能導航欄 -->
-            <div class="tab-navigation">
-                <button class="tab-btn active" data-page="page1" onclick="window.switchPage('page1', event); return false;">
+            <div class="tab-navigation" id="tabNavigation">
+                <button class="tab-btn active" data-page="page1" type="button">
                     <span data-i18n="tab_image_generation">🎨 AI 圖片生成</span>
                 </button>
-                <button class="tab-btn" data-page="page2" onclick="window.switchPage('page2', event); return false;">
+                <button class="tab-btn" data-page="page2" type="button">
                     <span data-i18n="tab_ads_advisor">📊 AI 廣告顧問</span>
                 </button>
-                <button class="tab-btn" data-page="page3" onclick="window.switchPage('page3', event); return false;">
+                <button class="tab-btn" data-page="page3" type="button">
                     <span data-i18n="tab_course_editor">📚 AI 課程編輯專家</span>
                 </button>
-                <button class="tab-btn" data-page="page4" onclick="window.switchPage('page4', event); return false;">
+                <button class="tab-btn" data-page="page4" type="button">
                     <span data-i18n="tab_prompt_architect">📝 AI 指令架構師</span>
                 </button>
-                <button class="tab-btn admin-only" id="adminTabBtn" data-page="page5" onclick="window.switchPage('page5', event); return false;" style="display: none;">
+                <button class="tab-btn admin-only" id="adminTabBtn" data-page="page5" type="button" style="display: none;">
                     <span data-i18n="tab_admin">👑 管理員</span>
                 </button>
             </div>
@@ -4334,58 +4334,63 @@
         // 確保 switchPage 函數在全局作用域可訪問
         window.switchPage = switchPage;
         
-        // 使用事件委托確保按鈕點擊正常工作
+        // 直接綁定導航按鈕點擊事件（最簡單可靠的方法）
         function initTabNavigation() {
-            const tabNavigation = document.querySelector('.tab-navigation');
-            if (tabNavigation) {
-                // 移除舊的事件監聽器（如果有的話）
-                const newTabNavigation = tabNavigation.cloneNode(true);
-                tabNavigation.parentNode.replaceChild(newTabNavigation, tabNavigation);
+            console.log('Initializing tab navigation...');
+            const tabButtons = document.querySelectorAll('.tab-btn[data-page]');
+            console.log('Found tab buttons:', tabButtons.length);
+            
+            tabButtons.forEach(function(btn) {
+                // 移除舊的事件監聽器
+                const newBtn = btn.cloneNode(true);
+                btn.parentNode.replaceChild(newBtn, btn);
                 
                 // 添加新的事件監聽器
-                newTabNavigation.addEventListener('click', function(e) {
+                newBtn.addEventListener('click', function(e) {
                     e.preventDefault();
                     e.stopPropagation();
+                    e.stopImmediatePropagation();
                     
-                    const btn = e.target.closest('.tab-btn');
-                    if (btn) {
-                        const onclick = btn.getAttribute('onclick');
-                        if (onclick) {
-                            // 提取 pageId
-                            const match = onclick.match(/switchPage\(['"]([^'"]+)['"]/);
-                            if (match) {
-                                const pageId = match[1];
-                                console.log('Tab clicked, switching to:', pageId);
-                                switchPage(pageId, e);
-                            }
-                        } else {
-                            // 如果沒有 onclick 屬性，嘗試從按鈕的 data 屬性獲取
-                            const pageId = btn.getAttribute('data-page');
-                            if (pageId) {
-                                console.log('Tab clicked (data-page), switching to:', pageId);
-                                switchPage(pageId, e);
-                            }
-                        }
+                    const pageId = newBtn.getAttribute('data-page');
+                    console.log('Tab button clicked:', pageId, newBtn);
+                    
+                    if (pageId) {
+                        switchPage(pageId, e);
                     }
-                });
+                }, true); // 使用捕獲階段確保優先執行
                 
-                console.log('Tab navigation initialized');
-            } else {
-                console.warn('Tab navigation not found');
-            }
+                console.log('Button bound:', newBtn.getAttribute('data-page'));
+            });
+            
+            console.log('Tab navigation initialized');
         }
         
-        // 在 DOM 加載完成後初始化
+        // 立即嘗試初始化
         if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', initTabNavigation);
+            document.addEventListener('DOMContentLoaded', function() {
+                setTimeout(initTabNavigation, 50);
+            });
         } else {
-            initTabNavigation();
+            setTimeout(initTabNavigation, 50);
         }
         
-        // 也嘗試在 window.load 時初始化（確保所有資源都加載完成）
+        // 也嘗試在 window.load 時初始化
         window.addEventListener('load', function() {
             setTimeout(initTabNavigation, 100);
         });
+        
+        // 如果登入後才顯示按鈕，在顯示時也初始化
+        if (typeof AuthManager !== 'undefined') {
+            const originalUpdateUI = AuthManager.updateUI;
+            AuthManager.updateUI = function(isLoggedIn, shouldSwitchPage) {
+                if (originalUpdateUI) {
+                    originalUpdateUI.call(this, isLoggedIn, shouldSwitchPage);
+                }
+                if (isLoggedIn) {
+                    setTimeout(initTabNavigation, 200);
+                }
+            };
+        }
         
         // Page 2 檔案上傳處理
         let selectedAdsFiles = [];
