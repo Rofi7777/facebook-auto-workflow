@@ -30,8 +30,32 @@ function switchPage(pageId) {
         targetPage.style.opacity = '1';
         console.log('[switchPage] Page activated:', pageId);
         
+        // 確保所有子元素也顯示
+        const allChildren = targetPage.querySelectorAll('*');
+        allChildren.forEach(child => {
+            if (child.style.display === 'none' && !child.classList.contains('admin-only') && !child.id.includes('adminTabBtn')) {
+                // 不要強制顯示被明確隱藏的元素（如 admin-only 按鈕）
+                // 但確保其他內容可見
+            }
+        });
+        
         // 強制觸發重排，確保內容顯示
         targetPage.offsetHeight;
+        
+        // 如果是 page4 或 page5，額外確保內容可見
+        if (pageId === 'page4' || pageId === 'page5') {
+            const containers = targetPage.querySelectorAll('.workflow-container, .modern-card, .input-panel, .output-panel, .admin-panel');
+            containers.forEach(container => {
+                if (container.classList.contains('workflow-container')) {
+                    container.style.display = 'grid';
+                } else {
+                    container.style.display = 'block';
+                }
+                container.style.visibility = 'visible';
+                container.style.opacity = '1';
+            });
+            console.log('[switchPage] Forced visibility for', pageId, 'containers:', containers.length);
+        }
         
         // 設置對應按鈕為 active
         const targetBtn = document.querySelector(`.tab-btn[data-page="${pageId}"]`);
