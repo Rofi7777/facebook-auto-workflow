@@ -2840,6 +2840,14 @@
         const sceneLocationSelect = document.getElementById('sceneLocation');
         const customLocationInput = document.getElementById('customLocationInput');
         
+        // 自定義輸入處理（如果元素存在）
+        const modelNationalitySelect = document.getElementById('modelNationality');
+        const customNationalityInput = document.getElementById('customNationalityInput');
+        const modelCombinationSelect = document.getElementById('modelCombination');
+        const customCombinationInput = document.getElementById('customCombinationInput');
+        const sceneLocationSelect = document.getElementById('sceneLocation');
+        const customLocationInput = document.getElementById('customLocationInput');
+        
         if (modelNationalitySelect && customNationalityInput) {
             modelNationalitySelect.addEventListener('change', function() {
                 if (this.value === 'custom') {
