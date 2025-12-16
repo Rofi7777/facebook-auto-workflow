@@ -3412,6 +3412,11 @@
             console.log('[bindButtonEvents] Button binding complete');
         }
         
+        // 確保 analyzeProduct 函數在全局作用域可訪問
+        window.analyzeProduct = analyzeProduct;
+        window.generateContent = generateContent;
+        window.generateScenarios = generateScenarios;
+        
         // 多重初始化機制
         function tryBindButtonEvents() {
             bindButtonEvents();

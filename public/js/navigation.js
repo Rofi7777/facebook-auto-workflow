@@ -4,11 +4,11 @@ function switchPage(pageId) {
     console.log('[switchPage] Switching to page:', pageId);
     
     try {
-        // 隱藏所有頁面（但不要設置 display: none，因為可能影響某些頁面的顯示）
+        // 隱藏所有頁面
         const allPages = document.querySelectorAll('.page-content');
         allPages.forEach(page => {
             page.classList.remove('active');
-            // 不強制設置 display: none，讓 CSS 控制顯示
+            page.style.display = 'none';
         });
         
         // 移除所有按鈕的 active 狀態
@@ -25,7 +25,7 @@ function switchPage(pageId) {
         }
         
         targetPage.classList.add('active');
-        // 不強制設置 display，讓 CSS 控制顯示
+        targetPage.style.display = 'block';
         console.log('[switchPage] Page activated:', pageId);
         
         // 設置對應按鈕為 active
