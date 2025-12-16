@@ -887,30 +887,65 @@ app.post('/api/analyze-product', authMiddleware, async (req, res) => {
     }
 
     // Security: Validate all image paths are within uploads directory
-    const uploadsDir = path.resolve('assets/uploads');
+    // In Vercel, files are stored in /tmp/, in local dev they're in assets/uploads
+    const isVercel = process.env.VERCEL || process.env.NODE_ENV === 'production';
+    const uploadsDir = isVercel 
+      ? '/tmp/uploads' 
+      : path.resolve(__dirname, '..', 'assets', 'uploads');
+    
     const validatedPaths = [];
     
     for (const imgPath of pathsToAnalyze) {
       if (!imgPath) continue;
       
-      const resolvedImagePath = path.resolve(imgPath);
+      // Handle both absolute and relative paths
+      let resolvedImagePath;
+      if (path.isAbsolute(imgPath)) {
+        resolvedImagePath = imgPath;
+      } else {
+        // If relative, resolve from uploads directory
+        resolvedImagePath = path.join(uploadsDir, path.basename(imgPath));
+      }
       
-      if (!resolvedImagePath.startsWith(uploadsDir)) {
-        return res.status(400).json({ error: 'Invalid image path detected' });
+      // Security check: ensure path is within allowed directory
+      const normalizedPath = path.normalize(resolvedImagePath);
+      const normalizedDir = path.normalize(uploadsDir);
+      
+      if (!normalizedPath.startsWith(normalizedDir)) {
+        console.warn(`🚨 Invalid image path (outside uploads directory): ${imgPath} -> ${resolvedImagePath}`);
+        continue; // Skip this path instead of returning error immediately
       }
       
       // 異步檢查文件是否存在
       try {
         await fs.access(resolvedImagePath);
         validatedPaths.push(resolvedImagePath);
+        console.log(`✅ Validated image path: ${resolvedImagePath}`);
       } catch (accessError) {
         console.log(`⚠️ Image file not found: ${resolvedImagePath}`);
-        // Continue with other images if one is missing
+        // Try alternative path formats
+        const altPath = path.join(uploadsDir, path.basename(imgPath));
+        if (altPath !== resolvedImagePath) {
+          try {
+            await fs.access(altPath);
+            validatedPaths.push(altPath);
+            console.log(`✅ Found image at alternative path: ${altPath}`);
+          } catch (altError) {
+            console.log(`⚠️ Alternative path also not found: ${altPath}`);
+          }
+        }
       }
     }
     
     if (validatedPaths.length === 0) {
-      return res.status(400).json({ error: 'No valid image files found' });
+      console.error(`❌ No valid image files found. Searched paths: ${JSON.stringify(pathsToAnalyze)}`);
+      console.error(`📁 Uploads directory: ${uploadsDir}`);
+      return res.status(400).json({ 
+        error: 'No valid image files found',
+        message: 'Please ensure images are uploaded before analysis',
+        searchedPaths: pathsToAnalyze,
+        uploadsDir: uploadsDir
+      });
     }
 
     console.log(`🖼️ Analyzing ${validatedPaths.length} product image(s):`, validatedPaths);
@@ -955,6 +990,8 @@ app.post('/api/analyze-product', authMiddleware, async (req, res) => {
 // Multi-platform content generation endpoint
 app.post('/api/generate-platform-content', authMiddleware, async (req, res) => {
   console.log('📥 /api/generate-platform-content route hit');
+  console.log('📦 Request body keys:', Object.keys(req.body || {}));
+  console.log('⏱️ Request started at:', new Date().toISOString());
   try {
     const { 
       productInfo, 
@@ -972,14 +1009,28 @@ app.post('/api/generate-platform-content', authMiddleware, async (req, res) => {
     console.log('Generating content for platforms:', platforms);
     
     // 安全性檢查：如果有 productImagePath，驗證路徑安全性
+    // In Vercel, files are stored in /tmp/, in local dev they're in assets/uploads
     let validatedProductImagePath = null;
     if (productImagePath) {
       try {
-        const uploadsDir = path.resolve(__dirname, '..', 'assets', 'uploads');
-        const resolvedImagePath = path.resolve(__dirname, '..', productImagePath);
+        const isVercel = process.env.VERCEL || process.env.NODE_ENV === 'production';
+        const uploadsDir = isVercel 
+          ? '/tmp/uploads' 
+          : path.resolve(__dirname, '..', 'assets', 'uploads');
+        
+        // Handle both absolute and relative paths
+        let resolvedImagePath;
+        if (path.isAbsolute(productImagePath)) {
+          resolvedImagePath = productImagePath;
+        } else {
+          resolvedImagePath = path.join(uploadsDir, path.basename(productImagePath));
+        }
         
         // 安全檢查：確保路徑在上傳目錄內
-        if (resolvedImagePath.startsWith(uploadsDir)) {
+        const normalizedPath = path.normalize(resolvedImagePath);
+        const normalizedDir = path.normalize(uploadsDir);
+        
+        if (normalizedPath.startsWith(normalizedDir)) {
           // 檢查文件是否存在
           await fs.access(resolvedImagePath);
           validatedProductImagePath = resolvedImagePath;
