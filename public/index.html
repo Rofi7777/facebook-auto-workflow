@@ -1881,15 +1881,7 @@
                         </select>
                     </div>
                     
-                    <div class="form-group">
-                        <label>
-                            <input type="checkbox" id="generateImages" name="generateImages" onchange="toggleScenarioOptions()">
-                            <span data-i18n="generate_image_checkbox">自動生成行銷圖片 (Generate Marketing Images)</span>
-                        </label>
-                    </div>
-                    
-                    <!-- 模特兒和場景設定選項 -->
-                    <div class="form-group" id="modelSceneOptionsGroup" style="display: none;">
+                    <!-- 移除自動生成圖片選項，改為在每個平台獨立生成 -->
                         <h4 style="color: #FF6B4A; margin-bottom: 15px;">👥 <span data-i18n="model_settings">模特兒設定</span></h4>
                         
                         <div class="form-group">
@@ -2936,29 +2928,319 @@
             statusDiv.style.display = 'block';
         }
         
-        // Loading state management
-        function setLoading(isLoading) {
-            analyzeBtn.disabled = isLoading;
-            if (isLoading) {
-                analyzeBtn.innerHTML = '<span class="loading"></span>AI 分析中...';
-            } else {
-                analyzeBtn.innerHTML = '🧠 分析產品並生成內容';
+        // 全局變量存儲數據
+        let uploadedImagePaths = [];
+        let uploadedImagePath = null;
+        let productAnalysis = null;
+        let painPointsAnalysis = null;
+        let generatedContent = null;
+        
+        // Loading state management for different buttons
+        function setButtonLoading(buttonId, isLoading, loadingText, normalText) {
+            const btn = document.getElementById(buttonId);
+            if (btn) {
+                btn.disabled = isLoading;
+                if (isLoading) {
+                    btn.innerHTML = `<span class="loading"></span>${loadingText}`;
+                } else {
+                    btn.innerHTML = normalText;
+                }
             }
         }
         
-        // Main form submission
-        form.addEventListener('submit', async function(e) {
-            e.preventDefault();
-            setLoading(true);
+        // Function 1: AI 產品分析
+        async function analyzeProduct() {
+            const analyzeBtn = document.getElementById('analyzeProductBtn');
+            setButtonLoading('analyzeProductBtn', true, '分析中...', '🔍 AI 產品分析');
             
             try {
-                const formData = new FormData();
                 const industryCategory = document.getElementById('industryCategory').value;
                 const productName = document.getElementById('productName').value;
                 const productDescription = document.getElementById('productDescription').value;
                 const imageFiles = Array.from(document.getElementById('imageUpload').files);
                 const language = document.getElementById('language').value;
-                const generateImages = document.getElementById('generateImages').checked;
+                
+                // Step 1: Upload images if provided
+                uploadedImagePaths = [];
+                if (imageFiles.length > 0) {
+                    showStatus(`📤 上傳 ${imageFiles.length} 張圖片中...`, 'info');
+                    const imageFormData = new FormData();
+                    
+                    imageFiles.forEach((file) => {
+                        imageFormData.append('images', file);
+                    });
+                    imageFormData.append('productName', productName);
+                    imageFormData.append('productDescription', productDescription || '');
+                    
+                    const imageResponse = await fetch('/api/upload-image', {
+                        method: 'POST',
+                        body: imageFormData
+                    });
+                    
+                    if (!imageResponse.ok) {
+                        throw new Error('圖片上傳失敗');
+                    }
+                    
+                    const imageResult = await imageResponse.json();
+                    uploadedImagePaths = imageResult.paths || [];
+                    uploadedImagePath = uploadedImagePaths[0];
+                }
+                
+                // Step 2: AI Product Analysis
+                if (uploadedImagePaths.length > 0 || productDescription) {
+                    showStatus(`🧠 AI 產品分析中... (${language})`, 'info');
+                    
+                    const analysisResponse = await AuthManager.authFetch('/api/analyze-product', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            imagePaths: uploadedImagePaths,
+                            imagePath: uploadedImagePaths[0],
+                            productInfo: {
+                                name: productName,
+                                description: productDescription,
+                                industryCategory: industryCategory
+                            },
+                            language: language
+                        })
+                    });
+                    
+                    if (analysisResponse.ok) {
+                        const analysisResult = await analysisResponse.json();
+                        productAnalysis = analysisResult.productAnalysis;
+                        painPointsAnalysis = analysisResult.painPointsAnalysis;
+                        
+                        displayAnalysisResults(productAnalysis, painPointsAnalysis);
+                        showStatus('✅ AI 產品分析完成！', 'success');
+                        
+                        // 顯示"生成多平台內容"按鈕
+                        document.getElementById('generateContentBtn').style.display = 'block';
+                    } else {
+                        let errorMessage = 'AI 分析失敗';
+                        try {
+                            const errorData = await analysisResponse.json();
+                            errorMessage = errorData.message || errorData.error || errorMessage;
+                        } catch (parseError) {
+                            errorMessage = `HTTP ${analysisResponse.status}: ${analysisResponse.statusText || 'AI 分析失敗'}`;
+                        }
+                        throw new Error(errorMessage);
+                    }
+                } else {
+                    throw new Error('請上傳產品圖片或輸入產品描述');
+                }
+            } catch (error) {
+                showStatus(`❌ 錯誤: ${error.message}`, 'error');
+            } finally {
+                setButtonLoading('analyzeProductBtn', false, '', '🔍 AI 產品分析');
+            }
+        }
+        
+        // Function 2: 生成多平台內容
+        async function generateContent() {
+            const generateBtn = document.getElementById('generateContentBtn');
+            setButtonLoading('generateContentBtn', true, '生成中...', '📝 生成多平台內容');
+            
+            try {
+                const industryCategory = document.getElementById('industryCategory').value;
+                const productName = document.getElementById('productName').value;
+                const productDescription = document.getElementById('productDescription').value;
+                const language = document.getElementById('language').value;
+                
+                // Get selected platforms
+                const selectedPlatforms = Array.from(document.querySelectorAll('#platformsGroup input[type="checkbox"]:checked')).map(cb => cb.value);
+                
+                if (selectedPlatforms.length === 0) {
+                    throw new Error('請至少選擇一個目標平台');
+                }
+                
+                if (!productAnalysis && !productName) {
+                    throw new Error('請先進行 AI 產品分析或輸入產品名稱');
+                }
+                
+                showStatus('🎯 生成多平台文字內容中...', 'info');
+                
+                const contentResponse = await AuthManager.authFetch('/api/generate-platform-content-text', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        productInfo: productAnalysis || {
+                            name: productName,
+                            description: productDescription,
+                            productType: productName,
+                            industryCategory: industryCategory
+                        },
+                        painPointsAnalysis: painPointsAnalysis || {},
+                        platforms: selectedPlatforms,
+                        language: language
+                    })
+                });
+                
+                if (!contentResponse.ok) {
+                    let errorMessage = '文字內容生成失敗';
+                    try {
+                        const errorData = await contentResponse.json();
+                        errorMessage = errorData.message || errorData.error || errorMessage;
+                    } catch (parseError) {
+                        errorMessage = `HTTP ${contentResponse.status}: ${contentResponse.statusText || '文字內容生成失敗'}`;
+                    }
+                    throw new Error(errorMessage);
+                }
+                
+                let contentResult;
+                try {
+                    const text = await contentResponse.text();
+                    if (!text) {
+                        throw new Error('伺服器返回空響應');
+                    }
+                    contentResult = JSON.parse(text);
+                } catch (parseError) {
+                    console.error('JSON parsing error:', parseError);
+                    throw new Error('無法解析伺服器響應，請稍後再試');
+                }
+                
+                generatedContent = contentResult.results;
+                displayPlatformResults(contentResult.results);
+                showStatus('✅ 多平台文字內容生成完成！', 'success');
+                
+                // 顯示"生成行銷場景"按鈕
+                document.getElementById('generateScenariosBtn').style.display = 'block';
+                
+            } catch (error) {
+                showStatus(`❌ 錯誤: ${error.message}`, 'error');
+            } finally {
+                setButtonLoading('generateContentBtn', false, '', '📝 生成多平台內容');
+            }
+        }
+        
+        // Function 3: 為單個平台生成圖片
+        async function generateImageForPlatform(platform) {
+            const btn = document.getElementById(`generate-image-${platform}`);
+            if (!btn) return;
+            
+            const originalText = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<span class="loading"></span>生成中...';
+            
+            try {
+                // 獲取場景設定（從隱藏的設置區域或使用默認值）
+                let scenarioType = '親子互動';
+                let modelNationality = 'taiwan';
+                let modelCombination = 'parents_baby';
+                let sceneLocation = 'park';
+                
+                // 嘗試從表單獲取（如果存在）
+                const selectedScenario = document.querySelector('input[name="scenarioType"]:checked');
+                if (selectedScenario) {
+                    scenarioType = selectedScenario.value;
+                }
+                
+                const nationalitySelect = document.getElementById('modelNationality');
+                if (nationalitySelect) {
+                    modelNationality = nationalitySelect.value;
+                    if (modelNationality === 'custom') {
+                        const customText = document.getElementById('customNationalityText')?.value.trim();
+                        if (customText) modelNationality = customText;
+                    }
+                }
+                
+                const combinationSelect = document.getElementById('modelCombination');
+                if (combinationSelect) {
+                    modelCombination = combinationSelect.value;
+                    if (modelCombination === 'custom') {
+                        const customText = document.getElementById('customCombinationText')?.value.trim();
+                        if (customText) modelCombination = customText;
+                    }
+                }
+                
+                const locationSelect = document.getElementById('sceneLocation');
+                if (locationSelect) {
+                    sceneLocation = locationSelect.value;
+                    if (sceneLocation === 'custom') {
+                        const customText = document.getElementById('customLocationText')?.value.trim();
+                        if (customText) sceneLocation = customText;
+                    }
+                }
+                
+                const industryCategory = document.getElementById('industryCategory').value;
+                const productName = document.getElementById('productName').value;
+                const productDescription = document.getElementById('productDescription').value;
+                
+                if (!generatedContent || !generatedContent[platform]) {
+                    throw new Error('請先生成該平台的文字內容');
+                }
+                
+                showStatus(`🖼️ 正在為 ${platform.toUpperCase()} 生成圖片...`, 'info');
+                
+                const imageResponse = await AuthManager.authFetch('/api/generate-platform-images', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        productInfo: productAnalysis || {
+                            name: productName,
+                            description: productDescription,
+                            productType: productName,
+                            industryCategory: industryCategory
+                        },
+                        contentResults: { [platform]: generatedContent[platform] }, // 只傳遞單個平台
+                        platforms: [platform], // 只生成一個平台
+                        scenarioType: scenarioType,
+                        productImagePath: uploadedImagePath,
+                        modelNationality: modelNationality,
+                        modelCombination: modelCombination,
+                        sceneLocation: sceneLocation
+                    })
+                });
+                
+                if (!imageResponse.ok) {
+                    let errorMessage = '圖片生成失敗';
+                    try {
+                        const errorData = await imageResponse.json();
+                        errorMessage = errorData.message || errorData.error || errorMessage;
+                    } catch (parseError) {
+                        errorMessage = `HTTP ${imageResponse.status}: ${imageResponse.statusText || '圖片生成失敗'}`;
+                    }
+                    throw new Error(errorMessage);
+                }
+                
+                let imageResult;
+                try {
+                    const text = await imageResponse.text();
+                    if (text) {
+                        imageResult = JSON.parse(text);
+                        
+                        // 更新該平台的內容，添加圖片信息
+                        if (imageResult.imageResults && imageResult.imageResults[platform]) {
+                            Object.assign(generatedContent[platform], imageResult.imageResults[platform]);
+                            displayPlatformResults(generatedContent); // 刷新顯示
+                            showStatus(`✅ ${platform.toUpperCase()} 圖片生成完成！`, 'success');
+                        }
+                    }
+                } catch (parseError) {
+                    console.error('Image response JSON parsing error:', parseError);
+                    throw new Error('無法解析伺服器響應');
+                }
+                
+            } catch (error) {
+                showStatus(`❌ ${platform.toUpperCase()} 圖片生成失敗: ${error.message}`, 'error');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = originalText;
+            }
+        }
+        
+        // 綁定按鈕事件
+        document.getElementById('analyzeProductBtn').addEventListener('click', analyzeProduct);
+        document.getElementById('generateContentBtn').addEventListener('click', generateContent);
+        
+        // 舊的表單提交代碼已移除，現在使用三個獨立的按鈕函數
+        
+        // Scenario generation button handler (保留原有功能)
                 
                 // 獲取場景類型選擇
                 let scenarioType = '親子互動'; // 預設值
@@ -3537,11 +3819,19 @@
                 const config = result.platformConfig || {};
                 const content = result.content;
                 
-                html += `<div class="platform-result">
-                    <h3>
-                        ${getPlatformIcon(platform)} ${config.displayName || platform.toUpperCase()}
-                        ${result.status === 'success' ? '✅' : '⚠️'}
-                    </h3>`;
+                html += `<div class="platform-result" id="platform-${platform}">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                        <h3 style="margin: 0;">
+                            ${getPlatformIcon(platform)} ${config.displayName || platform.toUpperCase()}
+                            ${result.status === 'success' ? '✅' : '⚠️'}
+                        </h3>
+                        <button onclick="generateImageForPlatform('${platform}')" 
+                                class="btn btn-small generate-image-btn" 
+                                id="generate-image-${platform}"
+                                style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 6px 12px; border: none; border-radius: 6px; cursor: pointer; font-size: 12px; display: ${result.status === 'success' ? 'block' : 'none'};">
+                            🖼️ 生成圖片
+                        </button>
+                    </div>`;
                 
                 if (result.status === 'success' && content) {
                     // Handle bilingual content format
