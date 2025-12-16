@@ -907,6 +907,14 @@ app.post('/api/analyze-product', authMiddleware, async (req, res) => {
     console.log('🌐 Analysis request language:', language);
     console.log('🏭 Industry category:', industryCategory);
     
+    // Check if aiService is initialized
+    if (!aiService) {
+      return res.status(500).json({ 
+        error: 'AI service not available',
+        message: 'AI service is not initialized. Please check GEMINI_API_KEY_NEW environment variable.'
+      });
+    }
+
     // Analyze product image(s) with AI
     const productAnalysis = await aiService.analyzeProductImage(validatedPaths, language, industryCategory);
     console.log('Product analysis completed:', productAnalysis);
@@ -924,8 +932,8 @@ app.post('/api/analyze-product', authMiddleware, async (req, res) => {
   } catch (error) {
     console.error('Product analysis error:', error);
     res.status(500).json({ 
-      error: 'Product analysis failed: ' + error.message,
-      fallback: 'Using fallback analysis mode'
+      error: 'Product analysis failed',
+      message: error.message || 'Unknown error occurred'
     });
   }
 });
@@ -967,6 +975,14 @@ app.post('/api/generate-platform-content', authMiddleware, async (req, res) => {
       } catch (validationError) {
         console.warn('🚨 Product image validation failed:', validationError.message);
       }
+    }
+    
+    // Check if aiService is initialized
+    if (!aiService) {
+      return res.status(500).json({ 
+        error: 'AI service not available',
+        message: 'AI service is not initialized. Please check GEMINI_API_KEY_NEW environment variable.'
+      });
     }
     
     const results = {};
