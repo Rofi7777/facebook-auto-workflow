@@ -111,25 +111,19 @@ function initImageUpload() {
     }, false);
     
     // 綁定上傳區域點擊事件 - 確保能打開文件選擇對話框
+    newUploadArea.style.cursor = 'pointer';
     newUploadArea.addEventListener('click', function(e) {
-        // 不要阻止默認行為，讓點擊能正常工作
+        e.preventDefault();
+        e.stopPropagation();
         console.log('[Image Upload] Upload area clicked');
         // 直接觸發文件輸入的點擊
-        setTimeout(function() {
-            newImageUpload.click();
-        }, 10);
+        newImageUpload.click();
     }, false);
     
-    // 也為上傳區域內的所有子元素添加點擊事件
+    // 也為上傳區域內的所有子元素設置 pointer-events: none，讓點擊穿透到父元素
     const uploadAreaChildren = newUploadArea.querySelectorAll('*');
     uploadAreaChildren.forEach(function(child) {
-        child.addEventListener('click', function(e) {
-            e.stopPropagation(); // 阻止冒泡，但不阻止默認行為
-            console.log('[Image Upload] Child element clicked');
-            setTimeout(function() {
-                newImageUpload.click();
-            }, 10);
-        }, false);
+        child.style.pointerEvents = 'none';
     });
     
     // 設置拖拽上傳
