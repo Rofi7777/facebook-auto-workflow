@@ -1145,6 +1145,225 @@ app.post('/api/generate-platform-content', authMiddleware, async (req, res) => {
   }
 });
 
+// Step 1: Generate platform content text only (no images) - to avoid timeout
+app.post('/api/generate-platform-content-text', authMiddleware, async (req, res) => {
+  console.log('📥 /api/generate-platform-content-text route hit (Step 1: Text only)');
+  console.log('⏱️ Request started at:', new Date().toISOString());
+  try {
+    const { 
+      productInfo, 
+      painPointsAnalysis, 
+      platforms = ['shopee', 'tiktok', 'instagram', 'facebook'], 
+      language = 'zh-TW'
+    } = req.body;
+    
+    console.log('Generating text content for platforms:', platforms);
+    
+    // Check if aiService is initialized
+    if (!aiService) {
+      return res.status(500).json({ 
+        error: 'AI service not available',
+        message: 'AI service is not initialized. Please check GEMINI_API_KEY_NEW environment variable.'
+      });
+    }
+    
+    const results = {};
+    
+    // Generate content for all platforms in parallel (text only, no images)
+    const platformPromises = platforms.map(async (platform) => {
+      try {
+        console.log(`Generating text content for ${platform}`);
+        const content = await aiService.generatePlatformContent(
+          productInfo, 
+          painPointsAnalysis, 
+          platform, 
+          language
+        );
+        
+        const platformResult = {
+          content,
+          platformConfig: PLATFORM_CONFIGS[platform],
+          status: 'success',
+          hasImages: false // Indicate that images need to be generated separately
+        };
+        
+        return { platform, result: platformResult };
+        
+      } catch (contentError) {
+        console.error(`Content generation failed for ${platform}:`, contentError);
+        return {
+          platform,
+          result: {
+            status: 'error',
+            error: contentError.message,
+            fallback: getFallbackContent(platform, productInfo, language)
+          }
+        };
+      }
+    });
+    
+    // Wait for all platform content generation to complete
+    const platformResults = await Promise.all(platformPromises);
+    
+    // Organize results by platform
+    platformResults.forEach(({ platform, result }) => {
+      results[platform] = result;
+    });
+    
+    console.log('✅ Step 1 completed: Text content generated for all platforms');
+    
+    res.json({
+      success: true,
+      message: 'Platform text content generated (Step 1 of 2)',
+      step: 1,
+      results,
+      brand: BRAND_CONFIG.name,
+      timestamp: new Date().toISOString()
+    });
+    
+  } catch (error) {
+    console.error('Step 1 (text generation) error:', error);
+    res.status(500).json({ 
+      error: 'Text content generation failed', 
+      message: error.message 
+    });
+  }
+});
+
+// Step 2: Generate platform images separately (after text content is ready)
+app.post('/api/generate-platform-images', authMiddleware, async (req, res) => {
+  console.log('📥 /api/generate-platform-images route hit (Step 2: Images only)');
+  console.log('⏱️ Request started at:', new Date().toISOString());
+  try {
+    const { 
+      productInfo,
+      contentResults, // The text content results from Step 1
+      platforms = ['shopee', 'tiktok', 'instagram', 'facebook'],
+      scenarioType = '親子互動',
+      productImagePath = null,
+      modelNationality = 'taiwan',
+      modelCombination = 'parents_baby',
+      sceneLocation = 'park'
+    } = req.body;
+    
+    console.log('Generating images for platforms:', platforms);
+    
+    // Check if aiService is initialized
+    if (!aiService) {
+      return res.status(500).json({ 
+        error: 'AI service not available',
+        message: 'AI service is not initialized. Please check GEMINI_API_KEY_NEW environment variable.'
+      });
+    }
+    
+    // 安全性檢查：如果有 productImagePath，驗證路徑安全性
+    let validatedProductImagePath = null;
+    if (productImagePath) {
+      try {
+        const isVercel = process.env.VERCEL || process.env.NODE_ENV === 'production';
+        const uploadsDir = isVercel 
+          ? '/tmp/uploads' 
+          : path.resolve(__dirname, '..', 'assets', 'uploads');
+        
+        let resolvedImagePath;
+        if (path.isAbsolute(productImagePath)) {
+          resolvedImagePath = productImagePath;
+        } else {
+          resolvedImagePath = path.join(uploadsDir, path.basename(productImagePath));
+        }
+        
+        const normalizedPath = path.normalize(resolvedImagePath);
+        const normalizedDir = path.normalize(uploadsDir);
+        
+        if (normalizedPath.startsWith(normalizedDir)) {
+          await fs.access(resolvedImagePath);
+          validatedProductImagePath = resolvedImagePath;
+          console.log('Validated product image path for image generation:', validatedProductImagePath);
+        } else {
+          console.warn('🚨 Invalid product image path (outside uploads directory):', productImagePath);
+        }
+      } catch (validationError) {
+        console.warn('🚨 Product image validation failed:', validationError.message);
+      }
+    }
+    
+    const imageResults = {};
+    
+    // Generate images for each platform (can be done sequentially to avoid timeout)
+    for (const platform of platforms) {
+      try {
+        if (!contentResults || !contentResults[platform] || !contentResults[platform].content) {
+          console.warn(`⚠️ No content found for ${platform}, skipping image generation`);
+          continue;
+        }
+        
+        const content = contentResults[platform].content;
+        const imagePrompt = aiService.generateImagePrompt(platform, productInfo, content);
+        const imagePath = `assets/generated/${platform}_${Date.now()}.png`;
+        
+        console.log(`Generating image for ${platform}...`);
+        const generatedImageResult = await aiService.generateMarketingImage(
+          imagePrompt, 
+          imagePath, 
+          validatedProductImagePath, 
+          scenarioType,
+          modelNationality,
+          modelCombination,
+          sceneLocation
+        );
+        
+        // Check if actual image was generated or just description
+        if (generatedImageResult && generatedImageResult.type === 'image' && generatedImageResult.isRealImage) {
+          imageResults[platform] = {
+            success: true,
+            generatedImageDescription: "AI 生成的真實圖片",
+            path: generatedImageResult.path,
+            isRealImage: true,
+            downloadUrl: generatedImageResult.downloadUrl,
+            imageSize: generatedImageResult.size,
+            imagePrompt: imagePrompt
+          };
+        } else {
+          imageResults[platform] = {
+            success: true,
+            generatedImageDescription: generatedImageResult,
+            isRealImage: false,
+            imageNote: "圖片描述已生成，需要圖像生成服務來創建實際圖片",
+            imagePrompt: imagePrompt
+          };
+        }
+        
+        console.log(`✅ Image generated for ${platform}`);
+        
+      } catch (imageError) {
+        console.error(`Image generation failed for ${platform}:`, imageError);
+        imageResults[platform] = {
+          success: false,
+          error: imageError.message
+        };
+      }
+    }
+    
+    console.log('✅ Step 2 completed: Images generated for all platforms');
+    
+    res.json({
+      success: true,
+      message: 'Platform images generated (Step 2 of 2)',
+      step: 2,
+      imageResults,
+      brand: BRAND_CONFIG.name,
+      timestamp: new Date().toISOString()
+    });
+    
+  } catch (error) {
+    console.error('Step 2 (image generation) error:', error);
+    res.status(500).json({ 
+      error: 'Image generation failed', 
+      message: error.message 
+    });
+  }
+});
+
 // Scene generation endpoint for creating marketing scenarios
 app.post('/api/generate-scenarios', authMiddleware, async (req, res) => {
   try {

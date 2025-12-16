@@ -3066,10 +3066,11 @@
                     }
                 }
                 
-                // Step 3: Generate platform content
-                showStatus('🎯 生成多平台內容中...', 'info');
+                // Step 3: Generate platform content (Split into 2 steps to avoid timeout)
+                // Step 3a: Generate text content only
+                showStatus('🎯 Step 1/2: 生成多平台文字內容中...', 'info');
                 
-                const contentResponse = await AuthManager.authFetch('/api/generate-platform-content', {
+                const contentResponse = await AuthManager.authFetch('/api/generate-platform-content-text', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -3083,24 +3084,103 @@
                         },
                         painPointsAnalysis: painPointsAnalysis || {},
                         platforms: selectedPlatforms,
-                        language: language,
-                        generateImages: generateImages,
-                        scenarioType: scenarioType,
-                        productImagePath: uploadedImagePath,
-                        modelNationality: modelNationality,
-                        modelCombination: modelCombination,
-                        sceneLocation: sceneLocation
+                        language: language
                     })
                 });
                 
+                // Check response status before parsing JSON
                 if (!contentResponse.ok) {
-                    throw new Error('內容生成失敗');
+                    let errorMessage = '文字內容生成失敗';
+                    try {
+                        const errorData = await contentResponse.json();
+                        errorMessage = errorData.message || errorData.error || errorMessage;
+                    } catch (parseError) {
+                        errorMessage = `HTTP ${contentResponse.status}: ${contentResponse.statusText || '文字內容生成失敗'}`;
+                    }
+                    throw new Error(errorMessage);
                 }
                 
-                const contentResult = await contentResponse.json();
+                // Parse JSON response
+                let contentResult;
+                try {
+                    const text = await contentResponse.text();
+                    if (!text) {
+                        throw new Error('伺服器返回空響應');
+                    }
+                    contentResult = JSON.parse(text);
+                } catch (parseError) {
+                    console.error('JSON parsing error:', parseError);
+                    throw new Error('無法解析伺服器響應，請稍後再試');
+                }
+                
                 generatedContent = contentResult.results;
                 displayPlatformResults(contentResult.results);
-                showStatus('✅ 多平台內容生成完成！', 'success');
+                showStatus('✅ Step 1/2: 文字內容生成完成！', 'success');
+                
+                // Step 3b: Generate images if requested
+                if (generateImages) {
+                    showStatus('🖼️ Step 2/2: 生成多平台圖片中...', 'info');
+                    
+                    const imageResponse = await AuthManager.authFetch('/api/generate-platform-images', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            productInfo: productAnalysis || {
+                                name: productName,
+                                description: productDescription,
+                                productType: productName,
+                                industryCategory: industryCategory
+                            },
+                            contentResults: generatedContent, // Pass the text content from Step 1
+                            platforms: selectedPlatforms,
+                            scenarioType: scenarioType,
+                            productImagePath: uploadedImagePath,
+                            modelNationality: modelNationality,
+                            modelCombination: modelCombination,
+                            sceneLocation: sceneLocation
+                        })
+                    });
+                    
+                    // Check response status before parsing JSON
+                    if (!imageResponse.ok) {
+                        let errorMessage = '圖片生成失敗';
+                        try {
+                            const errorData = await imageResponse.json();
+                            errorMessage = errorData.message || errorData.error || errorMessage;
+                        } catch (parseError) {
+                            errorMessage = `HTTP ${imageResponse.status}: ${imageResponse.statusText || '圖片生成失敗'}`;
+                        }
+                        showStatus(`⚠️ 圖片生成失敗: ${errorMessage}，但文字內容已生成`, 'error');
+                    } else {
+                        // Parse JSON response
+                        let imageResult;
+                        try {
+                            const text = await imageResponse.text();
+                            if (text) {
+                                imageResult = JSON.parse(text);
+                                
+                                // Merge image results into generatedContent
+                                if (imageResult.imageResults) {
+                                    Object.keys(imageResult.imageResults).forEach(platform => {
+                                        if (generatedContent[platform] && imageResult.imageResults[platform].success) {
+                                            Object.assign(generatedContent[platform], imageResult.imageResults[platform]);
+                                        }
+                                    });
+                                    displayPlatformResults(generatedContent); // Refresh display with images
+                                }
+                            }
+                        } catch (parseError) {
+                            console.error('Image response JSON parsing error:', parseError);
+                            showStatus('⚠️ 圖片生成完成，但無法解析響應', 'error');
+                        }
+                        
+                        showStatus('✅ Step 2/2: 圖片生成完成！', 'success');
+                    }
+                } else {
+                    showStatus('✅ 多平台內容生成完成！（未生成圖片）', 'success');
+                }
                 
                 // Show scenario generation and switch scenario buttons
                 generateScenariosBtn.style.display = 'block';
