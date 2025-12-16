@@ -4440,6 +4440,7 @@
                     
                     // 顯示分析結果
                     displayAdsAnalysisResults(result);
+                    updateStepIndicatorForPage(2, 3); // Move to step 3 (chat advisor)
                     
                     // 保存分析上下文供對話使用
                     analysisContext = {
@@ -4991,6 +4992,8 @@
 
                 status.className = 'success';
                 status.innerHTML = '✅ 課程內容生成成功！';
+                
+                // Update step indicator to step 3 (already done in displayCourseContent)
 
             } catch (error) {
                 console.error('Course generation error:', error);
@@ -5006,6 +5009,7 @@
         // 顯示課程內容
         function displayCourseContent(course) {
             const preview = document.getElementById('coursePreview');
+            if (!preview) return;
             
             console.log('📊 Course data:', course);
             console.log('🎨 Images data:', course.images);
@@ -5045,6 +5049,9 @@
                     </div>
                 </div>
             `;
+            
+            // Update step indicator to step 3
+            updateStepIndicatorForPage(3, 3);
         }
 
         // 格式化課程內容（簡化版Markdown轉HTML）
