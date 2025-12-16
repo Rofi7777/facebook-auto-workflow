@@ -2828,39 +2828,141 @@
     </div>
 
     <script>
+        // ==================== 徹底重構：圖片上傳功能 ====================
         // File upload handling - Multi-image support
         let selectedFiles = [];
         
-        // Initialize file upload handlers when DOM is ready
-        document.addEventListener('DOMContentLoaded', function() {
-            const fileUpload = document.getElementById('imageUpload');
-            if (fileUpload) {
-                // Remove old event listeners if any
-                const newFileUpload = fileUpload.cloneNode(true);
-                fileUpload.parentNode.replaceChild(newFileUpload, fileUpload);
+        // 初始化圖片上傳功能 - 徹底重構版本
+        function initImageUpload() {
+            console.log('[initImageUpload] Starting initialization...');
+            
+            const uploadArea = document.getElementById('uploadArea');
+            const imageUpload = document.getElementById('imageUpload');
+            
+            if (!uploadArea || !imageUpload) {
+                console.warn('[initImageUpload] Upload elements not found, will retry...');
+                return false;
+            }
+            
+            // 移除舊的事件監聽器
+            const newUploadArea = uploadArea.cloneNode(true);
+            uploadArea.parentNode.replaceChild(newUploadArea, uploadArea);
+            
+            const newImageUpload = document.getElementById('imageUpload');
+            if (!newImageUpload) {
+                console.error('[initImageUpload] Image upload input not found after clone');
+                return false;
+            }
+            
+            // 綁定文件選擇事件
+            newImageUpload.addEventListener('change', function(e) {
+                console.log('[Image Upload] Files selected:', e.target.files.length);
                 
-                // Add new event listener
-                newFileUpload.addEventListener('change', function(e) {
-                    const files = Array.from(e.target.files);
+                const files = Array.from(e.target.files);
+                
+                // 限制最多5個文件
+                if (files.length > 5) {
+                    alert('最多只能選擇5張圖片');
+                    files.splice(5);
                     
-                    // Limit to maximum 5 files
-                    if (files.length > 5) {
-                        alert('最多只能選擇5張圖片');
-                        files.splice(5);
-                        
-                        // Reset the input to selected files
-                        const dt = new DataTransfer();
-                        files.forEach(file => dt.items.add(file));
-                        e.target.files = dt.files;
-                    }
+                    // 重置 input
+                    const dt = new DataTransfer();
+                    files.forEach(file => dt.items.add(file));
+                    e.target.files = dt.files;
+                }
+                
+                selectedFiles = files;
+                updateFileUploadDisplay();
+                updateImagePreview();
+                
+                console.log('[Image Upload] Files processed:', selectedFiles.length);
+            }, false);
+            
+            // 綁定上傳區域點擊事件
+            newUploadArea.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log('[Image Upload] Upload area clicked');
+                newImageUpload.click();
+            }, false);
+            
+            // 設置拖拽上傳
+            setupDragAndDropForUpload(newUploadArea, newImageUpload);
+            
+            console.log('[initImageUpload] Initialization complete');
+            return true;
+        }
+        
+        // 設置拖拽上傳功能
+        function setupDragAndDropForUpload(uploadArea, fileInput) {
+            if (!uploadArea || !fileInput) return;
+            
+            // 阻止默認拖拽行為（只在拖拽區域內）
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                uploadArea.addEventListener(eventName, function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                }, false);
+            });
+            
+            // 高亮拖拽區域
+            ['dragenter', 'dragover'].forEach(eventName => {
+                uploadArea.addEventListener(eventName, function() {
+                    uploadArea.classList.add('dragover');
+                }, false);
+            });
+            
+            ['dragleave', 'drop'].forEach(eventName => {
+                uploadArea.addEventListener(eventName, function() {
+                    uploadArea.classList.remove('dragover');
+                }, false);
+            });
+            
+            // 處理拖放文件
+            uploadArea.addEventListener('drop', function(e) {
+                const dt = e.dataTransfer;
+                const files = dt.files;
+                
+                if (files.length > 0) {
+                    console.log('[Image Upload] Files dropped:', files.length);
                     
-                    selectedFiles = files;
+                    // 限制最多5個文件
+                    const fileArray = Array.from(files).slice(0, 5);
+                    selectedFiles = fileArray;
+                    
+                    // 更新文件 input
+                    const dt2 = new DataTransfer();
+                    fileArray.forEach(file => dt2.items.add(file));
+                    fileInput.files = dt2.files;
+                    
                     updateFileUploadDisplay();
                     updateImagePreview();
-                    // Also call the new handleFileSelect function
-                    handleFileSelect(files);
-                });
+                }
+            }, false);
+        }
+        
+        // 多重初始化機制
+        function tryInitImageUpload() {
+            if (initImageUpload()) {
+                console.log('[tryInitImageUpload] Success');
+            } else {
+                console.log('[tryInitImageUpload] Failed, will retry');
+                setTimeout(tryInitImageUpload, 100);
             }
+        }
+        
+        // 立即嘗試初始化
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', function() {
+                setTimeout(tryInitImageUpload, 10);
+            });
+        } else {
+            setTimeout(tryInitImageUpload, 10);
+        }
+        
+        // 也嘗試在 window.load 時初始化
+        window.addEventListener('load', function() {
+            setTimeout(tryInitImageUpload, 50);
         });
         
         function updateFileUploadDisplay() {
