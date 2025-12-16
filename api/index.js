@@ -850,10 +850,12 @@ app.post('/api/upload-image', upload.array('images', 5), (req, res) => {
     }
     
     console.log(`📤 ${req.files.length} image(s) uploaded successfully`);
+    console.log(`📁 Upload directory: ${upload.dest}`);
+    console.log(`📁 File paths:`, req.files.map(f => f.path));
     
     const uploadedFiles = req.files.map(file => ({
       filename: file.filename,
-      path: file.path,
+      path: file.path, // This is the absolute path in Vercel (/tmp/uploads/...)
       url: `/assets/uploads/${file.filename}`,
       originalName: file.originalname,
       size: file.size
@@ -863,9 +865,9 @@ app.post('/api/upload-image', upload.array('images', 5), (req, res) => {
       success: true,
       message: `${req.files.length} image(s) uploaded successfully`,
       files: uploadedFiles,
-      paths: req.files.map(f => f.path), // For easy access to paths array
+      paths: req.files.map(f => f.path), // Return absolute paths for Vercel compatibility
       filename: req.files[0].filename,   // For backward compatibility
-      path: req.files[0].path,          // For backward compatibility
+      path: req.files[0].path,          // For backward compatibility - absolute path
       url: `/assets/uploads/${req.files[0].filename}`
     });
   } catch (error) {
