@@ -2840,43 +2840,8 @@
         const sceneLocationSelect = document.getElementById('sceneLocation');
         const customLocationInput = document.getElementById('customLocationInput');
         
-        // 自定義輸入處理（如果元素存在）
-        const modelNationalitySelect = document.getElementById('modelNationality');
-        const customNationalityInput = document.getElementById('customNationalityInput');
-        const modelCombinationSelect = document.getElementById('modelCombination');
-        const customCombinationInput = document.getElementById('customCombinationInput');
-        const sceneLocationSelect = document.getElementById('sceneLocation');
-        const customLocationInput = document.getElementById('customLocationInput');
-        
-        if (modelNationalitySelect && customNationalityInput) {
-            modelNationalitySelect.addEventListener('change', function() {
-                if (this.value === 'custom') {
-                    customNationalityInput.style.display = 'block';
-                } else {
-                    customNationalityInput.style.display = 'none';
-                }
-            });
-        }
-        
-        if (modelCombinationSelect && customCombinationInput) {
-            modelCombinationSelect.addEventListener('change', function() {
-                if (this.value === 'custom') {
-                    customCombinationInput.style.display = 'block';
-                } else {
-                    customCombinationInput.style.display = 'none';
-                }
-            });
-        }
-        
-        if (sceneLocationSelect && customLocationInput) {
-            sceneLocationSelect.addEventListener('change', function() {
-                if (this.value === 'custom') {
-                    customLocationInput.style.display = 'block';
-                } else {
-                    customLocationInput.style.display = 'none';
-                }
-            });
-        }
+        // 自定義輸入處理（如果元素存在）- 這些元素現在是隱藏的，但保留處理邏輯以備將來使用
+        // 注意：這些元素在Step 1中已隱藏，使用默認值
         
         // Status display
         function showStatus(message, type) {
