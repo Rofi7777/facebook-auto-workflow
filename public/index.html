@@ -3283,8 +3283,8 @@
                     throw new Error('請至少選擇一個目標平台');
                 }
                 
-                // Step 1: Upload images if provided
-                let uploadedImagePaths = [];
+                // Step 1: Upload images if provided (使用全局變量)
+                uploadedImagePaths = [];
                 if (imageFiles.length > 0) {
                     showStatus(`📤 上傳 ${imageFiles.length} 張圖片中...`, 'info');
                     const imageFormData = new FormData();
