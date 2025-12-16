@@ -1926,9 +1926,28 @@
                         <input type="hidden" id="modelCombination" name="modelCombination" value="parents_baby">
                         <input type="hidden" id="sceneLocation" name="sceneLocation" value="park">
                         <input type="hidden" name="scenarioType" value="親子互動">
-                </form>
-                
-                <div id="status" class="status"></div>
+                        
+                        <!-- 操作按鈕 -->
+                        <div style="display: flex; gap: 15px; margin-top: 25px;">
+                            <button type="button" class="modern-btn modern-btn-primary" id="analyzeProductBtn" style="flex: 1;">
+                                <span>🔍</span>
+                                <span data-i18n="analyze_product_button">AI 產品分析</span>
+                            </button>
+                            
+                            <button type="button" class="modern-btn modern-btn-primary" id="generateContentBtn" style="display: none; flex: 1;">
+                                <span>📝</span>
+                                <span data-i18n="generate_content_button">生成多平台內容</span>
+                            </button>
+                        </div>
+                        
+                        <button type="button" class="modern-btn modern-btn-secondary" id="generateScenariosBtn" style="display: none; width: 100%; margin-top: 10px;">
+                            <span>🎬</span>
+                            <span data-i18n="generate_scenarios_button">生成行銷場景</span>
+                        </button>
+                    </form>
+                    
+                    <div id="status" class="status" style="margin-top: 20px;"></div>
+                </div>
             </div>
             
             <div class="output-panel">
@@ -2812,91 +2831,96 @@
     </div>
 
     <script>
-        const form = document.getElementById('productForm');
-        const statusDiv = document.getElementById('status');
-        const fileUpload = document.getElementById('imageUpload');
-        const analyzeBtn = document.getElementById('analyzeBtn');
-        const generateScenariosBtn = document.getElementById('generateScenariosBtn');
-        
         // File upload handling - Multi-image support
         let selectedFiles = [];
         
-        fileUpload.addEventListener('change', function(e) {
-            const files = Array.from(e.target.files);
-            
-            // Limit to maximum 5 files
-            if (files.length > 5) {
-                alert('最多只能選擇5張圖片');
-                files.splice(5);
+        // Initialize file upload handlers when DOM is ready
+        document.addEventListener('DOMContentLoaded', function() {
+            const fileUpload = document.getElementById('imageUpload');
+            if (fileUpload) {
+                // Remove old event listeners if any
+                const newFileUpload = fileUpload.cloneNode(true);
+                fileUpload.parentNode.replaceChild(newFileUpload, fileUpload);
                 
-                // Reset the input to selected files
-                const dt = new DataTransfer();
-                files.forEach(file => dt.items.add(file));
-                e.target.files = dt.files;
+                // Add new event listener
+                newFileUpload.addEventListener('change', function(e) {
+                    const files = Array.from(e.target.files);
+                    
+                    // Limit to maximum 5 files
+                    if (files.length > 5) {
+                        alert('最多只能選擇5張圖片');
+                        files.splice(5);
+                        
+                        // Reset the input to selected files
+                        const dt = new DataTransfer();
+                        files.forEach(file => dt.items.add(file));
+                        e.target.files = dt.files;
+                    }
+                    
+                    selectedFiles = files;
+                    updateFileUploadDisplay();
+                    updateImagePreview();
+                    // Also call the new handleFileSelect function
+                    handleFileSelect(files);
+                });
             }
-            
-            selectedFiles = files;
-            updateFileUploadDisplay();
-            updateImagePreview();
         });
         
         function updateFileUploadDisplay() {
-            const uploadText = fileUpload.parentElement.querySelector('p');
+            const fileUpload = document.getElementById('imageUpload');
+            if (!fileUpload) return;
             
-            if (selectedFiles.length === 0) {
-                uploadText.textContent = '📸 上傳玩具圖片 (Upload toy images - 最多5張)';
-            } else if (selectedFiles.length === 1) {
-                uploadText.textContent = `已選擇: ${selectedFiles[0].name}`;
-            } else {
-                uploadText.textContent = `已選擇: ${selectedFiles.length} 張圖片`;
+            const uploadText = fileUpload.parentElement.querySelector('.upload-text');
+            if (uploadText) {
+                if (selectedFiles.length === 0) {
+                    uploadText.textContent = '點擊或拖拽上傳圖片';
+                } else if (selectedFiles.length === 1) {
+                    uploadText.textContent = `已選擇: ${selectedFiles[0].name}`;
+                } else {
+                    uploadText.textContent = `已選擇: ${selectedFiles.length} 張圖片`;
+                }
             }
         }
         
         function updateImagePreview() {
             const previewContainer = document.getElementById('imagePreviewContainer');
-            const countDisplay = document.getElementById('selectedImageCount');
+            if (!previewContainer) return;
             
             if (selectedFiles.length === 0) {
-                previewContainer.classList.remove('show');
-                countDisplay.style.display = 'none';
+                previewContainer.style.display = 'none';
                 return;
             }
             
-            previewContainer.classList.add('show');
-            countDisplay.style.display = 'block';
-            countDisplay.textContent = `已選擇 ${selectedFiles.length}/5 張圖片`;
-            
-            let html = '<div class="image-preview-grid">';
+            previewContainer.style.display = 'grid';
+            previewContainer.innerHTML = '';
             
             selectedFiles.forEach((file, index) => {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const previewItem = document.querySelector(`[data-file-index="${index}"]`);
-                    if (previewItem) {
-                        previewItem.querySelector('img').src = e.target.result;
-                    }
-                };
-                reader.readAsDataURL(file);
-                
-                html += `
-                    <div class="image-preview-item" data-file-index="${index}">
-                        <img src="" alt="預覽圖片 ${index + 1}">
-                        <button class="remove-btn" onclick="removeImage(${index})">×</button>
-                    </div>
-                `;
+                if (file.type.startsWith('image/')) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        const previewItem = document.createElement('div');
+                        previewItem.className = 'image-preview-item';
+                        previewItem.innerHTML = `
+                            <img src="${e.target.result}" alt="Preview ${index + 1}">
+                            <button class="remove-btn" onclick="removeImage(${index})" type="button">×</button>
+                        `;
+                        previewContainer.appendChild(previewItem);
+                    };
+                    reader.readAsDataURL(file);
+                }
             });
-            
-            html += '</div>';
-            previewContainer.innerHTML = html;
         }
         
         function removeImage(index) {
             selectedFiles.splice(index, 1);
             
             // Update the file input
-            const dt = new DataTransfer();
-            selectedFiles.forEach(file => dt.items.add(file));
-            fileUpload.files = dt.files;
+            const fileUpload = document.getElementById('imageUpload');
+            if (fileUpload) {
+                const dt = new DataTransfer();
+                selectedFiles.forEach(file => dt.items.add(file));
+                fileUpload.files = dt.files;
+            }
             
             updateFileUploadDisplay();
             updateImagePreview();
@@ -3229,9 +3253,35 @@
             }
         }
         
-        // 綁定按鈕事件
-        document.getElementById('analyzeProductBtn').addEventListener('click', analyzeProduct);
-        document.getElementById('generateContentBtn').addEventListener('click', generateContent);
+        // 綁定按鈕事件 (確保在DOM加載後執行)
+        function bindButtonEvents() {
+            const analyzeBtn = document.getElementById('analyzeProductBtn');
+            const generateBtn = document.getElementById('generateContentBtn');
+            const scenariosBtn = document.getElementById('generateScenariosBtn');
+            
+            if (analyzeBtn && !analyzeBtn.hasAttribute('data-bound')) {
+                analyzeBtn.addEventListener('click', analyzeProduct);
+                analyzeBtn.setAttribute('data-bound', 'true');
+            }
+            if (generateBtn && !generateBtn.hasAttribute('data-bound')) {
+                generateBtn.addEventListener('click', generateContent);
+                generateBtn.setAttribute('data-bound', 'true');
+            }
+            if (scenariosBtn && !scenariosBtn.hasAttribute('data-bound')) {
+                scenariosBtn.addEventListener('click', generateScenarios);
+                scenariosBtn.setAttribute('data-bound', 'true');
+            }
+        }
+        
+        // 立即嘗試綁定（如果DOM已經加載）
+        bindButtonEvents();
+        
+        // 也監聽DOMContentLoaded事件
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', bindButtonEvents);
+        } else {
+            bindButtonEvents();
+        }
         
         // 舊的表單提交代碼已移除，現在使用三個獨立的按鈕函數
         
@@ -4095,45 +4145,23 @@
             });
         }
         
-        // Handle File Selection and Preview
+        // Handle File Selection and Preview (for drag & drop)
         function handleFileSelect(files) {
-            const previewContainer = document.getElementById('imagePreviewContainer');
-            if (!previewContainer) return;
+            if (!files || files.length === 0) return;
             
-            previewContainer.innerHTML = '';
-            previewContainer.style.display = 'grid';
+            const fileArray = Array.from(files).slice(0, 5);
+            selectedFiles = fileArray;
             
-            Array.from(files).slice(0, 5).forEach((file, index) => {
-                if (file.type.startsWith('image/')) {
-                    const reader = new FileReader();
-                    reader.onload = (e) => {
-                        const previewItem = document.createElement('div');
-                        previewItem.className = 'image-preview-item';
-                        previewItem.innerHTML = `
-                            <img src="${e.target.result}" alt="Preview ${index + 1}">
-                            <button class="remove-btn" onclick="removeImage(${index})" type="button">×</button>
-                        `;
-                        previewContainer.appendChild(previewItem);
-                    };
-                    reader.readAsDataURL(file);
-                }
-            });
-        }
-        
-        // Remove Image from Preview
-        function removeImage(index) {
+            // Update file input
             const fileInput = document.getElementById('imageUpload');
-            const dt = new DataTransfer();
-            const files = Array.from(fileInput.files);
+            if (fileInput) {
+                const dt = new DataTransfer();
+                fileArray.forEach(file => dt.items.add(file));
+                fileInput.files = dt.files;
+            }
             
-            files.forEach((file, i) => {
-                if (i !== index) {
-                    dt.items.add(file);
-                }
-            });
-            
-            fileInput.files = dt.files;
-            handleFileSelect(fileInput.files);
+            updateFileUploadDisplay();
+            updateImagePreview();
         }
         
         // Update Step Indicator
