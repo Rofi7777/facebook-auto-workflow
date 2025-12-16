@@ -1438,6 +1438,14 @@ app.post('/api/generate-course', authMiddleware, async (req, res) => {
   try {
     console.log('📚 Generating course content...');
     
+    // Check if courseGenerator is initialized
+    if (!courseGenerator) {
+      return res.status(500).json({ 
+        error: 'Course generation service not available',
+        message: 'Course generator service is not initialized. Please check GEMINI_API_KEY_NEW environment variable.'
+      });
+    }
+    
     const {
       targetAge,
       category,
@@ -1485,7 +1493,7 @@ app.post('/api/generate-course', authMiddleware, async (req, res) => {
     console.error('❌ Course generation error:', error);
     res.status(500).json({ 
       error: 'Course generation failed',
-      message: error.message 
+      message: error.message || 'Unknown error occurred'
     });
   }
 });

@@ -3643,16 +3643,24 @@
         async function loadBrandConfig() {
             try {
                 const response = await fetch('/api/config');
+                if (!response.ok) {
+                    throw new Error(`API returned ${response.status}`);
+                }
+                
                 const config = await response.json();
                 
-                // Update brand elements
+                // Update brand elements - check if elements exist
                 const logoElement = document.getElementById('brandLogo');
-                logoElement.src = config.brand.logoPath;
-                logoElement.alt = `${config.brand.name} Logo`;
-                logoElement.style.display = 'block';
-                // brandTitle and brandSlogan now use data-i18n attributes for automatic translation
-                // Title and slogan will be updated by updatePageLanguage() function
-                document.title = `${config.brand.name} Multi-Platform Content Generator`;
+                if (logoElement && config.brand && config.brand.logoPath) {
+                    logoElement.src = config.brand.logoPath;
+                    logoElement.alt = `${config.brand.name || 'Brand'} Logo`;
+                    logoElement.style.display = 'block';
+                }
+                
+                // Update document title
+                if (config.brand && config.brand.name) {
+                    document.title = `${config.brand.name} Multi-Platform Content Generator`;
+                }
                 
                 // Populate platforms - only update if API returns platforms
                 if (config.platforms && Array.isArray(config.platforms) && config.platforms.length > 0) {
@@ -4350,10 +4358,35 @@
                     })
                 });
 
-                const data = await response.json();
-
+                // Check response status before parsing JSON
                 if (!response.ok) {
-                    throw new Error(data.message || '課程生成失敗');
+                    let errorMessage = '課程生成失敗';
+                    try {
+                        const errorData = await response.json();
+                        errorMessage = errorData.message || errorData.error || errorMessage;
+                    } catch (parseError) {
+                        // If JSON parsing fails, use status text
+                        errorMessage = `HTTP ${response.status}: ${response.statusText || '課程生成失敗'}`;
+                    }
+                    throw new Error(errorMessage);
+                }
+
+                // Parse JSON response
+                let data;
+                try {
+                    const text = await response.text();
+                    if (!text) {
+                        throw new Error('伺服器返回空響應');
+                    }
+                    data = JSON.parse(text);
+                } catch (parseError) {
+                    console.error('JSON parsing error:', parseError);
+                    throw new Error('無法解析伺服器響應，請稍後再試');
+                }
+
+                // Validate response structure
+                if (!data || !data.course) {
+                    throw new Error('伺服器響應格式錯誤');
                 }
 
                 // 保存課程數據
@@ -4363,7 +4396,10 @@
                 displayCourseContent(data.course);
 
                 // 顯示下載按鈕
-                document.getElementById('downloadActions').style.display = 'flex';
+                const downloadActions = document.getElementById('downloadActions');
+                if (downloadActions) {
+                    downloadActions.style.display = 'flex';
+                }
 
                 status.className = 'success';
                 status.innerHTML = '✅ 課程內容生成成功！';
