@@ -3459,17 +3459,6 @@
                     showStatus('✅ 多平台內容生成完成！（未生成圖片）', 'success');
                 }
                 
-                // Show scenario generation and switch scenario buttons
-                generateScenariosBtn.style.display = 'block';
-                document.getElementById('switchScenarioBtn').style.display = 'block';
-                
-            } catch (error) {
-                showStatus(`❌ 錯誤: ${error.message}`, 'error');
-            } finally {
-                setLoading(false);
-            }
-        });
-        
         // Scenario generation button handler
         generateScenariosBtn.addEventListener('click', async function() {
             if (!productAnalysis || !generatedContent) {
