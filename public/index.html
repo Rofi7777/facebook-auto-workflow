@@ -1036,7 +1036,7 @@
             flex-wrap: wrap;
             padding: 0 20px;
             position: relative;
-            z-index: 12;
+            z-index: 1000;
         }
         
         .tab-btn {
@@ -1047,12 +1047,13 @@
             background: rgba(255, 255, 255, 0.15);
             color: white;
             border-radius: 12px;
-            cursor: pointer;
+            cursor: pointer !important;
             transition: all 0.3s;
             backdrop-filter: blur(10px);
             position: relative;
-            z-index: 1;
-            pointer-events: auto;
+            z-index: 1001 !important;
+            pointer-events: auto !important;
+            user-select: none;
         }
         
         .tab-btn:hover {
@@ -4272,6 +4273,14 @@
         
         // 分頁切換函數
         function switchPage(pageId, event) {
+            console.log('switchPage called:', pageId, event);
+            
+            // 阻止事件冒泡
+            if (event) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            
             // 隱藏所有頁面
             document.querySelectorAll('.page-content').forEach(page => {
                 page.classList.remove('active');
@@ -4286,21 +4295,32 @@
             const targetPage = document.getElementById(pageId);
             if (targetPage) {
                 targetPage.classList.add('active');
+                console.log('Page activated:', pageId);
             } else {
                 console.error('Page not found:', pageId);
                 return;
             }
             
             // 設置對應按鈕為 active
+            let targetBtn = null;
             if (event && event.target) {
-                event.target.classList.add('active');
-            } else {
-                // 如果沒有 event，通過 onclick 屬性找到對應按鈕
-                const targetBtn = document.querySelector(`.tab-btn[onclick*="${pageId}"]`);
-                if (targetBtn) {
+                // 如果點擊的是按鈕內的 span，找到父按鈕
+                targetBtn = event.target.closest('.tab-btn') || event.target;
+                if (targetBtn && targetBtn.classList.contains('tab-btn')) {
                     targetBtn.classList.add('active');
                 }
             }
+            
+            // 如果沒有找到按鈕，通過 onclick 屬性找到對應按鈕
+            if (!targetBtn || !targetBtn.classList.contains('active')) {
+                const btn = document.querySelector(`.tab-btn[onclick*="${pageId}"]`);
+                if (btn) {
+                    btn.classList.add('active');
+                    targetBtn = btn;
+                }
+            }
+            
+            console.log('Active button set:', targetBtn);
             
             // 如果切換到管理員頁面，初始化管理控制台
             if (pageId === 'page5' && typeof AdminConsole !== 'undefined') {
@@ -4310,6 +4330,27 @@
             // 滾動到頂部
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
+        
+        // 使用事件委托確保按鈕點擊正常工作
+        document.addEventListener('DOMContentLoaded', function() {
+            const tabNavigation = document.querySelector('.tab-navigation');
+            if (tabNavigation) {
+                tabNavigation.addEventListener('click', function(e) {
+                    const btn = e.target.closest('.tab-btn');
+                    if (btn) {
+                        const onclick = btn.getAttribute('onclick');
+                        if (onclick) {
+                            // 提取 pageId
+                            const match = onclick.match(/switchPage\(['"]([^'"]+)['"]/);
+                            if (match) {
+                                const pageId = match[1];
+                                switchPage(pageId, e);
+                            }
+                        }
+                    }
+                });
+            }
+        });
         
         // Page 2 檔案上傳處理
         let selectedAdsFiles = [];
