@@ -70,6 +70,12 @@ app.use(express.urlencoded({ limit: '15mb', extended: true }));
 app.use(express.static('public'));
 app.use('/assets', express.static('assets'));
 
+// Debug middleware - Log all incoming requests
+app.use((req, res, next) => {
+  console.log(`🔍 [${new Date().toISOString()}] ${req.method} ${req.path}`);
+  next();
+});
+
 // Configure multer for multi-file uploads with security validation (Product Images)
 // Note: In Vercel, we use /tmp for file uploads (temporary storage)
 const upload = multer({
@@ -862,6 +868,7 @@ app.post('/api/upload-image', upload.array('images', 5), (req, res) => {
 
 // AI-powered product analysis endpoint - Support multiple images
 app.post('/api/analyze-product', authMiddleware, async (req, res) => {
+  console.log('📥 /api/analyze-product route hit');
   try {
     const { imagePath, imagePaths, productInfo } = req.body;
     
@@ -940,6 +947,7 @@ app.post('/api/analyze-product', authMiddleware, async (req, res) => {
 
 // Multi-platform content generation endpoint
 app.post('/api/generate-platform-content', authMiddleware, async (req, res) => {
+  console.log('📥 /api/generate-platform-content route hit');
   try {
     const { 
       productInfo, 
@@ -2261,7 +2269,9 @@ app.use((req, res) => {
 });
 
 // Export for Vercel serverless functions
+// Vercel expects the handler to be the default export
 module.exports = app;
+module.exports.default = app;
 
 // Start server - Only for local development
 if (require.main === module) {
