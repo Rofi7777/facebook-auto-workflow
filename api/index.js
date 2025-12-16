@@ -1125,6 +1125,14 @@ app.post('/api/generate-scenarios', authMiddleware, async (req, res) => {
       }
     }
     
+    // Check if scenarioService is initialized
+    if (!scenarioService) {
+      return res.status(500).json({ 
+        error: 'Scenario generation service not available',
+        message: 'Scenario service is not initialized. Please check GEMINI_API_KEY_NEW environment variable.'
+      });
+    }
+    
     // Generate three marketing scenarios
     const scenarios = await scenarioService.generateMarketingScenarios(productInfo, contentData, scenarioType);
     console.log('Scenarios generated successfully');
@@ -1399,6 +1407,14 @@ app.post('/api/analyze-ads', authMiddleware, adsUpload.array('files', 10), async
       }))
     };
     
+    // Check if adsAnalyzer is initialized
+    if (!adsAnalyzer) {
+      return res.status(500).json({ 
+        error: 'Ads analysis service not available',
+        message: 'Ads analyzer service is not initialized. Please check GEMINI_API_KEY_NEW environment variable.'
+      });
+    }
+    
     console.log('🤖 Calling AI ads analyzer...');
     
     // 調用 AI 分析服務
@@ -1650,6 +1666,14 @@ app.post('/api/chat-with-advisor', authMiddleware, chatUpload.array('files', 5),
     
     console.log(`🤖 Calling chat advisor in ${userLanguage}...`);
     
+    // Check if chatAdvisor is initialized
+    if (!chatAdvisor) {
+      return res.status(500).json({ 
+        error: 'Chat advisor service not available',
+        message: 'Chat advisor service is not initialized. Please check GEMINI_API_KEY_NEW environment variable.'
+      });
+    }
+    
     // 獲取用戶個人化上下文
     let personalizedContext = '';
     try {
@@ -1897,6 +1921,14 @@ function buildReferenceContext(references) {
 // API endpoint for refining prompts (coding and image modes)
 app.post('/api/refine-prompt', authMiddleware, async (req, res) => {
   try {
+    // Check if aiService is initialized (needed for refine-prompt)
+    if (!aiService) {
+      return res.status(500).json({ 
+        error: 'AI service not available',
+        message: 'AI service is not initialized. Please check GEMINI_API_KEY_NEW environment variable.'
+      });
+    }
+    
     const { mode, input, platform, complexity, style, ratio, qualityTags, references } = req.body;
     
     console.log(`📝 Refining prompt in ${mode} mode...`);

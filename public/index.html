@@ -3177,11 +3177,30 @@
                     })
                 });
                 
+                // Check response status before parsing JSON
                 if (!scenarioResponse.ok) {
-                    throw new Error('場景生成失敗');
+                    let errorMessage = '場景生成失敗';
+                    try {
+                        const errorData = await scenarioResponse.json();
+                        errorMessage = errorData.message || errorData.error || errorMessage;
+                    } catch (parseError) {
+                        errorMessage = `HTTP ${scenarioResponse.status}: ${scenarioResponse.statusText || '場景生成失敗'}`;
+                    }
+                    throw new Error(errorMessage);
                 }
                 
-                const scenarioResult = await scenarioResponse.json();
+                // Parse JSON response
+                let scenarioResult;
+                try {
+                    const text = await scenarioResponse.text();
+                    if (!text) {
+                        throw new Error('伺服器返回空響應');
+                    }
+                    scenarioResult = JSON.parse(text);
+                } catch (parseError) {
+                    console.error('JSON parsing error:', parseError);
+                    throw new Error('無法解析伺服器響應，請稍後再試');
+                }
                 displayScenariosResults(scenarioResult.scenarios);
                 showStatus('✅ 行銷場景生成完成！', 'success');
                 
@@ -3867,11 +3886,30 @@
                         body: formData
                     });
                     
+                    // Check response status before parsing JSON
                     if (!response.ok) {
-                        throw new Error('分析請求失敗');
+                        let errorMessage = '分析請求失敗';
+                        try {
+                            const errorData = await response.json();
+                            errorMessage = errorData.message || errorData.error || errorMessage;
+                        } catch (parseError) {
+                            errorMessage = `HTTP ${response.status}: ${response.statusText || '分析請求失敗'}`;
+                        }
+                        throw new Error(errorMessage);
                     }
                     
-                    const result = await response.json();
+                    // Parse JSON response
+                    let result;
+                    try {
+                        const text = await response.text();
+                        if (!text) {
+                            throw new Error('伺服器返回空響應');
+                        }
+                        result = JSON.parse(text);
+                    } catch (parseError) {
+                        console.error('JSON parsing error:', parseError);
+                        throw new Error('無法解析伺服器響應，請稍後再試');
+                    }
                     
                     // 顯示分析結果
                     displayAdsAnalysisResults(result);
@@ -4091,7 +4129,30 @@
                     body: formData
                 });
                 
-                const data = await response.json();
+                // Check response status before parsing JSON
+                if (!response.ok) {
+                    let errorMessage = '對話請求失敗';
+                    try {
+                        const errorData = await response.json();
+                        errorMessage = errorData.message || errorData.error || errorMessage;
+                    } catch (parseError) {
+                        errorMessage = `HTTP ${response.status}: ${response.statusText || '對話請求失敗'}`;
+                    }
+                    throw new Error(errorMessage);
+                }
+                
+                // Parse JSON response
+                let data;
+                try {
+                    const text = await response.text();
+                    if (!text) {
+                        throw new Error('伺服器返回空響應');
+                    }
+                    data = JSON.parse(text);
+                } catch (parseError) {
+                    console.error('JSON parsing error:', parseError);
+                    throw new Error('無法解析伺服器響應，請稍後再試');
+                }
                 
                 if (data.success) {
                     // 移除載入訊息
