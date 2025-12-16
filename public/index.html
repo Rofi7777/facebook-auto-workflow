@@ -2379,8 +2379,9 @@
                                 <textarea id="bizContext" rows="4" placeholder="描述您想解決的商業問題或任務目標..." style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 8px; font-size: 14px; resize: vertical;"></textarea>
                             </div>
 
-                            <button type="button" id="bizGenerateBtn" class="btn" onclick="generateBusinessPrompt()" style="width: 100%; padding: 15px; background: linear-gradient(135deg, #4CAF50 0%, #8BC34A 100%); color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: 600; cursor: pointer;">
-                                🚀 生成專業 Prompt
+                            <button type="button" id="bizGenerateBtn" class="modern-btn modern-btn-primary" onclick="generateBusinessPrompt()" style="width: 100%;" onsuccess="updateStepIndicatorForPage(4, 3);">
+                                <span>🚀</span>
+                                <span>生成專業 Prompt</span>
                             </button>
                         </form>
                     </div>
@@ -2436,9 +2437,12 @@
                                 </div>
                             </div>
 
-                            <div class="form-group">
-                                <label for="codingPlatform">🎯 目標平台</label>
-                                <select id="codingPlatform" style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 8px; font-size: 14px;">
+                            <div class="modern-form-group">
+                                <label class="modern-form-label" for="codingPlatform">
+                                    <span>🎯</span>
+                                    <span>目標平台</span>
+                                </label>
+                                <select id="codingPlatform" class="modern-form-input">
                                     <option value="web">Web 網頁應用</option>
                                     <option value="mobile">Mobile App</option>
                                     <option value="desktop">Desktop 桌面應用</option>
@@ -2447,28 +2451,35 @@
                                 </select>
                             </div>
 
-                            <div class="form-group">
-                                <label for="codingComplexity">📊 複雜度</label>
-                                <select id="codingComplexity" style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 8px; font-size: 14px;">
+                            <div class="modern-form-group">
+                                <label class="modern-form-label" for="codingComplexity">
+                                    <span>📊</span>
+                                    <span>複雜度</span>
+                                </label>
+                                <select id="codingComplexity" class="modern-form-input">
                                     <option value="mvp">MVP 最小可行產品</option>
                                     <option value="standard">Standard 標準功能</option>
                                     <option value="enterprise">Enterprise 企業級</option>
                                 </select>
                             </div>
 
-                            <button type="button" class="btn" onclick="generateCodingPrompt()" id="codingGenerateBtn" style="width: 100%; padding: 15px; background: linear-gradient(135deg, #2196F3 0%, #03A9F4 100%); color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: 600; cursor: pointer;">
-                                🤖 AI 轉譯為結構化 PRD
+                            <button type="button" class="modern-btn modern-btn-primary" onclick="generateCodingPrompt()" id="codingGenerateBtn" style="width: 100%;" onsuccess="updateStepIndicatorForPage(4, 3);">
+                                <span>🤖</span>
+                                <span>AI 轉譯為結構化 PRD</span>
                             </button>
                         </form>
                     </div>
 
                     <!-- ==================== 視覺繪圖模式 ==================== -->
                     <div id="imageMode" class="prompt-mode" style="display: none;">
-                        <form id="imagePromptForm">
-                            <div class="form-group">
-                                <label for="imageInput" data-i18n="img_desc_label">🎨 描述您想生成的畫面</label>
+                        <form id="imagePromptForm" class="modern-form">
+                            <div class="modern-form-group">
+                                <label class="modern-form-label" for="imageInput">
+                                    <span>🎨</span>
+                                    <span data-i18n="img_desc_label">描述您想生成的畫面</span>
+                                </label>
                                 <p style="color: #888; font-size: 13px; margin-bottom: 10px;" data-i18n="img_desc_hint">例如：「太空中的貓」、「日落時分的海邊咖啡廳」、「未來城市的霓虹街景」</p>
-                                <textarea id="imageInput" rows="5" data-i18n-placeholder="img_desc_placeholder" placeholder="用自然語言描述您想要的畫面..." style="width: 100%; padding: 15px; border: 2px solid #ddd; border-radius: 8px; font-size: 14px; resize: vertical;"></textarea>
+                                <textarea id="imageInput" class="modern-form-input" rows="5" data-i18n-placeholder="img_desc_placeholder" placeholder="用自然語言描述您想要的畫面..." style="resize: vertical;"></textarea>
                             </div>
 
                             <!-- 參考資料上傳區 -->
@@ -2601,8 +2612,9 @@
                                 </div>
                             </div>
 
-                            <button type="button" class="btn" onclick="generateImagePrompt()" id="imageGenerateBtn" style="width: 100%; padding: 15px; background: linear-gradient(135deg, #9C27B0 0%, #E91E63 100%); color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: 600; cursor: pointer;">
-                                🎨 AI 生成繪圖指令
+                            <button type="button" class="modern-btn modern-btn-primary" onclick="generateImagePrompt()" id="imageGenerateBtn" style="width: 100%;" onsuccess="updateStepIndicatorForPage(4, 3);">
+                                <span>🎨</span>
+                                <span>AI 生成繪圖指令</span>
                             </button>
                         </form>
                     </div>
