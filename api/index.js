@@ -130,7 +130,8 @@ const adsUpload = multer({
 
 // Routes
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, '../public/index.html'));
+  const indexPath = path.join(__dirname, '..', 'public', 'index.html');
+  res.sendFile(indexPath);
 });
 
 app.get('/api/health', (req, res) => {
