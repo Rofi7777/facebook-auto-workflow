@@ -1863,7 +1863,7 @@
                                 <span>📸</span>
                                 <span data-i18n="image_upload">產品圖片</span>
                             </label>
-                            <div class="upload-area" id="uploadArea" onclick="document.getElementById('imageUpload').click()">
+                            <div class="upload-area" id="uploadArea">
                                 <input type="file" id="imageUpload" accept="image/*" multiple style="display: none;">
                                 <div class="upload-icon">📤</div>
                                 <div class="upload-text" data-i18n="image_upload_text">點擊或拖拽上傳圖片</div>
@@ -4104,16 +4104,16 @@
             
             if (!uploadArea || !fileInput) return;
             
-            // Prevent default drag behaviors
-            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-                uploadArea.addEventListener(eventName, preventDefaults, false);
-                document.body.addEventListener(eventName, preventDefaults, false);
-            });
-            
+            // Prevent default drag behaviors (只在拖拽區域內)
             function preventDefaults(e) {
                 e.preventDefault();
                 e.stopPropagation();
             }
+            
+            // 只在 uploadArea 上阻止默認行為，不要影響整個 body
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                uploadArea.addEventListener(eventName, preventDefaults, false);
+            });
             
             // Highlight drop area when item is dragged over it
             ['dragenter', 'dragover'].forEach(eventName => {
@@ -4337,32 +4337,34 @@
         // 直接綁定導航按鈕點擊事件（最簡單可靠的方法）
         function initTabNavigation() {
             console.log('Initializing tab navigation...');
-            const tabButtons = document.querySelectorAll('.tab-btn[data-page]');
-            console.log('Found tab buttons:', tabButtons.length);
+            const tabNavigation = document.getElementById('tabNavigation') || document.querySelector('.tab-navigation');
             
-            tabButtons.forEach(function(btn) {
-                // 移除舊的事件監聽器
-                const newBtn = btn.cloneNode(true);
-                btn.parentNode.replaceChild(newBtn, btn);
-                
-                // 添加新的事件監聽器
-                newBtn.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    e.stopImmediatePropagation();
-                    
-                    const pageId = newBtn.getAttribute('data-page');
-                    console.log('Tab button clicked:', pageId, newBtn);
-                    
-                    if (pageId) {
-                        switchPage(pageId, e);
-                    }
-                }, true); // 使用捕獲階段確保優先執行
-                
-                console.log('Button bound:', newBtn.getAttribute('data-page'));
-            });
+            if (!tabNavigation) {
+                console.warn('Tab navigation container not found');
+                return;
+            }
             
-            console.log('Tab navigation initialized');
+            // 使用事件委托，綁定到容器上
+            tabNavigation.addEventListener('click', function(e) {
+                // 找到被點擊的按鈕
+                const btn = e.target.closest('.tab-btn');
+                if (!btn) return;
+                
+                e.preventDefault();
+                e.stopPropagation();
+                e.stopImmediatePropagation();
+                
+                const pageId = btn.getAttribute('data-page');
+                console.log('Tab button clicked:', pageId, btn);
+                
+                if (pageId && typeof switchPage === 'function') {
+                    switchPage(pageId, e);
+                } else {
+                    console.error('switchPage function not found or pageId missing');
+                }
+            }, true); // 使用捕獲階段確保優先執行
+            
+            console.log('Tab navigation initialized with event delegation');
         }
         
         // 立即嘗試初始化
