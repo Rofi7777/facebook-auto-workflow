@@ -104,19 +104,39 @@ class AdminService {
         return { users: [], error: error.message };
       }
 
-      const users = data.users.map(user => ({
-        id: user.id,
-        email: user.email,
-        created_at: user.created_at,
-        last_sign_in_at: user.last_sign_in_at,
-        email_confirmed_at: user.email_confirmed_at,
-        role: this.isSuperAdmin(user.email) ? 'super_admin' : 
-              this.isAdmin(user.email) ? 'admin' : 
-              (user.user_metadata?.role || 'user'),
-        status: user.user_metadata?.status || 
-                (user.email_confirmed_at ? 'active' : 'pending'),
-        user_metadata: user.user_metadata
-      }));
+      const users = data.users.map(user => {
+        // 确保只有 rofi90@hotmail.com 是超级管理员
+        if (this.isSuperAdmin(user.email)) {
+          return {
+            id: user.id,
+            email: user.email,
+            created_at: user.created_at,
+            last_sign_in_at: user.last_sign_in_at,
+            email_confirmed_at: user.email_confirmed_at,
+            role: 'super_admin',
+            status: user.user_metadata?.status || 
+                    (user.email_confirmed_at ? 'active' : 'pending'),
+            user_metadata: user.user_metadata
+          };
+        }
+        
+        // 对于其他用户，从 user_metadata 获取角色，如果没有则默认为 'user'
+        const userRole = user.user_metadata?.role || 'user';
+        // 确保角色只能是 'user' 或 'admin'，不能是 'super_admin'
+        const role = (userRole === 'admin') ? 'admin' : 'user';
+        
+        return {
+          id: user.id,
+          email: user.email,
+          created_at: user.created_at,
+          last_sign_in_at: user.last_sign_in_at,
+          email_confirmed_at: user.email_confirmed_at,
+          role: role,
+          status: user.user_metadata?.status || 
+                  (user.email_confirmed_at ? 'active' : 'pending'),
+          user_metadata: user.user_metadata
+        };
+      });
 
       return { users, error: null };
     } catch (err) {
@@ -162,8 +182,27 @@ class AdminService {
     }
 
     try {
+      // 先获取用户信息，确保不能修改超级管理员的角色
+      const { data: userData, error: getUserError } = await this.client.auth.admin.getUserById(userId);
+      if (getUserError || !userData.user) {
+        return { success: false, error: 'User not found' };
+      }
+
+      // 禁止修改超级管理员的角色
+      if (this.isSuperAdmin(userData.user.email)) {
+        return { success: false, error: 'Cannot modify super admin role' };
+      }
+
+      // 确保角色只能是 'user' 或 'admin'，不能设置为 'super_admin'
+      if (role === 'super_admin') {
+        return { success: false, error: 'Cannot set role to super_admin. Only rofi90@hotmail.com can be super admin.' };
+      }
+
       const { data, error } = await this.client.auth.admin.updateUserById(userId, {
-        user_metadata: { role }
+        user_metadata: { 
+          ...userData.user.user_metadata,
+          role: role === 'admin' ? 'admin' : 'user'
+        }
       });
 
       if (error) {
@@ -189,11 +228,49 @@ class AdminService {
   }
 
   async promoteToAdmin(userId) {
-    return this.updateUserRole(userId, 'admin');
+    // 先检查用户是否是超级管理员
+    if (!this.enabled || !this.hasServiceKey) {
+      return { success: false, error: 'Service key required' };
+    }
+
+    try {
+      const { data: userData, error: getUserError } = await this.client.auth.admin.getUserById(userId);
+      if (getUserError || !userData.user) {
+        return { success: false, error: 'User not found' };
+      }
+
+      // 禁止修改超级管理员
+      if (this.isSuperAdmin(userData.user.email)) {
+        return { success: false, error: 'Cannot modify super admin' };
+      }
+
+      return this.updateUserRole(userId, 'admin');
+    } catch (err) {
+      return { success: false, error: err.message };
+    }
   }
 
   async demoteFromAdmin(userId) {
-    return this.updateUserRole(userId, 'user');
+    // 先检查用户是否是超级管理员
+    if (!this.enabled || !this.hasServiceKey) {
+      return { success: false, error: 'Service key required' };
+    }
+
+    try {
+      const { data: userData, error: getUserError } = await this.client.auth.admin.getUserById(userId);
+      if (getUserError || !userData.user) {
+        return { success: false, error: 'User not found' };
+      }
+
+      // 禁止修改超级管理员
+      if (this.isSuperAdmin(userData.user.email)) {
+        return { success: false, error: 'Cannot modify super admin' };
+      }
+
+      return this.updateUserRole(userId, 'user');
+    } catch (err) {
+      return { success: false, error: err.message };
+    }
   }
 
   async deleteUser(userId) {
@@ -226,16 +303,23 @@ class AdminService {
         return { user: null, error: error.message };
       }
 
-      return { 
+        // 确保只有 rofi90@hotmail.com 是超级管理员
+        let role = 'user';
+        if (this.isSuperAdmin(data.user.email)) {
+          role = 'super_admin';
+        } else {
+          const userRole = data.user.user_metadata?.role || 'user';
+          role = (userRole === 'admin') ? 'admin' : 'user';
+        }
+        
+        return { 
         user: {
           id: data.user.id,
           email: data.user.email,
           created_at: data.user.created_at,
           last_sign_in_at: data.user.last_sign_in_at,
           email_confirmed_at: data.user.email_confirmed_at,
-          role: this.isSuperAdmin(data.user.email) ? 'super_admin' : 
-                this.isAdmin(data.user.email) ? 'admin' : 
-                (data.user.user_metadata?.role || 'user'),
+          role: role,
           status: data.user.user_metadata?.status || 
                   (data.user.email_confirmed_at ? 'active' : 'pending'),
           user_metadata: data.user.user_metadata

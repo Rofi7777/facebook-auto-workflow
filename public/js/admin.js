@@ -166,12 +166,14 @@ const AdminManager = {
   },
 
   getActionButtons(user) {
+    // 超级管理员不能被操作
     if (user.role === 'super_admin') {
       return '<span style="color: #888; font-size: 12px;">-</span>';
     }
 
     let buttons = [];
     
+    // 状态管理按钮
     if (user.status === 'pending' || user.status !== 'active') {
       buttons.push(`<button onclick="AdminManager.approveUser('${user.id}')" style="padding: 4px 10px; background: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 11px; margin: 2px;" title="${t('admin_approve')}">✓</button>`);
     }
@@ -180,15 +182,19 @@ const AdminManager = {
       buttons.push(`<button onclick="AdminManager.suspendUser('${user.id}')" style="padding: 4px 10px; background: #ffc107; color: #333; border: none; border-radius: 4px; cursor: pointer; font-size: 11px; margin: 2px;" title="${t('admin_suspend')}">⏸</button>`);
     }
     
-    if (this.isSuperAdmin && user.role !== 'admin') {
-      buttons.push(`<button onclick="AdminManager.promoteUser('${user.id}')" style="padding: 4px 10px; background: #9b59b6; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 11px; margin: 2px;" title="${t('admin_promote')}">⬆</button>`);
-    }
-    
-    if (this.isSuperAdmin && user.role === 'admin') {
-      buttons.push(`<button onclick="AdminManager.demoteUser('${user.id}')" style="padding: 4px 10px; background: #6c757d; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 11px; margin: 2px;" title="${t('admin_demote')}">⬇</button>`);
-    }
-    
+    // 只有超级管理员可以调整用户权限
     if (this.isSuperAdmin) {
+      // 将一般用户提升为管理员
+      if (user.role === 'user') {
+        buttons.push(`<button onclick="AdminManager.promoteUser('${user.id}')" style="padding: 4px 10px; background: #9b59b6; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 11px; margin: 2px;" title="${t('admin_promote')}">⬆</button>`);
+      }
+      
+      // 将管理员降级为一般用户
+      if (user.role === 'admin') {
+        buttons.push(`<button onclick="AdminManager.demoteUser('${user.id}')" style="padding: 4px 10px; background: #6c757d; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 11px; margin: 2px;" title="${t('admin_demote')}">⬇</button>`);
+      }
+      
+      // 删除用户（不能删除超级管理员）
       buttons.push(`<button onclick="AdminManager.deleteUser('${user.id}')" style="padding: 4px 10px; background: #dc3545; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 11px; margin: 2px;" title="${t('admin_delete')}">🗑</button>`);
     }
     

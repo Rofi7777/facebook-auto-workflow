@@ -39,7 +39,7 @@ try {
 // Initialize AI services with error handling
 let aiService, scenarioService, adsAnalyzer, chatAdvisor, courseGenerator, documentExporter;
 try {
-  const apiKey = process.env.GEMINI_API_KEY_NEW || process.env.GEMINI_API_KEY;
+const apiKey = process.env.GEMINI_API_KEY_NEW || process.env.GEMINI_API_KEY;
   aiService = new GeminiAIService();
   scenarioService = new ScenarioGeneratorService();
   adsAnalyzer = new AdsAnalyzer();
@@ -276,11 +276,11 @@ app.post('/api/auth/reset-password', async (req, res) => {
 app.get('/api/auth/status', (req, res) => {
   try {
     const enabled = supabaseAuth ? supabaseAuth.isEnabled() : false;
-    res.json({
-      enabled: enabled,
-      message: enabled ? 'Authentication is enabled' : 'Authentication is disabled',
-      requiresLogin: enabled
-    });
+  res.json({
+    enabled: enabled,
+    message: enabled ? 'Authentication is enabled' : 'Authentication is disabled',
+    requiresLogin: enabled
+  });
   } catch (error) {
     console.error('Auth status error:', error);
     // 如果出错，默认返回认证已启用（安全起见）

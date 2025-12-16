@@ -26,9 +26,18 @@ class SupabaseAuthService {
       throw new Error('Authentication service is not available');
     }
 
+    // 确保新用户默认角色为 'user'，只有 rofi90@hotmail.com 可以是超级管理员
+    const defaultRole = email.toLowerCase() === 'rofi90@hotmail.com' ? 'super_admin' : 'user';
+
     const { data, error } = await this.client.auth.signUp({
       email,
       password,
+      options: {
+        data: {
+          role: defaultRole,
+          status: 'pending'
+        }
+      }
     });
 
     if (error) {

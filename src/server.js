@@ -2176,6 +2176,6 @@ if (require.main === module) {
   const listenHost = process.env.NODE_ENV === 'production' ? '0.0.0.0' : 'localhost';
   app.listen(PORT, listenHost, () => {
     console.log(`${BRAND_CONFIG.name} Facebook Auto Workflow server running on http://${listenHost}:${PORT}`);
-    console.log(`Ready to generate ${BRAND_CONFIG.name} Facebook promotional materials for babies!`);
-  });
+  console.log(`Ready to generate ${BRAND_CONFIG.name} Facebook promotional materials for babies!`);
+});
 }
