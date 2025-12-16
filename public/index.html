@@ -1920,101 +1920,12 @@
                                 <option value="bilingual">雙語</option>
                             </select>
                         </div>
-                    
-                    <!-- 移除自動生成圖片選項，改為在每個平台獨立生成 -->
-                        <h4 style="color: #FF6B4A; margin-bottom: 15px;">👥 <span data-i18n="model_settings">模特兒設定</span></h4>
                         
-                        <div class="form-group">
-                            <label for="modelNationality" data-i18n="model_nationality">模特兒國籍</label>
-                            <select id="modelNationality" name="modelNationality">
-                                <option value="taiwan" data-i18n="nationality_taiwan">台灣</option>
-                                <option value="usa" data-i18n="nationality_usa">美國</option>
-                                <option value="russia" data-i18n="nationality_russia">俄羅斯</option>
-                                <option value="brazil" data-i18n="nationality_brazil">巴西</option>
-                                <option value="custom" data-i18n="nationality_custom">自定義</option>
-                            </select>
-                            <div id="customNationalityInput" style="display: none; margin-top: 10px;">
-                                <input type="text" id="customNationalityText" placeholder="請輸入模特兒國籍或種族描述 (例如: 日本、韓國、混血等)" style="width: 100%; padding: 10px; border: 2px solid #e1e5e9; border-radius: 8px; font-size: 14px;" data-i18n-placeholder="custom_nationality_placeholder">
-                            </div>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="modelCombination" data-i18n="model_combination">人物組合</label>
-                            <select id="modelCombination" name="modelCombination">
-                                <option value="parents_baby" data-i18n="combination_parents_baby">爸媽與嬰兒</option>
-                                <option value="mom_baby" data-i18n="combination_mom_baby">媽媽與嬰兒</option>
-                                <option value="dad_baby" data-i18n="combination_dad_baby">爸爸與嬰兒</option>
-                                <option value="couple" data-i18n="combination_couple">夫妻</option>
-                                <option value="custom" data-i18n="combination_custom">自定義</option>
-                            </select>
-                            <div id="customCombinationInput" style="display: none; margin-top: 10px;">
-                                <input type="text" id="customCombinationText" placeholder="請輸入人物組合描述 (例如: 祖父母與孫子、三代同堂等)" style="width: 100%; padding: 10px; border: 2px solid #e1e5e9; border-radius: 8px; font-size: 14px;" data-i18n-placeholder="custom_combination_placeholder">
-                            </div>
-                        </div>
-                        
-                        <h4 style="color: #4ECDC4; margin-top: 20px; margin-bottom: 15px;">🌍 <span data-i18n="scene_settings">場景設定</span></h4>
-                        
-                        <div class="form-group">
-                            <label for="sceneLocation" data-i18n="scene_location">場景地點</label>
-                            <select id="sceneLocation" name="sceneLocation">
-                                <option value="city" data-i18n="location_city">城市</option>
-                                <option value="beach" data-i18n="location_beach">海邊</option>
-                                <option value="mountain" data-i18n="location_mountain">山區</option>
-                                <option value="park" data-i18n="location_park">公園</option>
-                                <option value="custom" data-i18n="location_custom">自定義</option>
-                            </select>
-                            <div id="customLocationInput" style="display: none; margin-top: 10px;">
-                                <input type="text" id="customLocationText" placeholder="請輸入場景地點描述 (例如: 咖啡廳、遊樂場、森林等)" style="width: 100%; padding: 10px; border: 2px solid #e1e5e9; border-radius: 8px; font-size: 14px;" data-i18n-placeholder="custom_location_placeholder">
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- 場景選擇選項 -->
-                    <div class="form-group" id="scenarioOptionsGroup" style="display: none;">
-                        <label data-i18n="usage_scenario_selection">使用場景選擇 / Usage Scenario Selection</label>
-                        <div class="checkbox-group" id="scenarioGroup">
-                            <div class="checkbox-item">
-                                <input type="radio" id="scenario_parent_child" name="scenarioType" value="親子互動" checked>
-                                <label for="scenario_parent_child">👨‍👩‍👧‍👦 <span data-i18n="scenario_parent_child">親子互動 (Parent-Child Interaction)</span></label>
-                            </div>
-                            <div class="checkbox-item">
-                                <input type="radio" id="scenario_child_solo" name="scenarioType" value="小孩單人使用">
-                                <label for="scenario_child_solo">🧒 <span data-i18n="scenario_child_solo">小孩單人使用 (Child Solo Play)</span></label>
-                            </div>
-                            <div class="checkbox-item">
-                                <input type="radio" id="scenario_outdoor_travel" name="scenarioType" value="外出旅遊">
-                                <label for="scenario_outdoor_travel">🌍 <span data-i18n="scenario_outdoor_travel">外出旅遊 (Outdoor Travel)</span></label>
-                            </div>
-                            <div class="checkbox-item">
-                                <input type="radio" id="scenario_home_play" name="scenarioType" value="居家遊戲">
-                                <label for="scenario_home_play">🏠 <span data-i18n="scenario_home_play">居家遊戲 (Home Play)</span></label>
-                            </div>
-                            <div class="checkbox-item">
-                                <input type="radio" id="scenario_personal_styling" name="scenarioType" value="個人穿搭">
-                                <label for="scenario_personal_styling">👔 <span data-i18n="scenario_personal_styling">個人穿搭 (Personal Styling)</span></label>
-                            </div>
-                            <div class="checkbox-item">
-                                <input type="radio" id="scenario_office_home_decor" name="scenarioType" value="辦公室/居家佈置">
-                                <label for="scenario_office_home_decor">🏢 <span data-i18n="scenario_office_home_decor">辦公室/居家佈置 (Office/Home Decoration)</span></label>
-                            </div>
-                            <div class="checkbox-item">
-                                <input type="radio" id="scenario_other" name="scenarioType" value="其他">
-                                <label for="scenario_other">✨ <span data-i18n="scenario_other">其他 (Other Creative)</span></label>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <button type="submit" class="btn" id="analyzeBtn">
-                        🧠 <span data-i18n="analyze_generate_button">分析產品並生成內容</span>
-                    </button>
-                    
-                    <button type="button" class="btn" id="switchScenarioBtn" style="display: none; background: #28a745;">
-                        🔄 <span data-i18n="switch_scenario_button">切換場景重新生成 (同產品不同平台)</span>
-                    </button>
-                    
-                    <button type="button" class="btn btn-secondary" id="generateScenariosBtn" style="display: none;">
-                        🎬 <span data-i18n="generate_scenarios_button">生成行銷場景</span>
-                    </button>
+                        <!-- 隱藏的默認設置（用於圖片生成） -->
+                        <input type="hidden" id="modelNationality" name="modelNationality" value="taiwan">
+                        <input type="hidden" id="modelCombination" name="modelCombination" value="parents_baby">
+                        <input type="hidden" id="sceneLocation" name="sceneLocation" value="park">
+                        <input type="hidden" name="scenarioType" value="親子互動">
                 </form>
                 
                 <div id="status" class="status"></div>
