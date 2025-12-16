@@ -25,6 +25,8 @@
             max-width: 1400px;
             margin: 0 auto;
             padding: 0;
+            position: relative;
+            z-index: 1;
         }
         
         /* 頂部標題和導航欄 - LingoVerse AI 風格 */
@@ -57,7 +59,7 @@
             display: flex;
             align-items: center;
             gap: 15px;
-            z-index: 100;
+            z-index: 101;
         }
         
         .app-top-actions .auth-btn {
@@ -1033,6 +1035,8 @@
             margin-top: 30px;
             flex-wrap: wrap;
             padding: 0 20px;
+            position: relative;
+            z-index: 12;
         }
         
         .tab-btn {
@@ -1046,6 +1050,9 @@
             cursor: pointer;
             transition: all 0.3s;
             backdrop-filter: blur(10px);
+            position: relative;
+            z-index: 1;
+            pointer-events: auto;
         }
         
         .tab-btn:hover {
@@ -1054,20 +1061,9 @@
         }
         
         .tab-btn.active {
-            background: rgba(255, 255, 255, 0.3);
-            box-shadow: 0 4px 15px rgba(255, 255, 255, 0.2);
-        }
-        
-        .tab-btn:hover {
-            background: #f0f8ff;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 10px rgba(135, 206, 235, 0.3);
-        }
-        
-        .tab-btn.active {
             background: linear-gradient(135deg, #87CEEB 0%, #FFB6C1 100%);
             color: white;
-            border-color: transparent;
+            box-shadow: 0 4px 15px rgba(255, 255, 255, 0.2);
         }
         
         .page-content {
@@ -1793,19 +1789,19 @@
             
         <!-- 功能導航欄 -->
             <div class="tab-navigation">
-                <button class="tab-btn active" onclick="switchPage('page1')">
+                <button class="tab-btn active" onclick="switchPage('page1', event)">
                     <span data-i18n="tab_image_generation">🎨 AI 圖片生成</span>
                 </button>
-                <button class="tab-btn" onclick="switchPage('page2')">
+                <button class="tab-btn" onclick="switchPage('page2', event)">
                     <span data-i18n="tab_ads_advisor">📊 AI 廣告顧問</span>
                 </button>
-                <button class="tab-btn" onclick="switchPage('page3')">
+                <button class="tab-btn" onclick="switchPage('page3', event)">
                     <span data-i18n="tab_course_editor">📚 AI 課程編輯專家</span>
                 </button>
-                <button class="tab-btn" onclick="switchPage('page4')">
+                <button class="tab-btn" onclick="switchPage('page4', event)">
                     <span data-i18n="tab_prompt_architect">📝 AI 指令架構師</span>
                 </button>
-                <button class="tab-btn admin-only" id="adminTabBtn" onclick="switchPage('page5')" style="display: none;">
+                <button class="tab-btn admin-only" id="adminTabBtn" onclick="switchPage('page5', event)" style="display: none;">
                     <span data-i18n="tab_admin">👑 管理員</span>
                 </button>
             </div>
@@ -4275,7 +4271,7 @@
         // ==================== Page 2: AI 廣告顧問功能 ====================
         
         // 分頁切換函數
-        function switchPage(pageId) {
+        function switchPage(pageId, event) {
             // 隱藏所有頁面
             document.querySelectorAll('.page-content').forEach(page => {
                 page.classList.remove('active');
@@ -4287,15 +4283,32 @@
             });
             
             // 顯示選中的頁面
-            document.getElementById(pageId).classList.add('active');
+            const targetPage = document.getElementById(pageId);
+            if (targetPage) {
+                targetPage.classList.add('active');
+            } else {
+                console.error('Page not found:', pageId);
+                return;
+            }
             
             // 設置對應按鈕為 active
-            event.target.classList.add('active');
+            if (event && event.target) {
+                event.target.classList.add('active');
+            } else {
+                // 如果沒有 event，通過 onclick 屬性找到對應按鈕
+                const targetBtn = document.querySelector(`.tab-btn[onclick*="${pageId}"]`);
+                if (targetBtn) {
+                    targetBtn.classList.add('active');
+                }
+            }
             
             // 如果切換到管理員頁面，初始化管理控制台
             if (pageId === 'page5' && typeof AdminConsole !== 'undefined') {
                 AdminConsole.init();
             }
+            
+            // 滾動到頂部
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
         
         // Page 2 檔案上傳處理
