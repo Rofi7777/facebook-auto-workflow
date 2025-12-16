@@ -4111,19 +4111,28 @@
                     document.title = `${config.brand.name} Multi-Platform Content Generator`;
                 }
                 
-                // Populate platforms - only update if API returns platforms
+                // Populate platforms - only update if API returns platforms (preserve modern UI)
                 if (config.platforms && Array.isArray(config.platforms) && config.platforms.length > 0) {
                     const platformsGroup = document.getElementById('platformsGroup');
-                    if (platformsGroup) {
-                        platformsGroup.innerHTML = '';
+                    if (platformsGroup && platformsGroup.classList.contains('platform-selection')) {
+                        // Modern UI: Update existing platform cards if needed
+                        // Keep the existing modern UI structure
                         config.platforms.forEach(platform => {
-                            const item = document.createElement('div');
-                            item.className = 'checkbox-item';
-                            item.innerHTML = `
-                                <input type="checkbox" id="platform_${platform.value}" value="${platform.value}" checked>
-                                <label for="platform_${platform.value}">${platform.label}</label>
-                            `;
-                            platformsGroup.appendChild(item);
+                            const existingCard = platformsGroup.querySelector(`[data-platform="${platform.value}"]`);
+                            if (!existingCard) {
+                                // Add new platform card if it doesn't exist
+                                const card = document.createElement('div');
+                                card.className = 'platform-card selected';
+                                card.setAttribute('data-platform', platform.value);
+                                card.onclick = () => togglePlatform(platform.value);
+                                card.innerHTML = `
+                                    <input type="checkbox" id="platform_${platform.value}" value="${platform.value}" checked>
+                                    <div class="platform-icon">${getPlatformIcon(platform.value)}</div>
+                                    <div class="platform-name">${platform.label}</div>
+                                    <div class="checkmark">✓</div>
+                                `;
+                                platformsGroup.appendChild(card);
+                            }
                         });
                     }
                 }
