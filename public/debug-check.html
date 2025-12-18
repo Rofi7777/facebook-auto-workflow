@@ -87,9 +87,19 @@
             // 使用 Promise 异步检查CSS文件
             const cssCheckPromises = cssFiles.map(file => {
                 return new Promise((resolve) => {
-                    const link = Array.from(document.querySelectorAll('link[rel="stylesheet"]')).find(l => {
+                    // 获取所有link标签
+                    const links = Array.from(document.querySelectorAll('link[rel="stylesheet"]'));
+                    
+                    // 检查link标签（支持相对路径和完整URL）
+                    const link = links.find(l => {
                         const href = l.href || l.getAttribute('href');
-                        return href && (href.includes(file) || href.endsWith(file));
+                        if (!href) return false;
+                        
+                        // 提取路径部分（去除查询参数和hash）
+                        const urlPath = new URL(href, window.location.origin).pathname;
+                        const filePath = file.startsWith('/') ? file : '/' + file;
+                        
+                        return urlPath === filePath || urlPath.endsWith(filePath) || href.includes(file);
                     });
                     
                     if (link) {
@@ -98,17 +108,18 @@
                         if (sheet) {
                             resolve({ type: 'pass', label: `CSS文件加载: ${file}`, details: '✓ 已加载' });
                         } else {
+                            // Link存在但sheet未加载，可能是加载中或加载失败
                             // 尝试fetch验证文件是否存在
                             fetch(file, { method: 'HEAD' })
                                 .then(res => {
                                     if (res.ok) {
-                                        resolve({ type: 'pass', label: `CSS文件加载: ${file}`, details: '✓ 文件存在' });
+                                        resolve({ type: 'warning', label: `CSS文件加载: ${file}`, details: '⚠ Link存在但样式表未加载（可能加载中）' });
                                     } else {
                                         resolve({ type: 'fail', label: `CSS文件加载: ${file}`, details: `✗ HTTP ${res.status}` });
                                     }
                                 })
                                 .catch(() => {
-                                    resolve({ type: 'fail', label: `CSS文件加载: ${file}`, details: '✗ 未找到' });
+                                    resolve({ type: 'fail', label: `CSS文件加载: ${file}`, details: '✗ 文件未找到' });
                                 });
                         }
                     } else {
