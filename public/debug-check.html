@@ -134,21 +134,21 @@
             
             // 2. 检查JavaScript模块加载
             const jsModules = [
-                { name: 'StateManager', path: '/js/core/state.js' },
-                { name: 'Router', path: '/js/core/router.js' },
-                { name: 'App', path: '/js/core/app.js' },
-                { name: 'ApiService', path: '/js/services/api.js' },
-                { name: 'AuthService', path: '/js/services/auth.js' },
-                { name: 'I18n', path: '/js/services/i18n.js' },
-                { name: 'Navigation', path: '/js/components/Navigation.js' },
-                { name: 'ImageUpload', path: '/js/components/ImageUpload.js' },
-                { name: 'PlatformSelector', path: '/js/components/PlatformSelector.js' },
-                { name: 'StepIndicator', path: '/js/components/StepIndicator.js' },
-                { name: 'Page1ProductAnalysis', path: '/js/pages/Page1ProductAnalysis.js' },
-                { name: 'Page2AdsAdvisor', path: '/js/pages/Page2AdsAdvisor.js' },
-                { name: 'Page3CourseEditor', path: '/js/pages/Page3CourseEditor.js' },
-                { name: 'Page4PromptArchitect', path: '/js/pages/Page4PromptArchitect.js' },
-                { name: 'Page5Admin', path: '/js/pages/Page5Admin.js' }
+                { name: 'StateManager', path: '/js/core/state.js', checkWindow: true },
+                { name: 'Router', path: '/js/core/router.js', checkWindow: true },
+                { name: 'App', path: '/js/core/app.js', checkWindow: true },
+                { name: 'ApiService', path: '/js/services/api.js', checkWindow: true },
+                { name: 'AuthService', path: '/js/services/auth.js', checkWindow: true },
+                { name: 'I18n', path: '/js/services/i18n.js', checkWindow: true },
+                { name: 'Navigation', path: '/js/components/Navigation.js', checkWindow: true },
+                { name: 'ImageUpload', path: '/js/components/ImageUpload.js', checkWindow: true },
+                { name: 'PlatformSelector', path: '/js/components/PlatformSelector.js', checkWindow: true },
+                { name: 'StepIndicator', path: '/js/components/StepIndicator.js', checkWindow: true },
+                { name: 'Page1ProductAnalysis', path: '/js/pages/Page1ProductAnalysis.js', checkWindow: true },
+                { name: 'Page2AdsAdvisor', path: '/js/pages/Page2AdsAdvisor.js', checkWindow: true },
+                { name: 'Page3CourseEditor', path: '/js/pages/Page3CourseEditor.js', checkWindow: true },
+                { name: 'Page4PromptArchitect', path: '/js/pages/Page4PromptArchitect.js', checkWindow: true },
+                { name: 'Page5Admin', path: '/js/pages/Page5Admin.js', checkWindow: true }
             ];
             
             // 检查脚本标签是否存在
@@ -156,9 +156,9 @@
             
             const jsCheckPromises = jsModules.map(module => {
                 return new Promise((resolve) => {
-                    // 检查window对象
-                    if (window[module.name]) {
-                        resolve({ type: 'pass', label: `JS模块: ${module.name}`, details: '✓ 已加载' });
+                    // 首先检查window对象（如果模块已加载）
+                    if (module.checkWindow && window[module.name]) {
+                        resolve({ type: 'pass', label: `JS模块: ${module.name}`, details: '✓ 已加载并初始化' });
                         return;
                     }
                     
@@ -173,7 +173,12 @@
                         fetch(module.path, { method: 'HEAD' })
                             .then(res => {
                                 if (res.ok) {
-                                    resolve({ type: 'warning', label: `JS模块: ${module.name}`, details: '⚠ 文件存在但模块未初始化' });
+                                    if (module.checkWindow) {
+                                        // 文件存在但模块未初始化，可能是加载顺序问题
+                                        resolve({ type: 'warning', label: `JS模块: ${module.name}`, details: '⚠ 文件存在但模块未初始化（可能加载顺序问题）' });
+                                    } else {
+                                        resolve({ type: 'pass', label: `JS模块: ${module.name}`, details: '✓ 文件存在' });
+                                    }
                                 } else {
                                     resolve({ type: 'fail', label: `JS模块: ${module.name}`, details: `✗ HTTP ${res.status}` });
                                 }
@@ -329,12 +334,13 @@
         window.addEventListener('load', () => {
             setTimeout(() => {
                 console.log('开始运行诊断...');
+                console.log('当前window对象:', Object.keys(window).filter(k => k.includes('State') || k.includes('Router') || k.includes('App') || k.includes('Api') || k.includes('Auth') || k.includes('I18n')));
                 runDiagnostics().catch(err => {
                     console.error('诊断运行错误:', err);
                     document.getElementById('diagnosticResults').innerHTML = 
                         '<div class="check-item fail"><div class="check-label">诊断运行错误</div><div class="check-details">' + err.message + '</div></div>';
                 });
-            }, 2000); // 等待2秒确保所有资源加载
+            }, 3000); // 等待3秒确保所有资源加载
         });
     </script>
 </body>
