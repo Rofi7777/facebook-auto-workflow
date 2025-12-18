@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>文件访问测试</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-item {
+            padding: 10px;
+            margin: 5px 0;
+            background: white;
+            border-radius: 4px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .status {
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        .pass {
+            background: #d4edda;
+            color: #155724;
+        }
+        .fail {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        .loading {
+            background: #fff3cd;
+            color: #856404;
+        }
+    </style>
+</head>
+<body>
+    <h1>文件访问测试</h1>
+    <div id="results"></div>
+    
+    <script>
+        async function testFile(url, name) {
+            const item = document.createElement('div');
+            item.className = 'test-item';
+            item.innerHTML = `
+                <span>${name}</span>
+                <span class="status loading">检查中...</span>
+            `;
+            document.getElementById('results').appendChild(item);
+            
+            try {
+                const response = await fetch(url, { method: 'HEAD' });
+                const statusSpan = item.querySelector('.status');
+                if (response.ok) {
+                    statusSpan.textContent = `✓ 可访问 (${response.status})`;
+                    statusSpan.className = 'status pass';
+                } else {
+                    statusSpan.textContent = `✗ HTTP ${response.status}`;
+                    statusSpan.className = 'status fail';
+                }
+            } catch (error) {
+                const statusSpan = item.querySelector('.status');
+                statusSpan.textContent = `✗ 错误: ${error.message}`;
+                statusSpan.className = 'status fail';
+            }
+        }
+        
+        async function testModule(name) {
+            const item = document.createElement('div');
+            item.className = 'test-item';
+            item.innerHTML = `
+                <span>${name}</span>
+                <span class="status loading">检查中...</span>
+            `;
+            document.getElementById('results').appendChild(item);
+            
+            await new Promise(resolve => setTimeout(resolve, 100));
+            
+            const statusSpan = item.querySelector('.status');
+            if (window[name]) {
+                statusSpan.textContent = '✓ 已加载';
+                statusSpan.className = 'status pass';
+            } else {
+                statusSpan.textContent = '✗ 未找到';
+                statusSpan.className = 'status fail';
+            }
+        }
+        
+        async function runTests() {
+            // 测试CSS文件
+            await testFile('/css/reset.css', 'CSS: reset.css');
+            await testFile('/css/variables.css', 'CSS: variables.css');
+            await testFile('/css/layout.css', 'CSS: layout.css');
+            await testFile('/css/components.css', 'CSS: components.css');
+            await testFile('/css/pages.css', 'CSS: pages.css');
+            await testFile('/css/modern-ui.css', 'CSS: modern-ui.css');
+            
+            // 测试JS文件
+            await testFile('/js/core/state.js', 'JS: core/state.js');
+            await testFile('/js/core/router.js', 'JS: core/router.js');
+            await testFile('/js/core/app.js', 'JS: core/app.js');
+            await testFile('/js/services/api.js', 'JS: services/api.js');
+            await testFile('/js/services/auth.js', 'JS: services/auth.js');
+            await testFile('/js/services/i18n.js', 'JS: services/i18n.js');
+            
+            // 等待脚本加载
+            await new Promise(resolve => setTimeout(resolve, 2000));
+            
+            // 测试模块
+            await testModule('StateManager');
+            await testModule('Router');
+            await testModule('App');
+            await testModule('ApiService');
+            await testModule('AuthService');
+            await testModule('I18n');
+        }
+        
+        window.addEventListener('load', () => {
+            setTimeout(runTests, 500);
+        });
+    </script>
+</body>
+</html>
+
