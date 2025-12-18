@@ -70,6 +70,11 @@ window.pageModules = {};
  * 初始化页面模块
  */
 async function initializePageModules() {
+  // 确保 pageModules 对象存在
+  if (!window.pageModules) {
+    window.pageModules = {};
+  }
+  
   const pages = [
     { name: 'Page1ProductAnalysis', id: 'page1' },
     { name: 'Page2AdsAdvisor', id: 'page2' },
@@ -87,6 +92,16 @@ async function initializePageModules() {
         console.log(`[App Init] ${page.name} initialized`);
       } catch (error) {
         console.error(`[App Init] Error initializing ${page.name}:`, error);
+        // 即使初始化失败，也创建一个空对象以避免后续错误
+        if (!window.pageModules[page.id]) {
+          window.pageModules[page.id] = {};
+        }
+      }
+    } else {
+      console.warn(`[App Init] ${page.name} class not found`);
+      // 创建空对象以避免后续访问错误
+      if (!window.pageModules[page.id]) {
+        window.pageModules[page.id] = {};
       }
     }
   }
@@ -128,26 +143,21 @@ function integrateExistingFeatures() {
     console.log('[App Init] AuthManager integrated with AuthService');
   }
   
-  // 3. 集成图片上传功能
+  // 3. 集成图片上传功能（如果页面模块未初始化，则使用原有函数）
   if (window.initImageUpload) {
-    // 延迟初始化，确保新组件已加载
+    // 延迟检查，确保页面模块已初始化
     setTimeout(() => {
-      const uploadArea = document.getElementById('uploadArea');
-      if (uploadArea && window.ImageUpload) {
-        // 使用新的 ImageUpload 组件
-        const imageUpload = new window.ImageUpload(uploadArea, {
-          maxFiles: 5,
-          maxSize: 10 * 1024 * 1024,
-          showPreview: true
-        });
-        imageUpload.init();
-        window.pageModules.page1.imageUpload = imageUpload;
-        console.log('[App Init] Image upload integrated with new component');
+      // 如果 page1 模块已初始化，图片上传应该已经由 Page1ProductAnalysis 处理
+      if (window.pageModules && window.pageModules.page1 && window.pageModules.page1.imageUpload) {
+        console.log('[App Init] Image upload already initialized by Page1ProductAnalysis');
       } else {
         // 回退到原有函数
-        window.initImageUpload();
+        console.log('[App Init] Using fallback image upload initialization');
+        if (typeof window.initImageUpload === 'function') {
+          window.initImageUpload();
+        }
       }
-    }, 500);
+    }, 1500); // 等待页面模块初始化完成
   }
   
   // 4. 集成导航功能
