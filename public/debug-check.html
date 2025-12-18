@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Googa AI Hub - 诊断工具</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .diagnostic-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #4a2c7a;
+            margin-bottom: 20px;
+        }
+        .check-item {
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            border-left: 4px solid #ddd;
+        }
+        .check-item.pass {
+            background: #d4edda;
+            border-left-color: #28a745;
+        }
+        .check-item.fail {
+            background: #f8d7da;
+            border-left-color: #dc3545;
+        }
+        .check-item.warning {
+            background: #fff3cd;
+            border-left-color: #ffc107;
+        }
+        .check-label {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        .check-details {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
+        button {
+            padding: 10px 20px;
+            background: #4a2c7a;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+        button:hover {
+            background: #6b3fa0;
+        }
+    </style>
+</head>
+<body>
+    <div class="diagnostic-container">
+        <h1>🔍 Googa AI Hub - 诊断工具</h1>
+        <button onclick="runDiagnostics()">运行诊断</button>
+        <div id="diagnosticResults"></div>
+    </div>
+    
+    <script>
+        function runDiagnostics() {
+            const results = [];
+            
+            // 1. 检查CSS文件加载
+            const cssFiles = [
+                '/css/reset.css',
+                '/css/variables.css',
+                '/css/layout.css',
+                '/css/components.css',
+                '/css/pages.css',
+                '/css/modern-ui.css'
+            ];
+            
+            cssFiles.forEach(file => {
+                const link = Array.from(document.querySelectorAll('link[rel="stylesheet"]')).find(l => l.href.includes(file));
+                if (link) {
+                    results.push({ type: 'pass', label: `CSS文件加载: ${file}`, details: '✓ 已加载' });
+                } else {
+                    results.push({ type: 'fail', label: `CSS文件加载: ${file}`, details: '✗ 未找到' });
+                }
+            });
+            
+            // 2. 检查JavaScript模块加载
+            const jsModules = [
+                'StateManager',
+                'Router',
+                'App',
+                'ApiService',
+                'AuthService',
+                'I18n',
+                'Navigation',
+                'ImageUpload',
+                'PlatformSelector',
+                'StepIndicator',
+                'Page1ProductAnalysis',
+                'Page2AdsAdvisor',
+                'Page3CourseEditor',
+                'Page4PromptArchitect',
+                'Page5Admin'
+            ];
+            
+            jsModules.forEach(module => {
+                if (window[module]) {
+                    results.push({ type: 'pass', label: `JS模块: ${module}`, details: '✓ 已加载' });
+                } else {
+                    results.push({ type: 'fail', label: `JS模块: ${module}`, details: '✗ 未找到' });
+                }
+            });
+            
+            // 3. 检查页面元素
+            const pages = ['page1', 'page2', 'page3', 'page4', 'page5'];
+            pages.forEach(pageId => {
+                const page = document.getElementById(pageId);
+                if (page) {
+                    const isVisible = page.classList.contains('active') || 
+                                    window.getComputedStyle(page).display !== 'none';
+                    const isPage1 = pageId === 'page1';
+                    if (isPage1 && isVisible) {
+                        results.push({ type: 'pass', label: `页面元素: ${pageId}`, details: '✓ 存在且可见' });
+                    } else if (!isPage1 && page) {
+                        results.push({ type: 'warning', label: `页面元素: ${pageId}`, details: isVisible ? '✓ 存在且可见' : '⚠ 存在但隐藏（正常）' });
+                    } else {
+                        results.push({ type: 'fail', label: `页面元素: ${pageId}`, details: '✗ 未找到' });
+                    }
+                } else {
+                    results.push({ type: 'fail', label: `页面元素: ${pageId}`, details: '✗ 未找到' });
+                }
+            });
+            
+            // 4. 检查Page1特定元素
+            const page1Elements = [
+                { id: 'productName', name: '产品名称输入框' },
+                { id: 'uploadArea', name: '上传区域' },
+                { id: 'imageUpload', name: '图片上传输入' },
+                { id: 'analyzeProductBtn', name: '分析按钮' },
+                { id: 'step-indicator', name: '步骤指示器', selector: '.step-indicator' }
+            ];
+            
+            page1Elements.forEach(el => {
+                const element = el.selector ? 
+                    document.querySelector(`#page1 ${el.selector}`) :
+                    document.getElementById(el.id);
+                if (element) {
+                    const isVisible = window.getComputedStyle(element).display !== 'none';
+                    results.push({ 
+                        type: isVisible ? 'pass' : 'warning', 
+                        label: `Page1元素: ${el.name}`, 
+                        details: isVisible ? '✓ 存在且可见' : '⚠ 存在但隐藏' 
+                    });
+                } else {
+                    results.push({ type: 'fail', label: `Page1元素: ${el.name}`, details: '✗ 未找到' });
+                }
+            });
+            
+            // 5. 检查Page4特定元素
+            const page4Elements = [
+                { id: 'businessMode', name: '商业顾问模式容器' },
+                { id: 'codingMode', name: '软件开发模式容器' },
+                { id: 'imageMode', name: '视觉绘图模式容器' },
+                { id: 'promptResult', name: 'Prompt结果容器' },
+                { selector: '.mode-tabs', name: '模式切换标签' }
+            ];
+            
+            page4Elements.forEach(el => {
+                const element = el.id ? 
+                    document.getElementById(el.id) :
+                    document.querySelector(`#page4 ${el.selector}`);
+                if (element) {
+                    const isVisible = window.getComputedStyle(element).display !== 'none' && 
+                                    window.getComputedStyle(element).visibility !== 'hidden';
+                    results.push({ 
+                        type: isVisible ? 'pass' : 'warning', 
+                        label: `Page4元素: ${el.name}`, 
+                        details: isVisible ? '✓ 存在且可见' : '⚠ 存在但隐藏' 
+                    });
+                } else {
+                    results.push({ type: 'fail', label: `Page4元素: ${el.name}`, details: '✗ 未找到' });
+                }
+            });
+            
+            // 6. 检查导航
+            const navButtons = document.querySelectorAll('.tab-btn[data-page]');
+            if (navButtons.length > 0) {
+                results.push({ type: 'pass', label: '导航按钮', details: `✓ 找到 ${navButtons.length} 个按钮` });
+            } else {
+                results.push({ type: 'fail', label: '导航按钮', details: '✗ 未找到' });
+            }
+            
+            // 7. 检查控制台错误
+            const originalError = console.error;
+            const errors = [];
+            console.error = function(...args) {
+                errors.push(args.join(' '));
+                originalError.apply(console, args);
+            };
+            
+            // 显示结果
+            displayResults(results);
+        }
+        
+        function displayResults(results) {
+            const container = document.getElementById('diagnosticResults');
+            container.innerHTML = '<h2>诊断结果</h2>';
+            
+            const passCount = results.filter(r => r.type === 'pass').length;
+            const failCount = results.filter(r => r.type === 'fail').length;
+            const warnCount = results.filter(r => r.type === 'warning').length;
+            
+            container.innerHTML += `
+                <div style="margin-bottom: 20px; padding: 15px; background: #e7f3ff; border-radius: 4px;">
+                    <strong>总结:</strong> 
+                    <span style="color: #28a745;">通过: ${passCount}</span> | 
+                    <span style="color: #dc3545;">失败: ${failCount}</span> | 
+                    <span style="color: #ffc107;">警告: ${warnCount}</span>
+                </div>
+            `;
+            
+            results.forEach(result => {
+                const div = document.createElement('div');
+                div.className = `check-item ${result.type}`;
+                div.innerHTML = `
+                    <div class="check-label">${result.label}</div>
+                    <div class="check-details">${result.details}</div>
+                `;
+                container.appendChild(div);
+            });
+        }
+        
+        // 页面加载后自动运行
+        window.addEventListener('load', () => {
+            setTimeout(runDiagnostics, 1000);
+        });
+    </script>
+</body>
+</html>
+
