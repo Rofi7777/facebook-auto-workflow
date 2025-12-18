@@ -261,10 +261,16 @@ class Page1ProductAnalysis {
       const productDescription = document.querySelector(`#${this.pageId} #productDescription`)?.value || '';
       const language = document.querySelector(`#${this.pageId} #languageSelect`)?.value || 'zh-TW';
       
+      const industryCategory = document.querySelector(`#${this.pageId} #industryCategory`)?.value || 'mother-kids';
+      
       const analysisData = {
-        productName: productName,
-        productDescription: productDescription,
-        images: uploadedImagePaths,
+        imagePaths: uploadedImagePaths,
+        imagePath: uploadedImagePath,
+        productInfo: {
+          name: productName,
+          description: productDescription,
+          industryCategory: industryCategory
+        },
         language: language
       };
       
@@ -360,26 +366,32 @@ class Page1ProductAnalysis {
       const productDescription = document.querySelector(`#${this.pageId} #productDescription`)?.value || '';
       const language = document.querySelector(`#${this.pageId} #languageSelect`)?.value || 'zh-TW';
       
+      const industryCategory = document.querySelector(`#${this.pageId} #industryCategory`)?.value || 'mother-kids';
+      const productDescription = document.querySelector(`#${this.pageId} #productDescription`)?.value || '';
+      
       // 准备生成数据
       const generationData = {
         productInfo: this.analysisResult.productAnalysis || {
-          productName: productName,
-          productDescription: productDescription
+          name: productName,
+          description: productDescription,
+          productType: productName,
+          industryCategory: industryCategory
         },
+        painPointsAnalysis: this.analysisResult.painPointsAnalysis || {},
         platforms: selectedPlatforms,
         language: language
       };
       
-      // 调用生成API
+      // 调用生成API (使用正确的端点)
       let contentResult;
       if (window.ApiService) {
-        contentResult = await window.ApiService.post('/generate-platform-content', generationData);
+        contentResult = await window.ApiService.post('/generate-platform-content-text', generationData);
       } else {
-        const response = await window.AuthService?.authFetch('/api/generate-platform-content', {
+        const response = await window.AuthService?.authFetch('/api/generate-platform-content-text', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(generationData)
-        }) || fetch('/api/generate-platform-content', {
+        }) || fetch('/api/generate-platform-content-text', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -399,8 +411,16 @@ class Page1ProductAnalysis {
         window.StateManager.setState('page1.contentResult', contentResult, true);
       }
       
+      // 保存生成的内容结果
+      const results = contentResult.results || contentResult;
+      
       // 显示结果
-      this.displayContentResults(contentResult);
+      this.displayContentResults({ results: results, platforms: contentResult.platforms });
+      
+      // 保存到状态
+      if (window.StateManager) {
+        window.StateManager.setState('page1.contentResult', { results: results }, true);
+      }
       
       // 显示场景生成按钮
       const scenariosBtn = document.querySelector(`#${this.pageId} #generateScenariosBtn`);
@@ -433,10 +453,41 @@ class Page1ProductAnalysis {
       }
 
       const productName = document.querySelector(`#${this.pageId} #productName`)?.value?.trim() || '';
-      const language = document.querySelector(`#${this.pageId} #languageSelect`)?.value || 'zh-TW';
+      const language = document.querySelector(`#${this.pageId} #languageSelect`)?.value || 
+                      document.querySelector(`#${this.pageId} #language`)?.value || 'zh-TW';
+      
+      // 获取场景类型和模型设置
+      const scenarioType = document.querySelector(`#${this.pageId} #scenarioType`)?.value || '親子互動';
+      let modelNationality = document.querySelector(`#${this.pageId} #modelNationality`)?.value || 'taiwan';
+      let modelCombination = document.querySelector(`#${this.pageId} #modelCombination`)?.value || 'parents-baby';
+      let sceneLocation = document.querySelector(`#${this.pageId} #sceneLocation`)?.value || 'home';
+      
+      // 处理自定义选项
+      if (modelNationality === 'custom') {
+        const customText = document.querySelector(`#${this.pageId} #customNationalityText`)?.value?.trim();
+        if (customText) modelNationality = customText;
+      }
+      if (modelCombination === 'custom') {
+        const customText = document.querySelector(`#${this.pageId} #customCombinationText`)?.value?.trim();
+        if (customText) modelCombination = customText;
+      }
+      if (sceneLocation === 'custom') {
+        const customText = document.querySelector(`#${this.pageId} #customLocationText`)?.value?.trim();
+        if (customText) sceneLocation = customText;
+      }
+      
+      // 获取已生成的内容和图片路径
+      const contentResult = window.StateManager?.getState('page1.contentResult');
+      const uploadedImagePath = window.StateManager?.getState('page1.uploadedImagePath');
       
       const scenariosData = {
         productInfo: this.analysisResult.productAnalysis || { productName },
+        contentData: contentResult?.results || contentResult,
+        productImagePath: uploadedImagePath,
+        scenarioType: scenarioType,
+        modelNationality: modelNationality,
+        modelCombination: modelCombination,
+        sceneLocation: sceneLocation,
         language: language
       };
       
@@ -458,12 +509,24 @@ class Page1ProductAnalysis {
         });
         
         if (!response.ok) {
-          throw new Error('場景生成失敗');
+          let errorMessage = '場景生成失敗';
+          try {
+            const errorData = await response.json();
+            errorMessage = errorData.message || errorData.error || errorMessage;
+          } catch (e) {
+            errorMessage = `HTTP ${response.status}: ${response.statusText || '場景生成失敗'}`;
+          }
+          throw new Error(errorMessage);
         }
-        scenariosResult = await response.json();
+        
+        const text = await response.text();
+        if (!text) {
+          throw new Error('伺服器返回空響應');
+        }
+        scenariosResult = JSON.parse(text);
       }
       
-      this.displayScenariosResults(scenariosResult);
+      this.displayScenariosResults(scenariosResult.scenarios || scenariosResult);
       
     } catch (error) {
       console.error('[Page1] Scenarios generation error:', error);
@@ -543,16 +606,76 @@ class Page1ProductAnalysis {
   /**
    * Display scenarios results
    */
-  displayScenariosResults(result) {
-    const resultContainer = document.querySelector(`#${this.pageId} .scenarios-result`) ||
-                            document.querySelector(`#${this.pageId} #aiMarketingScenario`);
-    if (!resultContainer) {
-      console.warn('[Page1] Scenarios result container not found');
+  displayScenariosResults(scenarios) {
+    const scenariosContainer = document.querySelector(`#${this.pageId} #scenariosContainer`) ||
+                               document.querySelector(`#${this.pageId} .scenarios-result`) ||
+                               document.querySelector(`#${this.pageId} #aiMarketingScenario`);
+    
+    if (!scenariosContainer) {
+      console.warn('[Page1] Scenarios container not found');
       return;
     }
     
-    resultContainer.innerHTML = '<div class="result-content">' + this.formatResult(result) + '</div>';
-    resultContainer.style.display = 'block';
+    if (!Array.isArray(scenarios)) {
+      scenariosContainer.innerHTML = '<div class="result-content">' + this.formatResult(scenarios) + '</div>';
+      scenariosContainer.style.display = 'block';
+      return;
+    }
+    
+    let html = '';
+    
+    scenarios.forEach((scenario, index) => {
+      html += `<div class="platform-result" style="margin-bottom: 25px;">
+        <h3 style="color: #4a90e2;">
+          🎬 場景 ${scenario.scenarioIndex || index + 1}: ${scenario.name || '場景 ' + (index + 1)}
+          ${scenario.imageError ? '⚠️' : '✅'}
+        </h3>
+        
+        <div style="margin-bottom: 15px;">
+          <h4 style="color: #333; margin-bottom: 8px;">📝 場景描述</h4>
+          <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 10px;">
+            ${scenario.description || ''}
+          </div>
+          
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+            <div>
+              <strong>💭 情感氛圍:</strong> ${scenario.emotion || 'N/A'}<br>
+              <strong>🎯 適合平台:</strong> ${scenario.suitablePlatforms?.join(', ') || '通用'}
+            </div>
+            <div>
+              <strong>🎨 視覺重點:</strong> ${scenario.visualFocus || 'N/A'}
+            </div>
+          </div>
+        </div>`;
+      
+      if (scenario.imageDescription) {
+        html += `<div style="margin-bottom: 15px;">
+          <h4 style="color: #333; margin-bottom: 8px;">🖼️ 圖片描述</h4>
+          <div style="background: #e8f4f8; padding: 15px; border-radius: 8px;">
+            ${scenario.imageDescription}
+          </div>
+        </div>`;
+      }
+      
+      if (scenario.imageUrl && !scenario.imageError) {
+        html += `<div style="margin-bottom: 15px;">
+          <h4 style="color: #333; margin-bottom: 8px;">🖼️ 生成的圖片</h4>
+          <img src="${scenario.imageUrl}" alt="Scenario ${index + 1}" style="max-width: 100%; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+        </div>`;
+      } else if (scenario.imageError) {
+        html += `<div style="margin-bottom: 15px; color: #dc3545;">
+          ⚠️ 圖片生成失敗: ${scenario.imageError}
+        </div>`;
+      }
+      
+      html += `</div>`;
+    });
+    
+    scenariosContainer.innerHTML = html;
+    scenariosContainer.style.display = 'block';
+    
+    // 滚动到结果区域
+    scenariosContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
   /**
