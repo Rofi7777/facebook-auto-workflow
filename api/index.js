@@ -155,6 +155,17 @@ app.get('/', (req, res) => {
   res.sendFile(indexPath);
 });
 
+// Test route to verify static file serving
+app.get('/test-static', (req, res) => {
+  res.json({
+    publicPath: publicPath,
+    assetsPath: assetsPath,
+    cssFiles: fs.existsSync(path.join(publicPath, 'css', 'reset.css')) ? 'exists' : 'not found',
+    jsFiles: fs.existsSync(path.join(publicPath, 'js', 'core', 'state.js')) ? 'exists' : 'not found',
+    indexHtml: fs.existsSync(path.join(publicPath, 'index.html')) ? 'exists' : 'not found'
+  });
+});
+
 app.get('/api/health', (req, res) => {
   try {
     res.json({ 
