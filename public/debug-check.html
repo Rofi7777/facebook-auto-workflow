@@ -71,7 +71,7 @@
     </div>
     
     <script>
-        function runDiagnostics() {
+        async function runDiagnostics() {
             const results = [];
             
             // 1. 检查CSS文件加载
@@ -84,41 +84,122 @@
                 '/css/modern-ui.css'
             ];
             
-            cssFiles.forEach(file => {
-                const link = Array.from(document.querySelectorAll('link[rel="stylesheet"]')).find(l => l.href.includes(file));
-                if (link) {
-                    results.push({ type: 'pass', label: `CSS文件加载: ${file}`, details: '✓ 已加载' });
-                } else {
-                    results.push({ type: 'fail', label: `CSS文件加载: ${file}`, details: '✗ 未找到' });
-                }
+            // 使用 Promise 异步检查CSS文件
+            const cssCheckPromises = cssFiles.map(file => {
+                return new Promise((resolve) => {
+                    const link = Array.from(document.querySelectorAll('link[rel="stylesheet"]')).find(l => {
+                        const href = l.href || l.getAttribute('href');
+                        return href && (href.includes(file) || href.endsWith(file));
+                    });
+                    
+                    if (link) {
+                        // 检查link是否已加载
+                        const sheet = link.sheet || link.styleSheet;
+                        if (sheet) {
+                            resolve({ type: 'pass', label: `CSS文件加载: ${file}`, details: '✓ 已加载' });
+                        } else {
+                            // 尝试fetch验证文件是否存在
+                            fetch(file, { method: 'HEAD' })
+                                .then(res => {
+                                    if (res.ok) {
+                                        resolve({ type: 'pass', label: `CSS文件加载: ${file}`, details: '✓ 文件存在' });
+                                    } else {
+                                        resolve({ type: 'fail', label: `CSS文件加载: ${file}`, details: `✗ HTTP ${res.status}` });
+                                    }
+                                })
+                                .catch(() => {
+                                    resolve({ type: 'fail', label: `CSS文件加载: ${file}`, details: '✗ 未找到' });
+                                });
+                        }
+                    } else {
+                        // Link标签不存在，直接fetch验证
+                        fetch(file, { method: 'HEAD' })
+                            .then(res => {
+                                if (res.ok) {
+                                    resolve({ type: 'warning', label: `CSS文件加载: ${file}`, details: '⚠ 文件存在但未在HTML中引用' });
+                                } else {
+                                    resolve({ type: 'fail', label: `CSS文件加载: ${file}`, details: `✗ HTTP ${res.status}` });
+                                }
+                            })
+                            .catch(() => {
+                                resolve({ type: 'fail', label: `CSS文件加载: ${file}`, details: '✗ 未找到' });
+                            });
+                    }
+                });
             });
+            
+            // 等待所有CSS检查完成
+            const cssResults = await Promise.all(cssCheckPromises);
+            results.push(...cssResults);
             
             // 2. 检查JavaScript模块加载
             const jsModules = [
-                'StateManager',
-                'Router',
-                'App',
-                'ApiService',
-                'AuthService',
-                'I18n',
-                'Navigation',
-                'ImageUpload',
-                'PlatformSelector',
-                'StepIndicator',
-                'Page1ProductAnalysis',
-                'Page2AdsAdvisor',
-                'Page3CourseEditor',
-                'Page4PromptArchitect',
-                'Page5Admin'
+                { name: 'StateManager', path: '/js/core/state.js' },
+                { name: 'Router', path: '/js/core/router.js' },
+                { name: 'App', path: '/js/core/app.js' },
+                { name: 'ApiService', path: '/js/services/api.js' },
+                { name: 'AuthService', path: '/js/services/auth.js' },
+                { name: 'I18n', path: '/js/services/i18n.js' },
+                { name: 'Navigation', path: '/js/components/Navigation.js' },
+                { name: 'ImageUpload', path: '/js/components/ImageUpload.js' },
+                { name: 'PlatformSelector', path: '/js/components/PlatformSelector.js' },
+                { name: 'StepIndicator', path: '/js/components/StepIndicator.js' },
+                { name: 'Page1ProductAnalysis', path: '/js/pages/Page1ProductAnalysis.js' },
+                { name: 'Page2AdsAdvisor', path: '/js/pages/Page2AdsAdvisor.js' },
+                { name: 'Page3CourseEditor', path: '/js/pages/Page3CourseEditor.js' },
+                { name: 'Page4PromptArchitect', path: '/js/pages/Page4PromptArchitect.js' },
+                { name: 'Page5Admin', path: '/js/pages/Page5Admin.js' }
             ];
             
-            jsModules.forEach(module => {
-                if (window[module]) {
-                    results.push({ type: 'pass', label: `JS模块: ${module}`, details: '✓ 已加载' });
-                } else {
-                    results.push({ type: 'fail', label: `JS模块: ${module}`, details: '✗ 未找到' });
-                }
+            // 检查脚本标签是否存在
+            const scriptTags = Array.from(document.querySelectorAll('script[src]'));
+            
+            const jsCheckPromises = jsModules.map(module => {
+                return new Promise((resolve) => {
+                    // 检查window对象
+                    if (window[module.name]) {
+                        resolve({ type: 'pass', label: `JS模块: ${module.name}`, details: '✓ 已加载' });
+                        return;
+                    }
+                    
+                    // 检查script标签
+                    const scriptTag = scriptTags.find(s => {
+                        const src = s.src || s.getAttribute('src');
+                        return src && (src.includes(module.path) || src.endsWith(module.path));
+                    });
+                    
+                    if (scriptTag) {
+                        // Script标签存在，检查文件是否可访问
+                        fetch(module.path, { method: 'HEAD' })
+                            .then(res => {
+                                if (res.ok) {
+                                    resolve({ type: 'warning', label: `JS模块: ${module.name}`, details: '⚠ 文件存在但模块未初始化' });
+                                } else {
+                                    resolve({ type: 'fail', label: `JS模块: ${module.name}`, details: `✗ HTTP ${res.status}` });
+                                }
+                            })
+                            .catch(() => {
+                                resolve({ type: 'fail', label: `JS模块: ${module.name}`, details: '✗ 文件未找到' });
+                            });
+                    } else {
+                        // Script标签不存在，检查文件是否存在
+                        fetch(module.path, { method: 'HEAD' })
+                            .then(res => {
+                                if (res.ok) {
+                                    resolve({ type: 'fail', label: `JS模块: ${module.name}`, details: '✗ 文件存在但未在HTML中引用' });
+                                } else {
+                                    resolve({ type: 'fail', label: `JS模块: ${module.name}`, details: `✗ HTTP ${res.status}` });
+                                }
+                            })
+                            .catch(() => {
+                                resolve({ type: 'fail', label: `JS模块: ${module.name}`, details: '✗ 未找到' });
+                            });
+                    }
+                });
             });
+            
+            const jsResults = await Promise.all(jsCheckPromises);
+            results.push(...jsResults);
             
             // 3. 检查页面元素
             const pages = ['page1', 'page2', 'page3', 'page4', 'page5'];
@@ -211,6 +292,11 @@
             displayResults(results);
         }
         
+        // 更新按钮点击事件
+        document.querySelector('button').addEventListener('click', () => {
+            runDiagnostics();
+        });
+        
         function displayResults(results) {
             const container = document.getElementById('diagnosticResults');
             container.innerHTML = '<h2>诊断结果</h2>';
@@ -239,9 +325,16 @@
             });
         }
         
-        // 页面加载后自动运行
+        // 页面加载后自动运行（等待更长时间确保所有资源加载）
         window.addEventListener('load', () => {
-            setTimeout(runDiagnostics, 1000);
+            setTimeout(() => {
+                console.log('开始运行诊断...');
+                runDiagnostics().catch(err => {
+                    console.error('诊断运行错误:', err);
+                    document.getElementById('diagnosticResults').innerHTML = 
+                        '<div class="check-item fail"><div class="check-label">诊断运行错误</div><div class="check-details">' + err.message + '</div></div>';
+                });
+            }, 2000); // 等待2秒确保所有资源加载
         });
     </script>
 </body>
