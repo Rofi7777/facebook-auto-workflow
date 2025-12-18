@@ -47,8 +47,29 @@ const PORT = process.env.PORT || 5000;
 app.use(cors());
 app.use(express.json({ limit: '15mb' }));
 app.use(express.urlencoded({ limit: '15mb', extended: true }));
-app.use(express.static('public'));
-app.use('/assets', express.static('assets'));
+
+// Static file serving - MUST use absolute paths
+const publicPath = path.resolve(__dirname, '..', 'public');
+const assetsPath = path.resolve(__dirname, '..', 'assets');
+
+// Debug: Log static file paths
+console.log('📁 Public path:', publicPath);
+console.log('📁 Assets path:', assetsPath);
+
+// Serve static files from root and /public path
+// Order matters: more specific paths first
+app.use('/public', express.static(publicPath, {
+  setHeaders: (res, filePath) => {
+    // Set correct MIME types
+    if (filePath.endsWith('.js')) {
+      res.setHeader('Content-Type', 'application/javascript');
+    } else if (filePath.endsWith('.css')) {
+      res.setHeader('Content-Type', 'text/css');
+    }
+  }
+}));
+app.use(express.static(publicPath));
+app.use('/assets', express.static(assetsPath));
 
 // Configure multer for multi-file uploads with security validation (Product Images)
 // Note: In Vercel, we use /tmp for file uploads (temporary storage)
