@@ -1,0 +1,105 @@
+/**
+ * Layout Styles
+ * 布局相关样式：header、container、grid等
+ */
+
+/* 主容器 */
+.main-container {
+  max-width: var(--max-width, 1400px);
+  margin: 0 auto;
+  padding: 0;
+  position: relative;
+  z-index: var(--z-index-base, 1);
+}
+
+/* 顶部标题和导航栏 */
+.app-top-header {
+  background: linear-gradient(
+    135deg,
+    var(--color-primary-start, #1a0d2e) 0%,
+    var(--color-primary-25, #2d1b4e) 25%,
+    var(--color-primary-50, #4a2c7a) 50%,
+    var(--color-primary-75, #6b3fa0) 75%,
+    var(--color-primary-end, #8b5ab5) 100%
+  );
+  padding: var(--spacing-xxl, 40px) var(--spacing-lg, 24px) var(--spacing-md, 16px);
+  text-align: center;
+  position: relative;
+  z-index: var(--z-index-header, 10);
+}
+
+.app-main-title {
+  font-size: var(--font-size-title, 42px);
+  font-weight: var(--font-weight-bold, 700);
+  color: var(--color-text-white, #ffffff);
+  margin-bottom: var(--spacing-sm, 8px);
+  letter-spacing: 1px;
+}
+
+.app-subtitle {
+  font-size: var(--font-size-md, 16px);
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.app-top-actions {
+  position: absolute;
+  top: var(--spacing-lg, 24px);
+  right: var(--spacing-lg, 24px);
+  z-index: calc(var(--z-index-header, 10) + 1);
+}
+
+/* 标签导航 */
+.tab-navigation {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  padding: var(--spacing-md, 16px);
+  border-radius: var(--border-radius-lg, 15px);
+  margin: var(--spacing-md, 16px) auto;
+  max-width: var(--max-width, 1400px);
+  display: flex;
+  justify-content: center;
+  gap: var(--spacing-sm, 8px);
+  flex-wrap: wrap;
+  position: sticky;
+  top: 0;
+  z-index: var(--z-index-navigation, 12);
+  box-shadow: var(--shadow-md, 0 4px 8px rgba(0, 0, 0, 0.15));
+}
+
+/* 页面内容 */
+.page-content {
+  display: none;
+  padding: var(--spacing-lg, 24px);
+}
+
+.page-content.active {
+  display: block;
+}
+
+/* 工作流容器 */
+.workflow-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-lg, 24px);
+  margin-top: var(--spacing-lg, 24px);
+}
+
+@media (max-width: 768px) {
+  .workflow-container {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* 输入面板和输出面板 */
+.input-panel,
+.output-panel {
+  background: var(--color-bg-card, #ffffff);
+  border-radius: var(--border-radius-lg, 15px);
+  padding: var(--container-padding, 30px);
+  box-shadow: var(--shadow-md, 0 4px 8px rgba(0, 0, 0, 0.15));
+}
+
+.output-panel {
+  max-height: 80vh;
+  overflow-y: auto;
+}

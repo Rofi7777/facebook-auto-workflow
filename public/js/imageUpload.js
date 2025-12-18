@@ -1,5 +1,9 @@
 // ==================== 圖片上傳功能 - 徹底重構版本 ====================
-let selectedFiles = [];
+// Note: selectedFiles is declared in index.html to avoid duplicate declaration
+// If not available, create it here
+if (typeof selectedFiles === 'undefined') {
+    var selectedFiles = [];
+}
 
 // 更新文件上傳顯示
 function updateFileUploadDisplay() {

@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>集成测试 - Googa AI Hub</title>
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="/public/css/reset.css">
+    <link rel="stylesheet" href="/public/css/variables.css">
+    <link rel="stylesheet" href="/public/css/layout.css">
+    <link rel="stylesheet" href="/public/css/components.css">
+    <link rel="stylesheet" href="/public/css/pages.css">
+    
+    <style>
+        body {
+            padding: 20px;
+        }
+        
+        .test-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .test-section {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+        
+        .test-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #4a2c7a;
+        }
+        
+        .test-result {
+            padding: 10px;
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+        
+        .test-result.success {
+            background: #d4edda;
+            color: #155724;
+            border-left: 4px solid #28a745;
+        }
+        
+        .test-result.error {
+            background: #f8d7da;
+            color: #721c24;
+            border-left: 4px solid #dc3545;
+        }
+        
+        .test-result.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border-left: 4px solid #17a2b8;
+        }
+        
+        .test-button {
+            padding: 10px 20px;
+            margin: 5px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+        
+        .test-button.primary {
+            background: linear-gradient(135deg, #87CEEB, #FFB6C1);
+            color: white;
+        }
+        
+        .module-status {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .module-card {
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            background: #f8f9fa;
+        }
+        
+        .module-card.loaded {
+            border-color: #28a745;
+            background: #d4edda;
+        }
+        
+        .module-card.error {
+            border-color: #dc3545;
+            background: #f8d7da;
+        }
+        
+        .module-name {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .module-status-text {
+            font-size: 12px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1 style="text-align: center; color: white; margin-bottom: 30px;">集成测试</h1>
+        
+        <!-- Module Loading Test -->
+        <div class="test-section">
+            <div class="test-title">1. 模块加载检查</div>
+            <div id="moduleTestResults"></div>
+            <button class="test-button primary" onclick="testModuleLoading()">检查模块加载</button>
+            <div id="moduleStatus" class="module-status"></div>
+        </div>
+        
+        <!-- Router Test -->
+        <div class="test-section">
+            <div class="test-title">2. 路由系统测试</div>
+            <div id="routerTestResults"></div>
+            <button class="test-button primary" onclick="testRouter()">测试路由</button>
+        </div>
+        
+        <!-- Component Test -->
+        <div class="test-section">
+            <div class="test-title">3. 组件测试</div>
+            <div id="componentTestResults"></div>
+            <button class="test-button primary" onclick="testComponents()">测试组件</button>
+            <div id="componentTestArea" style="margin-top: 20px;"></div>
+        </div>
+        
+        <!-- Page Registration Test -->
+        <div class="test-section">
+            <div class="test-title">4. 页面注册测试</div>
+            <div id="pageTestResults"></div>
+            <button class="test-button primary" onclick="testPageRegistration()">测试页面注册</button>
+        </div>
+        
+        <!-- Integration Test -->
+        <div class="test-section">
+            <div class="test-title">5. 完整集成测试</div>
+            <div id="integrationTestResults"></div>
+            <button class="test-button primary" onclick="testFullIntegration()">运行完整测试</button>
+        </div>
+    </div>
+    
+    <!-- Load all modules (same as index.html) -->
+    <script src="/public/js/core/state.js"></script>
+    <script src="/public/js/core/router.js"></script>
+    <script src="/public/js/core/app.js"></script>
+    <script src="/public/js/services/api.js"></script>
+    <script src="/public/js/services/auth.js"></script>
+    <script src="/public/js/services/i18n.js"></script>
+    <script src="/public/js/utils/dom.js"></script>
+    <script src="/public/js/utils/validation.js"></script>
+    <script src="/public/js/utils/file.js"></script>
+    <script src="/public/js/components/StepIndicator.js"></script>
+    <script src="/public/js/components/ImageUpload.js"></script>
+    <script src="/public/js/components/PlatformSelector.js"></script>
+    <script src="/public/js/components/Navigation.js"></script>
+    <script src="/public/js/pages/Page1ProductAnalysis.js"></script>
+    <script src="/public/js/pages/Page2AdsAdvisor.js"></script>
+    <script src="/public/js/pages/Page3CourseEditor.js"></script>
+    <script src="/public/js/pages/Page4PromptArchitect.js"></script>
+    <script src="/public/js/pages/Page5Admin.js"></script>
+    
+    <!-- Mock translations -->
+    <script>
+        if (typeof translations === 'undefined') {
+            window.translations = {
+                'zh-TW': { 'test_key': '测试值' },
+                'en': { 'test_key': 'Test Value' },
+                'vi': { 'test_key': 'Giá trị thử nghiệm' }
+            };
+        }
+    </script>
+    
+    <!-- Test Scripts -->
+    <script>
+        const requiredModules = [
+            'appState', 'router', 'app',
+            'apiService', 'authService', 'i18nService',
+            'DOMUtils', 'ValidationUtils', 'FileUtils',
+            'StepIndicator', 'ImageUpload', 'PlatformSelector', 'Navigation',
+            'Page1ProductAnalysis', 'Page2AdsAdvisor', 'Page3CourseEditor',
+            'Page4PromptArchitect', 'Page5Admin'
+        ];
+        
+        function checkModule(name) {
+            const parts = name.split('.');
+            let obj = window;
+            for (const part of parts) {
+                if (!obj || typeof obj[part] === 'undefined') {
+                    return false;
+                }
+                obj = obj[part];
+            }
+            return typeof obj === 'function' || typeof obj === 'object';
+        }
+        
+        function testModuleLoading() {
+            const results = document.getElementById('moduleTestResults');
+            const status = document.getElementById('moduleStatus');
+            
+            results.innerHTML = '';
+            status.innerHTML = '';
+            
+            let allLoaded = true;
+            const loaded = [];
+            const missing = [];
+            
+            requiredModules.forEach(moduleName => {
+                const isLoaded = checkModule(moduleName);
+                if (isLoaded) {
+                    loaded.push(moduleName);
+                } else {
+                    missing.push(moduleName);
+                    allLoaded = false;
+                }
+                
+                const card = document.createElement('div');
+                card.className = `module-card ${isLoaded ? 'loaded' : 'error'}`;
+                card.innerHTML = `
+                    <div class="module-name">${moduleName}</div>
+                    <div class="module-status-text">${isLoaded ? '✓ 已加载' : '✗ 未加载'}</div>
+                `;
+                status.appendChild(card);
+            });
+            
+            const result = document.createElement('div');
+            result.className = `test-result ${allLoaded ? 'success' : 'error'}`;
+            result.textContent = allLoaded 
+                ? `✓ 所有模块已加载 (${loaded.length}/${requiredModules.length})`
+                : `✗ 部分模块未加载 (${loaded.length}/${requiredModules.length}) - 缺失: ${missing.join(', ')}`;
+            results.appendChild(result);
+        }
+        
+        function testRouter() {
+            const results = document.getElementById('routerTestResults');
+            results.innerHTML = '';
+            
+            try {
+                if (!window.router) {
+                    throw new Error('Router 未定义');
+                }
+                
+                // Test router methods
+                const methods = ['navigate', 'register', 'getCurrentPage'];
+                const missingMethods = methods.filter(m => typeof window.router[m] !== 'function');
+                
+                if (missingMethods.length > 0) {
+                    throw new Error(`Router 方法缺失: ${missingMethods.join(', ')}`);
+                }
+                
+                const result = document.createElement('div');
+                result.className = 'test-result success';
+                result.textContent = '✓ 路由系统正常';
+                results.appendChild(result);
+            } catch (error) {
+                const result = document.createElement('div');
+                result.className = 'test-result error';
+                result.textContent = `✗ 路由系统错误: ${error.message}`;
+                results.appendChild(result);
+            }
+        }
+        
+        function testComponents() {
+            const results = document.getElementById('componentTestResults');
+            const testArea = document.getElementById('componentTestArea');
+            results.innerHTML = '';
+            testArea.innerHTML = '';
+            
+            try {
+                // Test StepIndicator
+                const stepContainer = document.createElement('div');
+                testArea.appendChild(stepContainer);
+                
+                if (window.StepIndicator) {
+                    const stepIndicator = new StepIndicator(stepContainer, {
+                        steps: [
+                            { label: '步骤 1' },
+                            { label: '步骤 2' },
+                            { label: '步骤 3' }
+                        ],
+                        currentStep: 1
+                    });
+                    
+                    // Test ImageUpload
+                    const uploadContainer = document.createElement('div');
+                    testArea.appendChild(uploadContainer);
+                    
+                    if (window.ImageUpload) {
+                        const imageUpload = new ImageUpload(uploadContainer, {
+                            maxFiles: 3,
+                            maxSizeMB: 5
+                        });
+                    }
+                    
+                    // Test PlatformSelector
+                    const platformContainer = document.createElement('div');
+                    testArea.appendChild(platformContainer);
+                    
+                    if (window.PlatformSelector) {
+                        const platformSelector = new PlatformSelector(platformContainer, {
+                            selected: ['tiktok', 'shopee']
+                        });
+                    }
+                    
+                    const result = document.createElement('div');
+                    result.className = 'test-result success';
+                    result.textContent = '✓ 组件创建成功';
+                    results.appendChild(result);
+                } else {
+                    throw new Error('组件类未定义');
+                }
+            } catch (error) {
+                const result = document.createElement('div');
+                result.className = 'test-result error';
+                result.textContent = `✗ 组件测试失败: ${error.message}`;
+                results.appendChild(result);
+            }
+        }
+        
+        function testPageRegistration() {
+            const results = document.getElementById('pageTestResults');
+            results.innerHTML = '';
+            
+            try {
+                if (!window.router) {
+                    throw new Error('Router 未定义');
+                }
+                
+                const pages = ['page1', 'page2', 'page3', 'page4', 'page5'];
+                const registered = [];
+                const missing = [];
+                
+                // Check if pages can be instantiated
+                pages.forEach(pageId => {
+                    const pageClass = window[`Page${pageId.charAt(pageId.length - 1).toUpperCase()}${pageId.slice(1)}`] || 
+                                     window[`Page${pageId.slice(-1)}${pageId.slice(0, -1)}`];
+                    
+                    if (pageClass && typeof pageClass === 'function') {
+                        try {
+                            const page = new pageClass();
+                            registered.push(pageId);
+                        } catch (e) {
+                            missing.push(`${pageId} (${e.message})`);
+                        }
+                    } else {
+                        missing.push(`${pageId} (类未找到)`);
+                    }
+                });
+                
+                const result = document.createElement('div');
+                result.className = `test-result ${missing.length === 0 ? 'success' : 'error'}`;
+                result.textContent = missing.length === 0
+                    ? `✓ 所有页面类可实例化 (${registered.length}/${pages.length})`
+                    : `✗ 部分页面类无法实例化 (${registered.length}/${pages.length}) - 问题: ${missing.join(', ')}`;
+                results.appendChild(result);
+            } catch (error) {
+                const result = document.createElement('div');
+                result.className = 'test-result error';
+                result.textContent = `✗ 页面注册测试失败: ${error.message}`;
+                results.appendChild(result);
+            }
+        }
+        
+        function testFullIntegration() {
+            const results = document.getElementById('integrationTestResults');
+            results.innerHTML = '';
+            
+            const tests = [
+                { name: '模块加载', fn: testModuleLoading },
+                { name: '路由系统', fn: testRouter },
+                { name: '组件创建', fn: testComponents },
+                { name: '页面注册', fn: testPageRegistration }
+            ];
+            
+            let passed = 0;
+            let failed = 0;
+            
+            tests.forEach((test, index) => {
+                setTimeout(() => {
+                    try {
+                        test.fn();
+                        passed++;
+                    } catch (error) {
+                        failed++;
+                        console.error(`Test ${test.name} failed:`, error);
+                    }
+                    
+                    if (index === tests.length - 1) {
+                        const result = document.createElement('div');
+                        result.className = `test-result ${failed === 0 ? 'success' : 'error'}`;
+                        result.textContent = failed === 0
+                            ? `✓ 所有集成测试通过 (${passed}/${tests.length})`
+                            : `✗ 部分测试失败 (${passed}/${tests.length} 通过, ${failed} 失败)`;
+                        results.appendChild(result);
+                    }
+                }, index * 500);
+            });
+        }
+        
+        // Auto-run module loading test on load
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                testModuleLoading();
+            }, 1000);
+        });
+    </script>
+</body>
+</html>
+

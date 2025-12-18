@@ -470,9 +470,32 @@ function showAuthError(formType, message) {
 async function handleAuthLogin(event) {
   event.preventDefault();
   
-  const email = document.getElementById('authEmail').value;
-  const password = document.getElementById('authPassword').value;
+  const emailInput = document.getElementById('authEmail');
+  const passwordInput = document.getElementById('authPassword');
   const submitBtn = document.getElementById('authLoginBtn');
+  
+  // 验证邮箱格式
+  if (!emailInput || !emailInput.value) {
+    showAuthError('login', '請輸入電子郵件');
+    return;
+  }
+  
+  const email = emailInput.value.trim();
+  const password = passwordInput?.value || '';
+  
+  // 基本邮箱格式验证
+  const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailPattern.test(email)) {
+    showAuthError('login', '請輸入有效的電子郵件地址');
+    emailInput.focus();
+    return;
+  }
+  
+  if (!password) {
+    showAuthError('login', '請輸入密碼');
+    if (passwordInput) passwordInput.focus();
+    return;
+  }
   
   submitBtn.disabled = true;
   submitBtn.textContent = translations[currentLanguage]?.auth_loading || 'Loading...';
@@ -590,6 +613,36 @@ async function handleAuthRegister(event) {
 }
 
 document.addEventListener('DOMContentLoaded', async function() {
+  // 清除所有错误消息
+  const loginError = document.getElementById('authLoginError');
+  const registerError = document.getElementById('authRegisterError');
+  if (loginError) {
+    loginError.textContent = '';
+    loginError.style.display = 'none';
+  }
+  if (registerError) {
+    registerError.textContent = '';
+    registerError.style.display = 'none';
+  }
+  
+  // 清除输入框的验证状态
+  const emailInput = document.getElementById('authEmail');
+  const regEmailInput = document.getElementById('authRegEmail');
+  if (emailInput) {
+    emailInput.setCustomValidity('');
+    emailInput.addEventListener('invalid', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+    });
+  }
+  if (regEmailInput) {
+    regEmailInput.setCustomValidity('');
+    regEmailInput.addEventListener('invalid', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+    });
+  }
+  
   // 強制清除自動登入狀態 - 無論如何都先顯示登入頁面
   const authShell = document.getElementById('authShell');
   const appShell = document.getElementById('appShell');

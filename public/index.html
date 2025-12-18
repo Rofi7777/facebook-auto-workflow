@@ -4,8 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Googa AI Hub - 您的AI學習宇宙</title>
-    <link rel="stylesheet" href="/css/adminConsole.css?v=20251210d">
-    <link rel="stylesheet" href="/css/modern-ui.css?v=20251216">
+    <!-- New Architecture CSS -->
+    <link rel="stylesheet" href="/public/css/reset.css">
+    <link rel="stylesheet" href="/public/css/variables.css">
+    <link rel="stylesheet" href="/public/css/layout.css">
+    <link rel="stylesheet" href="/public/css/components.css">
+    <link rel="stylesheet" href="/public/css/pages.css">
+    <!-- Existing CSS -->
+    <link rel="stylesheet" href="/public/css/adminConsole.css?v=20251210d">
+    <link rel="stylesheet" href="/public/css/modern-ui.css?v=20251216">
     <style>
         * {
             margin: 0;
@@ -1732,10 +1739,10 @@
                 
                 <div class="auth-error" id="authLoginError"></div>
                 
-                <form onsubmit="handleAuthLogin(event)">
+                <form onsubmit="handleAuthLogin(event)" novalidate>
                     <div class="auth-form-group">
                         <label for="authEmail"><span class="icon">✉️</span> <span data-i18n="auth_email">電子郵件</span></label>
-                        <input type="email" id="authEmail" placeholder="your@email.com" required autocomplete="email">
+                        <input type="text" id="authEmail" placeholder="your@email.com" autocomplete="email">
                     </div>
                     <div class="auth-form-group">
                         <label for="authPassword"><span class="icon">🔒</span> <span data-i18n="auth_password">密碼</span></label>
@@ -1759,10 +1766,10 @@
                 
                 <div class="auth-error" id="authRegisterError"></div>
                 
-                <form onsubmit="handleAuthRegister(event)">
+                <form onsubmit="handleAuthRegister(event)" novalidate>
                     <div class="auth-form-group">
                         <label for="authRegEmail"><span class="icon">✉️</span> <span data-i18n="auth_email">電子郵件</span></label>
-                        <input type="email" id="authRegEmail" placeholder="your@email.com" required autocomplete="email">
+                        <input type="text" id="authRegEmail" placeholder="your@email.com" autocomplete="email">
                     </div>
                     <div class="auth-form-group">
                         <label for="authRegPassword"><span class="icon">🔒</span> <span data-i18n="auth_password">密碼</span></label>
@@ -2870,6 +2877,46 @@
     </div>
 
     <script>
+        // ==================== 立即清除错误消息 ====================
+        // 在页面加载时立即清除所有错误消息（在 DOMContentLoaded 之前）
+        (function() {
+            function clearAuthErrors() {
+                const loginError = document.getElementById('authLoginError');
+                const registerError = document.getElementById('authRegisterError');
+                if (loginError) {
+                    loginError.textContent = '';
+                    loginError.style.display = 'none';
+                }
+                if (registerError) {
+                    registerError.textContent = '';
+                    registerError.style.display = 'none';
+                }
+                
+                // 清除输入框的验证状态
+                const emailInput = document.getElementById('authEmail');
+                const regEmailInput = document.getElementById('authRegEmail');
+                if (emailInput) {
+                    emailInput.setCustomValidity('');
+                }
+                if (regEmailInput) {
+                    regEmailInput.setCustomValidity('');
+                }
+            }
+            
+            // 立即执行
+            clearAuthErrors();
+            
+            // DOM 加载后再次清除
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', clearAuthErrors);
+            } else {
+                clearAuthErrors();
+            }
+            
+            // 页面完全加载后再次清除
+            window.addEventListener('load', clearAuthErrors);
+        })();
+        
         // ==================== 徹底重構：圖片上傳功能 ====================
         // File upload handling - Multi-image support
         let selectedFiles = [];
@@ -2882,7 +2929,7 @@
             const imageUpload = document.getElementById('imageUpload');
             
             if (!uploadArea || !imageUpload) {
-                console.warn('[initImageUpload] Upload elements not found, will retry...');
+                // 不在这里记录警告，由 tryInitImageUpload 统一处理
                 return false;
             }
             
@@ -2983,13 +3030,27 @@
             }, false);
         }
         
-        // 多重初始化機制
+        // 多重初始化機制（添加重试次数限制）
+        let imageUploadRetryCount = 0;
+        const MAX_IMAGE_UPLOAD_RETRIES = 10; // 最多重试 10 次
+        
         function tryInitImageUpload() {
             if (initImageUpload()) {
                 console.log('[tryInitImageUpload] Success');
+                imageUploadRetryCount = 0; // 重置计数器
             } else {
-                console.log('[tryInitImageUpload] Failed, will retry');
-                setTimeout(tryInitImageUpload, 100);
+                imageUploadRetryCount++;
+                if (imageUploadRetryCount < MAX_IMAGE_UPLOAD_RETRIES) {
+                    // 只在重试次数未超限时记录警告
+                    if (imageUploadRetryCount === 1) {
+                        console.warn('[tryInitImageUpload] Upload elements not found, will retry (max ' + MAX_IMAGE_UPLOAD_RETRIES + ' times)...');
+                    }
+                    setTimeout(tryInitImageUpload, 100);
+                } else {
+                    // 超过重试次数，停止重试
+                    console.warn('[tryInitImageUpload] Max retries reached. Upload elements may not exist on this page.');
+                    imageUploadRetryCount = 0; // 重置计数器
+                }
             }
         }
         
@@ -3457,17 +3518,42 @@
         // 確保 analyzeProduct 函數在全局作用域可訪問
         window.analyzeProduct = analyzeProduct;
         window.generateContent = generateContent;
-        window.generateScenarios = generateScenarios;
+        
+        // 創建 generateScenarios 函數（如果尚未定義）
+        if (typeof generateScenarios === 'undefined') {
+            window.generateScenarios = function() {
+                const btn = document.getElementById('generateScenariosBtn');
+                if (btn) {
+                    btn.click();
+                } else {
+                    console.warn('[generateScenarios] Button not found');
+                }
+            };
+        } else {
+            window.generateScenarios = generateScenarios;
+        }
         
         // 多重初始化機制
+        let bindButtonEventsRetryCount = 0;
+        const MAX_BIND_RETRIES = 10;
         function tryBindButtonEvents() {
             bindButtonEvents();
-            // 如果按鈕還沒找到，重試
+            // 如果按鈕還沒找到，重試（最多10次）
             setTimeout(function() {
                 const analyzeBtn = document.getElementById('analyzeProductBtn');
                 if (!analyzeBtn || !analyzeBtn.hasAttribute('data-bound')) {
-                    console.log('[tryBindButtonEvents] Retrying...');
-                    tryBindButtonEvents();
+                    bindButtonEventsRetryCount++;
+                    if (bindButtonEventsRetryCount < MAX_BIND_RETRIES) {
+                        if (bindButtonEventsRetryCount === 1) {
+                            console.log('[tryBindButtonEvents] Retrying... (max ' + MAX_BIND_RETRIES + ' times)');
+                        }
+                        tryBindButtonEvents();
+                    } else {
+                        console.warn('[tryBindButtonEvents] Max retries reached. Buttons may not exist on this page.');
+                        bindButtonEventsRetryCount = 0; // 重置计数器
+                    }
+                } else {
+                    bindButtonEventsRetryCount = 0; // 成功时重置计数器
                 }
             }, 100);
         }
@@ -3488,230 +3574,6 @@
         
         // 舊的表單提交代碼已移除，現在使用三個獨立的按鈕函數
         
-        // Scenario generation button handler (保留原有功能)
-                
-                // 獲取場景類型選擇
-                let scenarioType = '親子互動'; // 預設值
-                if (generateImages) {
-                    const selectedScenario = document.querySelector('input[name="scenarioType"]:checked');
-                    if (selectedScenario) {
-                        scenarioType = selectedScenario.value;
-                    }
-                }
-                
-                // 獲取模特兒和場景設定
-                let modelNationality = 'taiwan';
-                let modelCombination = 'parents_baby';
-                let sceneLocation = 'park';
-                if (generateImages) {
-                    modelNationality = document.getElementById('modelNationality').value;
-                    modelCombination = document.getElementById('modelCombination').value;
-                    sceneLocation = document.getElementById('sceneLocation').value;
-                    
-                    // Use custom text if "custom" is selected
-                    if (modelNationality === 'custom') {
-                        const customText = document.getElementById('customNationalityText').value.trim();
-                        if (customText) {
-                            modelNationality = customText;
-                        }
-                    }
-                    if (modelCombination === 'custom') {
-                        const customText = document.getElementById('customCombinationText').value.trim();
-                        if (customText) {
-                            modelCombination = customText;
-                        }
-                    }
-                    if (sceneLocation === 'custom') {
-                        const customText = document.getElementById('customLocationText').value.trim();
-                        if (customText) {
-                            sceneLocation = customText;
-                        }
-                    }
-                }
-                
-                // Get selected platforms
-                const selectedPlatforms = Array.from(document.querySelectorAll('#platformsGroup input[type="checkbox"]:checked')).map(cb => cb.value);
-                
-                if (selectedPlatforms.length === 0) {
-                    throw new Error('請至少選擇一個目標平台');
-                }
-                
-                // Step 1: Upload images if provided (使用全局變量)
-                uploadedImagePaths = [];
-                if (imageFiles.length > 0) {
-                    showStatus(`📤 上傳 ${imageFiles.length} 張圖片中...`, 'info');
-                    const imageFormData = new FormData();
-                    
-                    // Append all image files
-                    imageFiles.forEach((file, index) => {
-                        imageFormData.append('images', file);
-                    });
-                    imageFormData.append('productName', productName);
-                    imageFormData.append('productDescription', productDescription || '');
-                    
-                    const imageResponse = await fetch('/api/upload-image', {
-                        method: 'POST',
-                        body: imageFormData
-                    });
-                    
-                    if (!imageResponse.ok) {
-                        throw new Error('圖片上傳失敗');
-                    }
-                    
-                    const imageResult = await imageResponse.json();
-                    uploadedImagePaths = imageResult.paths || [];
-                    uploadedImagePath = uploadedImagePaths[0]; // For backward compatibility
-                }
-                
-                // Step 2: AI Product Analysis  
-                if (uploadedImagePaths.length > 0 || productDescription) {
-                    showStatus(`🧠 AI 產品分析中... (${language})`, 'info');
-                    console.log('🌐 Selected language for analysis:', language);
-                    
-                    const analysisResponse = await AuthManager.authFetch('/api/analyze-product', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({
-                            imagePaths: uploadedImagePaths,
-                            imagePath: uploadedImagePaths[0], // For backward compatibility
-                            productInfo: {
-                                name: productName,
-                                description: productDescription,
-                                industryCategory: industryCategory
-                            },
-                            language: language
-                        })
-                    });
-                    
-                    if (analysisResponse.ok) {
-                        const analysisResult = await analysisResponse.json();
-                        productAnalysis = analysisResult.productAnalysis;
-                        painPointsAnalysis = analysisResult.painPointsAnalysis;
-                        
-                        displayAnalysisResults(productAnalysis, painPointsAnalysis);
-                    } else {
-                        showStatus('⚠️ AI 分析失敗，使用基礎模式生成內容', 'info');
-                    }
-                }
-                
-                // Step 3: Generate platform content (Split into 2 steps to avoid timeout)
-                // Step 3a: Generate text content only
-                showStatus('🎯 Step 1/2: 生成多平台文字內容中...', 'info');
-                
-                const contentResponse = await AuthManager.authFetch('/api/generate-platform-content-text', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        productInfo: productAnalysis || {
-                            name: productName,
-                            description: productDescription,
-                            productType: productName,
-                            industryCategory: industryCategory
-                        },
-                        painPointsAnalysis: painPointsAnalysis || {},
-                        platforms: selectedPlatforms,
-                        language: language
-                    })
-                });
-                
-                // Check response status before parsing JSON
-                if (!contentResponse.ok) {
-                    let errorMessage = '文字內容生成失敗';
-                    try {
-                        const errorData = await contentResponse.json();
-                        errorMessage = errorData.message || errorData.error || errorMessage;
-                    } catch (parseError) {
-                        errorMessage = `HTTP ${contentResponse.status}: ${contentResponse.statusText || '文字內容生成失敗'}`;
-                    }
-                    throw new Error(errorMessage);
-                }
-                
-                // Parse JSON response
-                let contentResult;
-                try {
-                    const text = await contentResponse.text();
-                    if (!text) {
-                        throw new Error('伺服器返回空響應');
-                    }
-                    contentResult = JSON.parse(text);
-                } catch (parseError) {
-                    console.error('JSON parsing error:', parseError);
-                    throw new Error('無法解析伺服器響應，請稍後再試');
-                }
-                
-                generatedContent = contentResult.results;
-                displayPlatformResults(contentResult.results);
-                showStatus('✅ Step 1/2: 文字內容生成完成！', 'success');
-                
-                // Step 3b: Generate images if requested
-                if (generateImages) {
-                    showStatus('🖼️ Step 2/2: 生成多平台圖片中...', 'info');
-                    
-                    const imageResponse = await AuthManager.authFetch('/api/generate-platform-images', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({
-                            productInfo: productAnalysis || {
-                                name: productName,
-                                description: productDescription,
-                                productType: productName,
-                                industryCategory: industryCategory
-                            },
-                            contentResults: generatedContent, // Pass the text content from Step 1
-                            platforms: selectedPlatforms,
-                            scenarioType: scenarioType,
-                            productImagePath: uploadedImagePath,
-                            modelNationality: modelNationality,
-                            modelCombination: modelCombination,
-                            sceneLocation: sceneLocation
-                        })
-                    });
-                    
-                    // Check response status before parsing JSON
-                    if (!imageResponse.ok) {
-                        let errorMessage = '圖片生成失敗';
-                        try {
-                            const errorData = await imageResponse.json();
-                            errorMessage = errorData.message || errorData.error || errorMessage;
-                        } catch (parseError) {
-                            errorMessage = `HTTP ${imageResponse.status}: ${imageResponse.statusText || '圖片生成失敗'}`;
-                        }
-                        showStatus(`⚠️ 圖片生成失敗: ${errorMessage}，但文字內容已生成`, 'error');
-                    } else {
-                        // Parse JSON response
-                        let imageResult;
-                        try {
-                            const text = await imageResponse.text();
-                            if (text) {
-                                imageResult = JSON.parse(text);
-                                
-                                // Merge image results into generatedContent
-                                if (imageResult.imageResults) {
-                                    Object.keys(imageResult.imageResults).forEach(platform => {
-                                        if (generatedContent[platform] && imageResult.imageResults[platform].success) {
-                                            Object.assign(generatedContent[platform], imageResult.imageResults[platform]);
-                                        }
-                                    });
-                                    displayPlatformResults(generatedContent); // Refresh display with images
-                                }
-                            }
-                        } catch (parseError) {
-                            console.error('Image response JSON parsing error:', parseError);
-                            showStatus('⚠️ 圖片生成完成，但無法解析響應', 'error');
-                        }
-                        
-                        showStatus('✅ Step 2/2: 圖片生成完成！', 'success');
-                    }
-                } else {
-                    showStatus('✅ 多平台內容生成完成！（未生成圖片）', 'success');
-                }
-                
         // Scenario generation button handler
         generateScenariosBtn.addEventListener('click', async function() {
             if (!productAnalysis || !generatedContent) {
@@ -6937,18 +6799,50 @@
         }
     </script>
     
+    <!-- New Architecture Core Modules -->
+    <script src="/public/js/core/state.js"></script>
+    <script src="/public/js/core/router.js"></script>
+    <script src="/public/js/core/app.js"></script>
+    
+    <!-- New Architecture Services -->
+    <script src="/public/js/services/api.js"></script>
+    <script src="/public/js/services/auth.js"></script>
+    <script src="/public/js/services/i18n.js"></script>
+    
+    <!-- New Architecture Utils -->
+    <script src="/public/js/utils/dom.js"></script>
+    <script src="/public/js/utils/validation.js"></script>
+    <script src="/public/js/utils/file.js"></script>
+    
+    <!-- New Architecture Components -->
+    <script src="/public/js/components/StepIndicator.js"></script>
+    <script src="/public/js/components/ImageUpload.js"></script>
+    <script src="/public/js/components/PlatformSelector.js"></script>
+    <script src="/public/js/components/Navigation.js"></script>
+    
+    <!-- New Architecture Pages -->
+    <script src="/public/js/pages/Page1ProductAnalysis.js"></script>
+    <script src="/public/js/pages/Page2AdsAdvisor.js"></script>
+    <script src="/public/js/pages/Page3CourseEditor.js"></script>
+    <script src="/public/js/pages/Page4PromptArchitect.js"></script>
+    <script src="/public/js/pages/Page5Admin.js"></script>
+    
+    <!-- Existing Scripts (保持向后兼容) -->
     <!-- 引入多語言翻譯系統 -->
-    <script src="/js/translations.js"></script>
+    <script src="/public/js/translations.js"></script>
     <!-- 引入用戶認證系統 -->
-    <script src="/js/auth.js"></script>
+    <script src="/public/js/auth.js"></script>
     <!-- 引入用戶學習追蹤系統 -->
-    <script src="/js/userLearning.js"></script>
-    <script src="/js/admin.js"></script>
-    <script src="/js/adminConsole.js?v=20251210c"></script>
+    <script src="/public/js/userLearning.js"></script>
+    <script src="/public/js/admin.js"></script>
+    <script src="/public/js/adminConsole.js?v=20251210c"></script>
     
     <!-- 引入重構後的導航和上傳功能 -->
-    <script src="/js/navigation.js"></script>
-    <script src="/js/imageUpload.js"></script>
+    <script src="/public/js/navigation.js"></script>
+    <script src="/public/js/imageUpload.js"></script>
+    
+    <!-- Application Initialization -->
+    <script src="/public/js/app-init.js"></script>
     <script>
         function switchAdminTab(tabName) {
             document.querySelectorAll('.admin-tab').forEach(tab => tab.classList.remove('active'));
@@ -7041,7 +6935,21 @@
     <script>
         // 初始化時應用語言設定
         document.addEventListener('DOMContentLoaded', function() {
-            updatePageLanguage();
+            // 等待 translations.js 和 i18n.js 加载完成
+            if (typeof updatePageLanguage === 'function') {
+                updatePageLanguage();
+            } else if (window.i18nService) {
+                window.i18nService.updatePageLanguage();
+            } else {
+                // 延迟执行，等待模块加载
+                setTimeout(function() {
+                    if (typeof updatePageLanguage === 'function') {
+                        updatePageLanguage();
+                    } else if (window.i18nService) {
+                        window.i18nService.updatePageLanguage();
+                    }
+                }, 500);
+            }
         });
     </script>
     </div><!-- End of appShell -->
