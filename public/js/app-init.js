@@ -1,89 +1,196 @@
 /**
  * Application Initialization Script
- * Registers pages and initializes the application
+ * 初始化新架构并集成现有代码
  */
 
-// Wait for DOM and all scripts to load
+// 全局页面模块实例
+window.pageModules = {};
+
+// 等待DOM和所有脚本加载完成
 (async function() {
-  // Wait for all required modules to be available
-  await waitForModules(['appState', 'router', 'app', 'apiService', 'authService', 'i18nService']);
-  
   console.log('[App Init] Starting application initialization...');
   
+  // 等待DOM加载
+  if (document.readyState === 'loading') {
+    await new Promise(resolve => {
+      document.addEventListener('DOMContentLoaded', resolve);
+    });
+  }
+  
+  // 等待核心模块加载
+  await waitForModules(['StateManager', 'Router', 'App', 'ApiService', 'AuthService', 'I18n']);
+  
   try {
-    // Register services
-    if (window.app && window.authService) {
-      window.app.register(window.authService);
+    // 1. 初始化应用核心
+    if (window.App) {
+      await window.App.init();
+      console.log('[App Init] Core app initialized');
     }
     
-    if (window.app && window.i18nService) {
-      window.app.register(window.i18nService);
+    // 2. 初始化国际化
+    if (window.I18n) {
+      const savedLang = localStorage.getItem('app_language') || 'zh-TW';
+      window.I18n.setLanguage(savedLang);
+      console.log('[App Init] I18n initialized with language:', savedLang);
     }
     
-    // Register pages
-    if (window.router) {
-      // Page 1: Product Analysis
-      if (window.Page1ProductAnalysis) {
-        const page1 = new Page1ProductAnalysis();
-        window.router.register('page1', page1);
-        window.page1Module = page1; // Store for debugging
-        console.log('[App Init] Page1 registered');
-      }
-      
-      // Page 2: Ads Advisor
-      if (window.Page2AdsAdvisor) {
-        const page2 = new Page2AdsAdvisor();
-        window.router.register('page2', page2);
-        window.page2Module = page2;
-        console.log('[App Init] Page2 registered');
-      }
-      
-      // Page 3: Course Editor
-      if (window.Page3CourseEditor) {
-        const page3 = new Page3CourseEditor();
-        window.router.register('page3', page3);
-        window.page3Module = page3;
-        console.log('[App Init] Page3 registered');
-      }
-      
-      // Page 4: Prompt Architect
-      if (window.Page4PromptArchitect) {
-        const page4 = new Page4PromptArchitect();
-        window.router.register('page4', page4);
-        window.page4Module = page4;
-        console.log('[App Init] Page4 registered');
-      }
-      
-      // Page 5: Admin Console
-      if (window.Page5Admin) {
-        const page5 = new Page5Admin();
-        window.router.register('page5', page5);
-        window.page5Module = page5;
-        console.log('[App Init] Page5 registered');
-      }
+    // 3. 初始化导航组件
+    if (window.Navigation) {
+      window.Navigation.init();
+      console.log('[App Init] Navigation initialized');
     }
     
-    // Initialize app
-    if (window.app) {
-      await window.app.init();
-      console.log('[App Init] Application initialized');
+    // 4. 初始化各个页面模块
+    await initializePageModules();
+    
+    // 5. 集成现有功能
+    integrateExistingFeatures();
+    
+    // 6. 设置路由监听
+    setupRouteListeners();
+    
+    // 7. 启动应用
+    if (window.App) {
+      await window.App.start();
     }
     
-    // Setup navigation integration
-    setupNavigationIntegration();
-    
-    // Setup auth integration
-    setupAuthIntegration();
-    
-    console.log('[App Init] Initialization complete');
+    console.log('[App Init] Application initialization complete');
     
   } catch (error) {
     console.error('[App Init] Initialization error:', error);
+    // 即使初始化失败，也确保基本功能可用
+    fallbackInitialization();
   }
 })();
 
 /**
- * Wait for modules to be available
+ * 初始化页面模块
+ */
+async function initializePageModules() {
+  const pages = [
+    { name: 'Page1ProductAnalysis', id: 'page1' },
+    { name: 'Page2AdsAdvisor', id: 'page2' },
+    { name: 'Page3CourseEditor', id: 'page3' },
+    { name: 'Page4PromptArchitect', id: 'page4' },
+    { name: 'Page5Admin', id: 'page5' }
+  ];
+  
+  for (const page of pages) {
+    if (window[page.name]) {
+      try {
+        const pageModule = new window[page.name]();
+        await pageModule.init();
+        window.pageModules[page.id] = pageModule;
+        console.log(`[App Init] ${page.name} initialized`);
+      } catch (error) {
+        console.error(`[App Init] Error initializing ${page.name}:`, error);
+      }
+    }
+  }
+}
+
+/**
+ * 集成现有功能
+ */
+function integrateExistingFeatures() {
+  // 1. 集成现有的 switchPage 函数
+  if (typeof window.switchPage === 'function') {
+    const originalSwitchPage = window.switchPage;
+    window.switchPage = function(pageId, event) {
+      // 使用新的Router
+      if (window.Router) {
+        window.Router.navigateTo(pageId);
+      } else {
+        // 回退到原始函数
+        originalSwitchPage(pageId, event);
+      }
+    };
+    console.log('[App Init] switchPage integrated with Router');
+  }
+  
+  // 2. 集成现有的 AuthManager
+  if (window.AuthManager && window.AuthService) {
+    // 确保 AuthManager 使用新的 AuthService
+    const originalSignIn = window.AuthManager.signIn;
+    window.AuthManager.signIn = async function(email, password) {
+      try {
+        const result = await window.AuthService.signIn(email, password);
+        // 更新UI
+        this.updateUI(true);
+        return result;
+      } catch (error) {
+        throw error;
+      }
+    };
+    console.log('[App Init] AuthManager integrated with AuthService');
+  }
+  
+  // 3. 集成图片上传功能
+  if (window.initImageUpload) {
+    // 延迟初始化，确保新组件已加载
+    setTimeout(() => {
+      const uploadArea = document.getElementById('uploadArea');
+      if (uploadArea && window.ImageUpload) {
+        // 使用新的 ImageUpload 组件
+        const imageUpload = new window.ImageUpload(uploadArea, {
+          maxFiles: 5,
+          maxSize: 10 * 1024 * 1024,
+          showPreview: true
+        });
+        imageUpload.init();
+        window.pageModules.page1.imageUpload = imageUpload;
+        console.log('[App Init] Image upload integrated with new component');
+      } else {
+        // 回退到原有函数
+        window.initImageUpload();
+      }
+    }, 500);
+  }
+  
+  // 4. 集成导航功能
+  if (window.initTabNavigation) {
+    // 延迟初始化
+    setTimeout(() => {
+      if (window.Navigation && window.Navigation.initialized) {
+        console.log('[App Init] Navigation already initialized by component');
+      } else {
+        window.initTabNavigation();
+        console.log('[App Init] Navigation initialized with existing function');
+      }
+    }, 500);
+  }
+}
+
+/**
+ * 设置路由监听
+ */
+function setupRouteListeners() {
+  if (window.Router) {
+    // 监听路由变化
+    window.Router.onRouteChange((newPage, oldPage) => {
+      console.log(`[App Init] Route changed from ${oldPage} to ${newPage}`);
+      
+      // 更新导航组件
+      if (window.Navigation) {
+        window.Navigation.setActivePage(newPage);
+      }
+      
+      // 更新状态管理
+      if (window.StateManager) {
+        window.StateManager.setState('currentPage', newPage);
+      }
+      
+      // 触发页面显示事件
+      if (window.pageModules[newPage]) {
+        // 可以在这里调用页面的 beforeShow/afterShow 方法
+        console.log(`[App Init] Page module ${newPage} is active`);
+      }
+    });
+  }
+}
+
+/**
+ * 等待模块加载
  */
 function waitForModules(moduleNames, maxWait = 10000) {
   return new Promise((resolve, reject) => {
@@ -92,33 +199,16 @@ function waitForModules(moduleNames, maxWait = 10000) {
     
     const checkModules = () => {
       const allLoaded = moduleNames.every(name => {
-        // Check if module exists in window
-        const parts = name.split('.');
-        let obj = window;
-        for (const part of parts) {
-          if (!obj || typeof obj[part] === 'undefined') {
-            return false;
-          }
-          obj = obj[part];
-        }
-        return true;
+        return window[name] !== undefined;
       });
       
       if (allLoaded) {
         resolve();
       } else if (Date.now() - startTime > maxWait) {
-        const missing = moduleNames.filter(name => {
-          const parts = name.split('.');
-          let obj = window;
-          for (const part of parts) {
-            if (!obj || typeof obj[part] === 'undefined') {
-              return true;
-            }
-            obj = obj[part];
-          }
-          return false;
-        });
-        reject(new Error(`Modules not loaded: ${missing.join(', ')}`));
+        const missing = moduleNames.filter(name => !window[name]);
+        console.warn(`[App Init] Some modules not loaded: ${missing.join(', ')}`);
+        // 不拒绝，允许部分模块缺失
+        resolve();
       } else {
         setTimeout(checkModules, checkInterval);
       }
@@ -129,103 +219,43 @@ function waitForModules(moduleNames, maxWait = 10000) {
 }
 
 /**
- * Setup navigation integration
+ * 回退初始化（当主初始化失败时）
  */
-function setupNavigationIntegration() {
-  // Integrate with existing navigation if available
-  if (typeof switchPage === 'function') {
-    // Override switchPage to use router
-    const originalSwitchPage = window.switchPage;
-    window.switchPage = function(pageId, event) {
-      if (window.router) {
-        // Use router for navigation
-        window.router.navigate(pageId).catch(error => {
-          console.error('[Navigation] Router navigation failed, falling back to original:', error);
-          // Fallback to original if router fails
-          if (originalSwitchPage) {
-            originalSwitchPage(pageId, event);
-          }
-        });
-      } else {
-        // Fallback to original if router not available
-        if (originalSwitchPage) {
-          originalSwitchPage(pageId, event);
-        }
-      }
-    };
-    console.log('[App Init] Navigation integration setup complete');
+function fallbackInitialization() {
+  console.log('[App Init] Using fallback initialization');
+  
+  // 确保基本的导航功能可用
+  if (typeof window.switchPage === 'function') {
+    console.log('[App Init] Basic switchPage function available');
   }
   
-  // Setup navigation component if container exists
-  const navContainer = document.querySelector('.tab-navigation') || document.getElementById('tabNavigation');
-  if (navContainer && window.Navigation) {
-    const user = window.authService?.getUser() || window.appState?.get('user');
-    const isAdmin = user && (user.role === 'admin' || user.role === 'super_admin');
-    
-    const navigation = new Navigation(navContainer, {
-      activePage: window.appState?.get('currentPage') || 'page1',
-      showAdminTab: isAdmin,
-      onPageChange: (pageId, previousPage) => {
-        if (window.router) {
-          window.router.navigate(pageId);
-        }
-      }
-    });
-    
-    window.navigation = navigation;
+  // 确保认证功能可用
+  if (window.AuthManager) {
+    console.log('[App Init] AuthManager available');
+  }
+  
+  // 初始化导航（如果存在）
+  if (window.initTabNavigation) {
+    setTimeout(() => {
+      window.initTabNavigation();
+    }, 1000);
+  }
+  
+  // 初始化图片上传（如果存在）
+  if (window.initImageUpload) {
+    setTimeout(() => {
+      window.initImageUpload();
+    }, 1000);
   }
 }
 
 /**
- * Setup auth integration
+ * 全局错误处理
  */
-function setupAuthIntegration() {
-  // Listen for auth state changes
-  if (window.authService) {
-    // Update navigation when auth state changes
-    const originalUpdateUI = window.authService.updateUI;
-    window.authService.updateUI = function(shouldSwitchPage) {
-      originalUpdateUI.call(this, shouldSwitchPage);
-      
-      // Update navigation admin tab visibility
-      if (window.navigation) {
-        const user = this.getUser();
-        const isAdmin = user && (user.role === 'admin' || user.role === 'super_admin');
-        if (isAdmin) {
-          window.navigation.showAdminTab();
-        } else {
-          window.navigation.hideAdminTab();
-        }
-      }
-    };
-  }
-  
-  // Listen for router navigation events
-  if (window.router) {
-    window.addEventListener('router:navigate', (event) => {
-      const { pageId } = event.detail;
-      
-      // Update navigation active state
-      if (window.navigation) {
-        window.navigation.setActivePage(pageId);
-      }
-      
-      // Update app state
-      if (window.appState) {
-        window.appState.set('currentPage', pageId);
-      }
-    });
-  }
-}
+window.addEventListener('error', function(event) {
+  console.error('[App Init] Global error:', event.error);
+});
 
-/**
- * Initialize when DOM is ready
- */
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', function() {
-    console.log('[App Init] DOM ready');
-  });
-} else {
-  console.log('[App Init] DOM already ready');
-}
-
+window.addEventListener('unhandledrejection', function(event) {
+  console.error('[App Init] Unhandled promise rejection:', event.reason);
+});

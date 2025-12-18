@@ -40,6 +40,15 @@ class Router {
    * @param {boolean} updateHistory - 是否更新浏览器历史
    */
   navigateTo(pageId, updateHistory = true) {
+    // 兼容旧的 switchPage 调用
+    if (typeof window.switchPage === 'function' && !window.switchPage._migrated) {
+      // 如果旧的 switchPage 存在且未被迁移，先调用它以确保兼容性
+      try {
+        window.switchPage(pageId);
+      } catch (e) {
+        console.warn('[Router] Old switchPage failed, using new router:', e);
+      }
+    }
     console.log('[Router] Navigating to:', pageId);
 
     // 隐藏所有页面

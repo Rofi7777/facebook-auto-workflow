@@ -87,11 +87,14 @@ class Navigation {
       return;
     }
 
-    // 使用Router导航（如果可用）
+    // 优先使用Router导航
     if (window.Router) {
       window.Router.navigateTo(pageId);
+    } else if (typeof window.switchPage === 'function') {
+      // 回退到现有的 switchPage 函数
+      window.switchPage(pageId);
     } else {
-      // 回退到直接切换
+      // 最后回退到直接切换
       this.switchPage(pageId);
     }
 
