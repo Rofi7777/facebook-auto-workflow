@@ -47,27 +47,60 @@ class Page2AdsAdvisor {
       this.isAnalyzing = true;
       this.setButtonLoading('startAnalysisBtn', true, '分析中...');
       
-      const formData = this.getFormData();
+      // 获取文件（如果有）
+      const fileInput = document.querySelector(`#${this.pageId} #adsFileUpload`) ||
+                        document.querySelector(`#${this.pageId} input[type="file"]`);
+      const selectedFiles = fileInput ? Array.from(fileInput.files) : [];
+      
+      // 准备FormData（因为可能需要上传文件）
+      const formData = new FormData();
+      const data = this.getFormData();
+      
+      formData.append('brandName', data.brandName);
+      formData.append('productName', data.productName);
+      formData.append('coreProduct', data.coreProduct);
+      formData.append('targetMarket', data.targetMarket);
+      formData.append('platforms', JSON.stringify(data.platforms));
+      formData.append('language', data.language || 'zh-TW');
+      
+      // 添加文件
+      selectedFiles.forEach((file, index) => {
+        formData.append('files', file);
+      });
       
       let result;
-      if (window.ApiService) {
-        result = await window.ApiService.post('/analyze-ads', formData);
+      if (window.ApiService && selectedFiles.length === 0) {
+        // 如果没有文件，可以使用JSON方式
+        result = await window.ApiService.post('/analyze-ads', data);
       } else {
+        // 有文件或ApiService不可用，使用FormData
         const response = await window.AuthService?.authFetch('/api/analyze-ads', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(formData)
+          body: formData
         }) || fetch('/api/analyze-ads', {
           method: 'POST',
           headers: {
-            'Content-Type': 'application/json',
             ...(window.AuthService?.getAuthHeaders() || {})
           },
-          body: JSON.stringify(formData)
+          body: formData
         });
         
-        if (!response.ok) throw new Error('分析失敗');
-        result = await response.json();
+        if (!response.ok) {
+          let errorMessage = '分析請求失敗';
+          try {
+            const errorData = await response.json();
+            errorMessage = errorData.message || errorData.error || errorMessage;
+          } catch (parseError) {
+            errorMessage = `HTTP ${response.status}: ${response.statusText || '分析請求失敗'}`;
+          }
+          throw new Error(errorMessage);
+        }
+        
+        const text = await response.text();
+        if (!text) {
+          throw new Error('伺服器返回空響應');
+        }
+        result = JSON.parse(text);
       }
       
       this.displayResults(result);
@@ -82,12 +115,18 @@ class Page2AdsAdvisor {
   }
 
   getFormData() {
+    const languageSelect = document.querySelector(`#${this.pageId} #languageSelect`) ||
+                          document.querySelector(`#languageSelect`);
+    const currentLanguage = languageSelect?.value || 
+                           (typeof currentLanguage !== 'undefined' ? currentLanguage : 'zh-TW');
+    
     return {
       brandName: document.querySelector(`#${this.pageId} #brandName`)?.value || '',
       productName: document.querySelector(`#${this.pageId} #adProductName`)?.value || '',
       coreProduct: document.querySelector(`#${this.pageId} #coreProduct`)?.value || '',
       targetMarket: document.querySelector(`#${this.pageId} #targetMarket`)?.value || '',
-      platforms: Array.from(document.querySelectorAll(`#${this.pageId} input[type="checkbox"]:checked`)).map(cb => cb.value)
+      platforms: Array.from(document.querySelectorAll(`#${this.pageId} input[type="checkbox"]:checked`)).map(cb => cb.value),
+      language: currentLanguage
     };
   }
 
