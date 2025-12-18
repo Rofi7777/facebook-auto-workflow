@@ -79,20 +79,58 @@ class Router {
     targetPage.style.visibility = 'visible';
     targetPage.style.opacity = '1';
 
-    // 特殊处理 page4 和 page5
+    // 特殊处理 page4 和 page5 - 确保所有内容可见
     if (pageId === 'page4' || pageId === 'page5') {
-      const containers = targetPage.querySelectorAll(
-        '.workflow-container, .modern-card, .input-panel, .output-panel, .admin-panel'
-      );
-      containers.forEach(container => {
-        if (container.classList.contains('workflow-container')) {
-          container.style.display = 'grid';
-        } else {
-          container.style.display = 'block';
-        }
+      // 确保工作流容器可见
+      const workflowContainers = targetPage.querySelectorAll('.workflow-container');
+      workflowContainers.forEach(container => {
+        container.style.display = 'grid';
         container.style.visibility = 'visible';
         container.style.opacity = '1';
       });
+      
+      // 确保所有面板可见
+      const panels = targetPage.querySelectorAll('.modern-card, .input-panel, .output-panel, .admin-panel, .prompt-mode');
+      panels.forEach(panel => {
+        panel.style.display = panel.classList.contains('workflow-container') ? 'grid' : 'block';
+        panel.style.visibility = 'visible';
+        panel.style.opacity = '1';
+      });
+      
+      // Page 4 特殊处理：确保模式表单可见
+      if (pageId === 'page4') {
+        const businessMode = targetPage.querySelector('#businessMode');
+        const codingMode = targetPage.querySelector('#codingMode');
+        const imageMode = targetPage.querySelector('#imageMode');
+        
+        // 默认显示business模式
+        if (businessMode) {
+          businessMode.style.display = 'block';
+          businessMode.style.visibility = 'visible';
+          businessMode.style.opacity = '1';
+        }
+        if (codingMode) {
+          codingMode.style.display = 'none';
+        }
+        if (imageMode) {
+          imageMode.style.display = 'none';
+        }
+        
+        // 确保输出面板可见
+        const outputPanel = targetPage.querySelector('.output-panel');
+        if (outputPanel) {
+          outputPanel.style.display = 'block';
+          outputPanel.style.visibility = 'visible';
+          outputPanel.style.opacity = '1';
+        }
+        
+        const promptResult = targetPage.querySelector('#promptResult');
+        if (promptResult) {
+          promptResult.style.display = 'block';
+          promptResult.style.visibility = 'visible';
+          promptResult.style.opacity = '1';
+        }
+      }
     }
 
     // 设置对应按钮为 active

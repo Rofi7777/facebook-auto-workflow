@@ -43,13 +43,16 @@ window.pageModules = {};
     // 4. 初始化各个页面模块
     await initializePageModules();
     
-    // 5. 集成现有功能
+    // 5. 确保首页可见
+    ensurePage1Visible();
+    
+    // 6. 集成现有功能
     integrateExistingFeatures();
     
-    // 6. 设置路由监听
+    // 7. 设置路由监听
     setupRouteListeners();
     
-    // 7. 启动应用
+    // 8. 启动应用
     if (window.App) {
       await window.App.start();
     }
@@ -216,6 +219,42 @@ function waitForModules(moduleNames, maxWait = 10000) {
     
     checkModules();
   });
+}
+
+/**
+ * 确保首页可见
+ */
+function ensurePage1Visible() {
+  const page1 = document.getElementById('page1');
+  if (page1) {
+    // 确保page1有active类
+    if (!page1.classList.contains('active')) {
+      page1.classList.add('active');
+    }
+    
+    // 强制设置显示
+    page1.style.display = 'block';
+    page1.style.visibility = 'visible';
+    page1.style.opacity = '1';
+    
+    // 确保工作流容器可见
+    const workflowContainer = page1.querySelector('.workflow-container');
+    if (workflowContainer) {
+      workflowContainer.style.display = 'grid';
+      workflowContainer.style.visibility = 'visible';
+      workflowContainer.style.opacity = '1';
+    }
+    
+    // 确保所有面板可见
+    const panels = page1.querySelectorAll('.input-panel, .output-panel');
+    panels.forEach(panel => {
+      panel.style.display = 'block';
+      panel.style.visibility = 'visible';
+      panel.style.opacity = '1';
+    });
+    
+    console.log('[App Init] Page1 visibility ensured');
+  }
 }
 
 /**
